@@ -5,9 +5,10 @@ import urllib
 import urllib2
 import time
 import subprocess
+import config
 from pprint import pprint
 
-USDEUR_URL = "FIXME"
+USDEUR_URL = "http://currency-api.appspot.com/api/USD/EUR.json?key=" + config.currency_api_key
 
 class USDEUR_Rate:
     filename = "usdeur.json"
