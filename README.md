@@ -4,7 +4,11 @@ Bitcoin arbitrage - opportunity detector
 
 # config
 
-Edit config.py file to setup your preferences and callback (like sending an email, a jabber msg, ...)
+First
+
+    cp src/config.py-example src/config.py
+
+Then edit config.py file to setup your preferences (watched markets) and callback (like sending an email, a jabber msg, run trading bot)
 
 It fetch data from bitcoincharts API (most of markets) and bitcoin-central API.
 
@@ -17,3 +21,6 @@ It fetch data from bitcoincharts API (most of markets) and bitcoin-central API.
     31/01/2013 13:18:29 - buy at 14.5500 (intrsngEUR) and sell at 15.5500 (bc2EUR) - 6.4309%
 
 
+# LICENSE
+
+MIT
