@@ -7,7 +7,7 @@ import time
 import subprocess
 from pprint import pprint
 
-USDEUR_URL = "http://currency-api.appspot.com/api/USD/EUR.json?key=7c39adea3d9de51587da396d4f268db4aafa9b28"
+USDEUR_URL = "FIXME"
 
 class USDEUR_Rate:
     filename = "usdeur.json"
