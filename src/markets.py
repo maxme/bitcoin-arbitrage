@@ -4,6 +4,7 @@ import json
 import urllib
 import urllib2
 import time
+import config
 from pprint import pprint
 
 MARKETS_URL = "http://bitcoincharts.com/t/markets.json"
@@ -72,9 +73,7 @@ def check_arbitrage_opportunity(json_data):
     filtered = []
     res = []
     for i in data:
-        #if i["currency"] == "EUR":
-        #    print i["symbol"]
-        if i["symbol"] in ["mtgoxEUR", "intrsngEUR", "bc2EUR"]:
+        if i["symbol"] in config.watched_markets:
             filtered.append(i)
     print "ticker " + format_symbols(filtered)
     for i in filtered:
