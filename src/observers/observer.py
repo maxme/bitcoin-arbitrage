@@ -1,0 +1,3 @@
+class Observer(object):
+    pass
+
