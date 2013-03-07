@@ -39,3 +39,4 @@ nosetests.xml
 
 # Project
 src/config.py
+old/
