@@ -1,8 +1,18 @@
+# watch the following markets
 markets = ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR"]
 
-# buy if > 5% profitable
-buy_threshold_percentage = 5
-
 # observers if any
-observers = ["Logger"]
+observers = ["Logger", "TraderBot"]
 
+#### Trader Bot Config
+
+# Access to Private APIs
+mtgox_key = "FIXME"
+mtgox_secret = "FIXME"
+
+bitcoincentral_username = "FIXME"
+bitcoincentral_password = "FIXME"
+
+# SafeGuards
+max_tx_volume = 10 # in BTC
+balance_margin = 0.05 # 5%
