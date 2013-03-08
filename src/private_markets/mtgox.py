@@ -90,7 +90,6 @@ class PrivateMtGox(Market):
             params.append(("price_int", str(price)))
 
         response = self._send_request(self.buy_url, params)
-        print response
         if response and "result" in response and response["result"] == "success":
             return response["return"]
         return None

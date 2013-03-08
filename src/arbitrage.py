@@ -21,7 +21,7 @@ class Arbitrer:
 
     def get_profit_for(self, mi, mj, kask, kbid):
         if self.depths[kask]["asks"][mi]["price"] >= self.depths[kbid]["bids"][mj]["price"]:
-            return 0, 0
+            return 0, 0, 0, 0
 
         max_amount_buy = 0
         for i in range(mi + 1):
@@ -58,7 +58,7 @@ class Arbitrer:
                 w_sellprice = (w_sellprice * (sell_total - amount) + price * amount) / sell_total
 
         profit = sell_total * w_sellprice - buy_total * w_buyprice
-        return profit, sell_total
+        return profit, sell_total, w_buyprice, w_sellprice
 
     def get_max_depth(self, kask, kbid):
         i = 0
@@ -77,24 +77,27 @@ class Arbitrer:
         maxi, maxj = self.get_max_depth(kask, kbid)
         best_profit = 0
         best_i, best_j = (0, 0)
+        best_w_buyprice, best_w_sellprice = (0, 0)
         best_volume = 0
         for i in range(maxi + 1):
             for j in range(maxj + 1):
-                profit, volume = self.get_profit_for(i, j, kask, kbid)
+                profit, volume, w_buyprice, w_sellprice = self.get_profit_for(i, j, kask, kbid)
                 if profit >= 0 and profit >= best_profit:
                     best_profit = profit
                     best_volume = volume
                     best_i, best_j = (i, j)
+                    best_w_buyprice, best_w_sellprice = (w_buyprice, w_sellprice)
         return best_profit, best_volume, self.depths[kask]["asks"][best_i]["price"],\
-               self.depths[kbid]["bids"][best_j]["price"]
+               self.depths[kbid]["bids"][best_j]["price"], best_w_buyprice, best_w_sellprice
 
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
         perc = (bid["price"] - ask["price"]) / bid["price"] * 100
-        profit, volume, buyprice, sellprice = self.arbitrage_depth_opportunity(kask, kbid)
-        logging.debug("buy at %.4f (%s) and sell at %.4f (%s) - %.4f%%" % (ask["price"], kask, bid["price"], kbid, perc))
+        profit, volume, buyprice, sellprice, weighted_buyprice,\
+                weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
         perc2 = (1 - (volume - (profit/buyprice)) / volume) * 100
         for observer in self.observers:
-            observer.opportunity(profit, volume, buyprice, kask, sellprice, kbid, perc2)
+            observer.opportunity(profit, volume, buyprice, kask, sellprice, kbid,
+                                 perc2, weighted_buyprice, weighted_sellprice)
 
     def update_depths(self):
         self.depths = {}
@@ -103,7 +106,7 @@ class Arbitrer:
 
     def tickers(self):
         for market in self.markets:
-            logging.info("ticker: " + market.name + " - " + str(market.get_ticker()))
+            logging.debug("ticker: " + market.name + " - " + str(market.get_ticker()))
 
     def loop(self):
         while True:
