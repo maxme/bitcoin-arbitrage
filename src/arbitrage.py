@@ -29,7 +29,7 @@ class Arbitrer:
         max_amount_sell = 0
         for j in range(mj + 1):
             max_amount_sell += self.depths[kbid]["bids"][j]["amount"]
-        max_amount = min(max_amount_buy, max_amount_sell)
+        max_amount = min(max_amount_buy, max_amount_sell, config.max_tx_volume)
 
         buy_total = 0
         w_buyprice = 0
@@ -62,10 +62,14 @@ class Arbitrer:
 
     def get_max_depth(self, kask, kbid):
         i = 0
-        j = 0
         while self.depths[kask]["asks"][i]["price"] < self.depths[kbid]["bids"][0]["price"]:
+            if i >= len(self.depths[kask]["asks"]) - 1:
+                break
             i += 1
+        j = 0
         while self.depths[kask]["asks"][0]["price"] < self.depths[kbid]["bids"][j]["price"]:
+            if j >= self.depths[kbid]["bids"][j]["price"]:
+                break
             j += 1
         return i, j
 
@@ -91,7 +95,6 @@ class Arbitrer:
         perc2 = (1 - (volume - (profit/buyprice)) / volume) * 100
         for observer in self.observers:
             observer.opportunity(profit, volume, buyprice, kask, sellprice, kbid, perc2)
-
 
     def update_depths(self):
         self.depths = {}
