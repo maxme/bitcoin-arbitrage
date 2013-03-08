@@ -25,8 +25,10 @@ class TraderBot(Observer):
             return
         if kask not in self.clients:
             logging.warn("Can't automate this trade, client not available: %s" % (kask))
+            return
         if kbid not in self.clients:
             logging.warn("Can't automate this trade, client not available: %s" % (kbid))
+            return
         volume = min(config.max_tx_volume, volume)
 
         # Check balances
