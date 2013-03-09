@@ -24,14 +24,14 @@ class MockMarket(object):
                 pass
 
     def buy(self, volume, price):
-        logging.info("buy %f BTC @ %f on %s" % (volume, price, self.name))
+        logging.info("execute buy %f BTC @ %f on %s" % (volume, price, self.name))
         self.eur_balance -= price * volume
         self.btc_balance += volume - volume * self.fee
         if self.persistent:
             self.save()
 
     def sell(self, volume, price):
-        logging.info("sell %f BTC @ %f on %s" % (volume, price, self.name))
+        logging.info("execute sell %f BTC @ %f on %s" % (volume, price, self.name))
         self.btc_balance -= volume
         self.eur_balance += price * volume - price * volume * self.fee
         if self.persistent:

@@ -37,6 +37,19 @@ depths2 = {
               {'amount': 5, 'price': 32.6},
               {'amount': 10, 'price': 32.3}]}}
 
+depths3 = {
+    'BitcoinCentralEUR':
+    {'asks': [{'amount': 1, 'price': 34.2},
+              {'amount': 2, 'price': 34.3},
+              {'amount': 3, 'price': 34.5},
+              {'amount': 3, 'price': 35.0}]},
+    'MtGoxEUR':
+    {'bids': [{'amount': 2, 'price': 33.2},
+              {'amount': 3, 'price': 33.1},
+              {'amount': 5, 'price': 32.6},
+              {'amount': 10, 'price': 32.3}]}}
+
+
 
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
@@ -44,15 +57,19 @@ class TestArbitrage(unittest.TestCase):
 
     def test_getprofit1(self):
         self.arbitrer.depths = depths2
-        profit, vol = self.arbitrer.get_profit_for(0, 0, 'BitcoinCentralEUR', 'MtGoxEUR')
+        profit, vol, wb, ws = self.arbitrer.get_profit_for(0, 0, 'BitcoinCentralEUR', 'MtGoxEUR')
         assert(80 == int(profit * 100))
         assert(vol == 2)
 
     def test_getprofit2(self):
         self.arbitrer.depths = depths2
-        profit, vol = self.arbitrer.get_profit_for(2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
+        profit, vol, wb, ws = self.arbitrer.get_profit_for(2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
         print profit, vol
 
+    def test_getprofit3(self):
+        self.arbitrer.depths = depths3
+        profit, vol, wb, ws = self.arbitrer.get_profit_for(2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
+        print "profit=", profit, vol
 
 if __name__ == '__main__':
     unittest.main()

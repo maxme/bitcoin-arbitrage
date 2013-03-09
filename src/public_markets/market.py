@@ -1,4 +1,7 @@
 import time
+import urllib2
+import config
+import logging
 
 class Market(object):
     def __init__(self, currency):
@@ -9,15 +12,20 @@ class Market(object):
 
     def get_depth(self):
         timediff = time.time() - self.depth_updated
-        if (timediff > self.update_rate):
+        if timediff > self.update_rate:
             self.ask_update_depth()
-        # FIXME: debug
-        #self.depth = {"asks": self.depth["asks"][2:], "bids": self.depth["bids"][2:]}
+        timediff = time.time() - self.depth_updated
+        if timediff > config.market_expiration_time:
+            logging.warn('Market: %s order book is expired' % self.name)
+            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
         return self.depth
 
     def ask_update_depth(self):
-        self.update_depth()
-        self.depth_updated = time.time()
+        try:
+            self.update_depth()
+            self.depth_updated = time.time()
+        except Exception:
+            logging.error("HTTPError, can't update market: %s" % self.name)
 
     def get_ticker(self):
         depth = self.get_depth()
