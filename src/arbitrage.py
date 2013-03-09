@@ -5,7 +5,7 @@ import time
 import logging
 import json
 
-class Arbitrer:
+class Arbitrer(object):
     def __init__(self):
         self.markets = []
         self.observers = []
@@ -94,7 +94,9 @@ class Arbitrer:
         perc = (bid["price"] - ask["price"]) / bid["price"] * 100
         profit, volume, buyprice, sellprice, weighted_buyprice,\
                 weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
-        perc2 = (1 - (volume - (profit/buyprice)) / volume) * 100
+        if volume == 0 or buyprice == 0:
+            return
+        perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
         for observer in self.observers:
             observer.opportunity(profit, volume, buyprice, kask, sellprice, kbid,
                                  perc2, weighted_buyprice, weighted_sellprice)
@@ -112,6 +114,9 @@ class Arbitrer:
         while True:
             self.update_depths()
             self.tickers()
+            for observer in self.observers:
+                observer.begin_opportunity_finder(self.depths)
+
             for kmarket1 in self.depths:
                 for kmarket2 in self.depths:
                     if kmarket1 == kmarket2: # same market
@@ -120,6 +125,9 @@ class Arbitrer:
                     market2 = self.depths[kmarket2]
                     if float(market1["asks"][0]['price']) < float(market2["bids"][0]['price']):
                         self.arbitrage_opportunity(kmarket1, market1["asks"][0], kmarket2, market2["bids"][0])
+
+            for observer in self.observers:
+                observer.end_opportunity_finder()
             time.sleep(30)
 
 if __name__ == '__main__':
