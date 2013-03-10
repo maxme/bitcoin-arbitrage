@@ -10,11 +10,17 @@ class Arbitrer(object):
         self.markets = []
         self.observers = []
         self.depths = {}
-        for market_name in config.markets:
+        self.init_markets(config.markets)
+        self.init_observers(config.observers)
+
+    def init_markets(self, markets):
+        for market_name in markets:
             exec('import public_markets.' + market_name.lower())
             market =  eval('public_markets.' + market_name.lower() + '.' + market_name + '()')
             self.markets.append(market)
-        for observer_name in config.observers:
+
+    def init_observers(self, observers):
+        for observer_name in observers:
             exec('import observers.' + observer_name.lower())
             observer =  eval('observers.' + observer_name.lower() + '.' + observer_name + '()')
             self.observers.append(observer)
@@ -62,15 +68,17 @@ class Arbitrer(object):
 
     def get_max_depth(self, kask, kbid):
         i = 0
-        while self.depths[kask]["asks"][i]["price"] < self.depths[kbid]["bids"][0]["price"]:
-            if i >= len(self.depths[kask]["asks"]) - 1:
-                break
-            i += 1
+        if len(self.depths[kbid]["bids"]) != 0 and len(self.depths[kask]["asks"]) != 0:
+            while self.depths[kask]["asks"][i]["price"] < self.depths[kbid]["bids"][0]["price"]:
+                if i >= len(self.depths[kask]["asks"]) - 1:
+                    break
+                i += 1
         j = 0
-        while self.depths[kask]["asks"][0]["price"] < self.depths[kbid]["bids"][j]["price"]:
-            if j >= self.depths[kbid]["bids"][j]["price"]:
-                break
-            j += 1
+        if len(self.depths[kask]["asks"]) != 0 and len(self.depths[kbid]["bids"]) != 0:
+            while self.depths[kask]["asks"][0]["price"] < self.depths[kbid]["bids"][j]["price"]:
+                if j >= len(self.depths[kbid]["bids"]) - 1:
+                    break
+                j += 1
         return i, j
 
     def arbitrage_depth_opportunity(self, kask, kbid):
@@ -102,35 +110,69 @@ class Arbitrer(object):
                                  perc2, weighted_buyprice, weighted_sellprice)
 
     def update_depths(self):
-        self.depths = {}
+        depths = {}
         for market in self.markets:
-            self.depths[market.name] = market.get_depth()
+            depths[market.name] = market.get_depth()
+        return depths
 
     def tickers(self):
         for market in self.markets:
             logging.debug("ticker: " + market.name + " - " + str(market.get_ticker()))
 
+
+    def replay_history(self, directory):
+        import os
+        import json
+        import pprint
+        files = os.listdir(directory)
+        files.sort()
+        for f in files:
+            self.depths = json.load(open(directory + '/' + f, 'r'))
+            self.tick()
+
+    def tick(self):
+        for observer in self.observers:
+            observer.begin_opportunity_finder(self.depths)
+
+        for kmarket1 in self.depths:
+            for kmarket2 in self.depths:
+                if kmarket1 == kmarket2: # same market
+                    continue
+                market1 = self.depths[kmarket1]
+                market2 = self.depths[kmarket2]
+                if float(market1["asks"][0]['price']) < float(market2["bids"][0]['price']):
+                    self.arbitrage_opportunity(kmarket1, market1["asks"][0], kmarket2, market2["bids"][0])
+
+        for observer in self.observers:
+            observer.end_opportunity_finder()
+
+
     def loop(self):
         while True:
-            self.update_depths()
+            self.depths = self.update_depths()
             self.tickers()
-            for observer in self.observers:
-                observer.begin_opportunity_finder(self.depths)
-
-            for kmarket1 in self.depths:
-                for kmarket2 in self.depths:
-                    if kmarket1 == kmarket2: # same market
-                        continue
-                    market1 = self.depths[kmarket1]
-                    market2 = self.depths[kmarket2]
-                    if float(market1["asks"][0]['price']) < float(market2["bids"][0]['price']):
-                        self.arbitrage_opportunity(kmarket1, market1["asks"][0], kmarket2, market2["bids"][0])
-
-            for observer in self.observers:
-                observer.end_opportunity_finder()
+            self.tick()
             time.sleep(30)
 
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
+def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--verbose", help="more verbose", action="store_true")
+    parser.add_argument("-r", "--replay-history", type=str, help="replay history from a directory")
+    parser.add_argument("-o", "--observers", type=str, help="observers")
+    args = parser.parse_args()
+    level = logging.INFO
+    if args.verbose:
+        level = logging.DEBUG
+    logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=level)
     arbitrer = Arbitrer()
-    arbitrer.loop()
+    if args.replay_history:
+        # reset observers
+        if args.observers:
+            arbitrer.init_observers(args.observers.split(","))
+        arbitrer.replay_history(args.replay_history)
+    else:
+        arbitrer.loop()
+
+if __name__ == '__main__':
+    main()
