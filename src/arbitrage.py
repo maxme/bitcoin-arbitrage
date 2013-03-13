@@ -14,12 +14,14 @@ class Arbitrer(object):
         self.init_observers(config.observers)
 
     def init_markets(self, markets):
+        self.market_names = markets
         for market_name in markets:
             exec('import public_markets.' + market_name.lower())
             market =  eval('public_markets.' + market_name.lower() + '.' + market_name + '()')
             self.markets.append(market)
 
     def init_observers(self, observers):
+        self.observer_names = observers
         for observer_name in observers:
             exec('import observers.' + observer_name.lower())
             observer =  eval('observers.' + observer_name.lower() + '.' + observer_name + '()')
@@ -119,7 +121,6 @@ class Arbitrer(object):
         for market in self.markets:
             logging.debug("ticker: " + market.name + " - " + str(market.get_ticker()))
 
-
     def replay_history(self, directory):
         import os
         import json
@@ -127,7 +128,11 @@ class Arbitrer(object):
         files = os.listdir(directory)
         files.sort()
         for f in files:
-            self.depths = json.load(open(directory + '/' + f, 'r'))
+            depths = json.load(open(directory + '/' + f, 'r'))
+            self.depths = {}
+            for market in self.market_names:
+                if market in depths:
+                    self.depths[market] = depths[market]
             self.tick()
 
     def tick(self):
@@ -146,7 +151,6 @@ class Arbitrer(object):
         for observer in self.observers:
             observer.end_opportunity_finder()
 
-
     def loop(self):
         while True:
             self.depths = self.update_depths()
@@ -160,6 +164,7 @@ def main():
     parser.add_argument("-v", "--verbose", help="more verbose", action="store_true")
     parser.add_argument("-r", "--replay-history", type=str, help="replay history from a directory")
     parser.add_argument("-o", "--observers", type=str, help="observers")
+    parser.add_argument("-m", "--markets", type=str, help="markets")
     args = parser.parse_args()
     level = logging.INFO
     if args.verbose:
@@ -167,9 +172,10 @@ def main():
     logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=level)
     arbitrer = Arbitrer()
     if args.replay_history:
-        # reset observers
         if args.observers:
             arbitrer.init_observers(args.observers.split(","))
+        if args.markets:
+            arbitrer.init_markets(args.markets.split(","))
         arbitrer.replay_history(args.replay_history)
     else:
         arbitrer.loop()
