@@ -24,11 +24,11 @@ class Market(object):
         return self.depth
 
     def ask_update_depth(self):
-        ## try:
-        self.update_depth()
-        self.depth_updated = time.time()
-        ## except Exception:
-        ##     logging.error("HTTPError, can't update market: %s" % self.name)
+        try:
+            self.update_depth()
+            self.depth_updated = time.time()
+        except Exception:
+            logging.error("HTTPError, can't update market: %s" % self.name)
 
     def get_ticker(self):
         depth = self.get_depth()
