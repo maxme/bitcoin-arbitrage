@@ -55,12 +55,14 @@ class TraderBotSim(TraderBot):
         self.btcentral = MockMarket("bitcoin-central")
         self.intersango = MockMarket("intersango")
         self.bitcoin24 = MockMarket("bitcoin24")
+        self.bitstamp = MockMarket("bitstamp", 0.005) # 0.5% fee
         self.clients = {
             "MtGoxEUR": self.mtgox,
             "MtGoxUSD": self.mtgox,
             "BitcoinCentralEUR": self.btcentral,
             "Bitcoin24EUR": self.bitcoin24,
-            "IntersangoEUR": self.intersango
+            "IntersangoEUR": self.intersango,
+            "BitstampEUR": self.bitstamp,
             }
         self.profit_thresh = 1 # in EUR
         self.perc_thresh = 0.1 # in %
