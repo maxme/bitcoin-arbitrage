@@ -1,8 +1,12 @@
 # watch the following markets
+# ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR", "Bitcoin24EUR", "BitstampEUR"]
 markets = ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR"]
 
 # observers if any
+# ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper"]
 observers = ["Logger", "TraderBot"]
+
+market_expiration_time = 120 # in seconds: 2 minutes
 
 #### Trader Bot Config
 
