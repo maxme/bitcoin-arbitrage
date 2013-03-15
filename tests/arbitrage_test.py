@@ -64,12 +64,15 @@ class TestArbitrage(unittest.TestCase):
     def test_getprofit2(self):
         self.arbitrer.depths = depths2
         profit, vol, wb, ws = self.arbitrer.get_profit_for(2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
-        print profit, vol
+        assert(159 == int(profit * 100))
+        assert(vol == 5)
+
 
     def test_getprofit3(self):
         self.arbitrer.depths = depths3
         profit, vol, wb, ws = self.arbitrer.get_profit_for(2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
-        print "profit=", profit, vol
+        assert(profit == 0)
+        assert(vol == 0)
 
 if __name__ == '__main__':
     unittest.main()
