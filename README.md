@@ -9,7 +9,7 @@ It gets order books from supported exchanges API, currently:
  - Bitstamp
  - MtGox
 
-To add a new exchange see this doc/add-new-exchange.md
+To add a new exchange see this [doc/add-new-exchange.md](doc/add-new-exchange.md)
 
 # WARNING
 
