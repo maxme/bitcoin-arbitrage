@@ -45,6 +45,9 @@ opportunities.
 # TODO
 
  * Tests
+ * Add other exchanges:
+   * btc-e
+   * icbit
  * Update order books with a WebSocket client for supported exchanges (MtGox, Bitcoin-Central)
  * Better documentation
  * Add fiat currency converters USD / EUR
@@ -52,7 +55,7 @@ opportunities.
  * Better history handling for observer "HistoryDumper" (Redis ?)
  * Move EUR / USD from a market to an other:
    * Coupons
-   *
+   * Ripple ?
    * Negative Operations
 
 # LICENSE
