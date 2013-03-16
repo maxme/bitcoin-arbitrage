@@ -10,7 +10,7 @@ from traderbot import TraderBot
 import json
 
 class MockMarket(object):
-    def __init__(self, name, fee=0, eur_balance=500., btc_balance=25., persistent=True):
+    def __init__(self, name, fee=0, eur_balance=500., btc_balance=15., persistent=True):
         self.name = name
         self.filename = "traderbot-sim-" + name + ".json"
         self.eur_balance = eur_balance
@@ -70,7 +70,8 @@ class TraderBotSim(TraderBot):
         self.last_trade = 0
 
     def total_balance(self, price):
-        return self.mtgox.balance_total(price) + self.btcentral.balance_total(price)
+        market_balances = [i.balance_total(price) for i in set(self.clients.values())]
+        return sum(market_balances)
 
     def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice):
         self.clients[kask].buy(volume, weighted_buyprice)
