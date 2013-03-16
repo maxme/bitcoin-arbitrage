@@ -1,19 +1,26 @@
 # bitcoin-arbitrage - opportunity detector and automated trading
 
-Bitcoin arbitrage - opportunity detector.
+It gets order books from supported exchanges and calculate arbitrage
+opportunities between each markets. It takes market depth into account.
 
-It gets order books from supported exchanges API, currently:
+Currently supported exchanges to get data:
  - Bitcoin24
  - Bitcoin-Central
  - Intersango
  - Bitstamp
  - MtGox
 
+Currently supported exchanges to automate trade:
+ - Bitcoin-Central
+ - MtGox
+
 To add a new exchange see this [doc/add-new-exchange.md](doc/add-new-exchange.md)
+
+Donation are always welcome: 1Maxime7WnLqq24hasMA872JZ4VBGMDbKk
 
 # WARNING
 
-**Real trading bots are included in this version. Don't use them if you don't know what you are doing.**
+**Real trading bots are included. Don't put your API keys in config.py if you don't know what you are doing.**
 
 # Configuration
 
@@ -29,6 +36,11 @@ Then edit config.py file to setup your preferences: watched markets and observer
     2013-03-12 03:52:14,356 [INFO] profit: 66.283642 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (BitcoinCentralEUR) ~22.59%
     2013-03-12 03:52:14,357 [INFO] profit: 31.811390 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (IntersangoEUR) ~10.84%
     2013-03-12 03:52:45,090 [INFO] profit: 9.774324 EUR with volume: 10 BTC - buy at 35.3630 (Bitcoin24EUR) sell at 35.4300 (BitcoinCentralEUR) ~2.76%
+
+Note, this example is real, it has happened when the blockchain
+forked. MtGox is a very reactive market, price dropped significally in
+1 hour, this kind of situation opens very good arbitrage
+opportunities.
 
 # TODO
 
