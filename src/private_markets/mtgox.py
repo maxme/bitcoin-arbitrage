@@ -76,12 +76,12 @@ class PrivateMtGox(Market):
             return json.loads(jsonstr)
         return None
 
-    def trade(self, amount, currency, ttype, price=None):
+    def trade(self, amount, ttype, price=None):
         if price:
-            price = self._to_int_price(price, currency)
+            price = self._to_int_price(price, self.currency)
         amount = self._to_int_amount(amount)
 
-        self.buy_url["url"] = self._change_currency_url(self.buy_url["url"], currency)
+        self.buy_url["url"] = self._change_currency_url(self.buy_url["url"], self.currency)
 
         params = [ ("nonce", self._create_nonce()),
                    ("amount_int", str(amount)),
@@ -94,11 +94,11 @@ class PrivateMtGox(Market):
             return response["return"]
         return None
 
-    def buy(self, amount, currency, price=None):
-        return self.trade(amount, currency, "bid", price)
+    def buy(self, amount, price=None):
+        return self.trade(amount, "bid", price)
 
-    def sell(self, amount, currency, price=None):
-        return self.trade(amount, currency, "ask", price)
+    def sell(self, amount, price=None):
+        return self.trade(amount, "ask", price)
 
     def get_info(self):
         params = [ ("nonce", self._create_nonce()) ]
