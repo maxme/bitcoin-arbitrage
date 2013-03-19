@@ -4,6 +4,7 @@ import urllib2
 import json
 from market import Market
 
+
 class BtceUSD(Market):
     def __init__(self):
         super(BtceUSD, self).__init__("USD")

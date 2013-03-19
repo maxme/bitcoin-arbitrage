@@ -4,14 +4,18 @@ import sys
 import websocket
 websocket._debug = True
 
+
 def on_message(ws, message):
     print message
+
 
 def on_error(ws, error):
     print error
 
+
 def on_close(ws):
     print "### closed ###"
+
 
 def on_open(ws):
     def run(*args):

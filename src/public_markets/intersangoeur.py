@@ -2,6 +2,7 @@ import urllib2
 import json
 from market import Market
 
+
 class IntersangoEUR(Market):
     def __init__(self):
         super(IntersangoEUR, self).__init__("EUR")
@@ -27,4 +28,3 @@ class IntersangoEUR(Market):
 if __name__ == "__main__":
     market = IntersangoEUR()
     print json.dumps(market.get_ticker())
-

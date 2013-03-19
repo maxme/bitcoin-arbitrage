@@ -1,5 +1,6 @@
 import abc
 
+
 class Observer(object):
     __metaclass__ = abc.ABCMeta
 
@@ -13,4 +14,3 @@ class Observer(object):
     @abc.abstractmethod
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
         pass
-

@@ -50,7 +50,6 @@ depths3 = {
               {'amount': 10, 'price': 32.3}]}}
 
 
-
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
         self.arbitrer = arbitrage.Arbitrer()
@@ -67,7 +66,6 @@ class TestArbitrage(unittest.TestCase):
         assert(159 == int(profit * 100))
         assert(vol == 5)
 
-
     def test_getprofit3(self):
         self.arbitrer.depths = depths3
         profit, vol, wb, ws = self.arbitrer.get_profit_for(2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
@@ -76,4 +74,3 @@ class TestArbitrage(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

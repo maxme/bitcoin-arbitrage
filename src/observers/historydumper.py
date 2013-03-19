@@ -3,6 +3,7 @@ import json
 import time
 import os
 
+
 class HistoryDumper(Observer):
     out_dir = 'history/'
 
@@ -22,4 +23,3 @@ class HistoryDumper(Observer):
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
         pass
-

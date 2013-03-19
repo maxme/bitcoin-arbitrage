@@ -2,6 +2,7 @@ import urllib2
 import json
 from market import Market
 
+
 class Bitcoin24EUR(Market):
     def __init__(self):
         super(Bitcoin24EUR, self).__init__("EUR")
@@ -27,4 +28,3 @@ class Bitcoin24EUR(Market):
 if __name__ == "__main__":
     market = Bitcoin24EUR()
     print json.dumps(market.get_ticker())
-

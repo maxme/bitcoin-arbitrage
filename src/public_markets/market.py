@@ -6,6 +6,7 @@ sys.path.append(".")
 import config
 import logging
 
+
 class Market(object):
     def __init__(self, currency):
         self.name = self.__class__.__name__
@@ -45,4 +46,3 @@ class Market(object):
 
     def sell(self, price, amount):
         pass
-
