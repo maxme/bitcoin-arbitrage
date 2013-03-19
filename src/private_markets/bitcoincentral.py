@@ -65,7 +65,6 @@ class PrivateBitcoinCentral(Market):
 
     def buy(self, amount, price=None):
         response = self.trade(amount, "buy", price)
-        print response
 
     def sell(self, amount, price=None):
         response = self.trade(amount, "sell", price)
