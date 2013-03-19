@@ -3,6 +3,7 @@ import json
 import sys
 from market import Market
 
+
 class BitstampEUR(Market):
     def __init__(self):
         super(BitstampEUR, self).__init__("EUR")
@@ -32,4 +33,3 @@ class BitstampEUR(Market):
 if __name__ == "__main__":
     market = BitstampEUR()
     print market.get_ticker()
-

@@ -9,6 +9,7 @@ from private_markets import bitcoincentral
 from traderbot import TraderBot
 import json
 
+
 class MockMarket(object):
     def __init__(self, name, fee=0, eur_balance=500., btc_balance=15., persistent=True):
         self.name = name
@@ -49,13 +50,14 @@ class MockMarket(object):
     def balance_total(self, price):
         return self.eur_balance + self.btc_balance * price
 
+
 class TraderBotSim(TraderBot):
     def __init__(self):
-        self.mtgox = MockMarket("mtgox", 0.006) # 0.6% fee
+        self.mtgox = MockMarket("mtgox", 0.006)  # 0.6% fee
         self.btcentral = MockMarket("bitcoin-central")
         self.intersango = MockMarket("intersango")
         self.bitcoin24 = MockMarket("bitcoin24")
-        self.bitstamp = MockMarket("bitstamp", 0.005) # 0.5% fee
+        self.bitstamp = MockMarket("bitstamp", 0.005)  # 0.5% fee
         self.clients = {
             "MtGoxEUR": self.mtgox,
             "MtGoxUSD": self.mtgox,
@@ -63,9 +65,9 @@ class TraderBotSim(TraderBot):
             "Bitcoin24EUR": self.bitcoin24,
             "IntersangoEUR": self.intersango,
             "BitstampEUR": self.bitstamp,
-            }
-        self.profit_thresh = 1 # in EUR
-        self.perc_thresh = 0.1 # in %
+        }
+        self.profit_thresh = 1  # in EUR
+        self.perc_thresh = 0.1  # in %
         self.trade_wait = 120
         self.last_trade = 0
 
@@ -80,4 +82,3 @@ class TraderBotSim(TraderBot):
 if __name__ == "__main__":
     t = TraderBotSim()
     print t.total_balance(33)
-

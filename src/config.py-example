@@ -6,7 +6,7 @@ markets = ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR"]
 # ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
 observers = ["Logger"]
 
-market_expiration_time = 120 # in seconds: 2 minutes
+market_expiration_time = 120  # in seconds: 2 minutes
 
 #### Trader Bot Config
 # Access to Private APIs
@@ -28,4 +28,3 @@ smtp_login = 'FIXME'
 smtp_passwd = 'FIXME'
 smtp_from = 'FIXME'
 smtp_to = 'FIXME'
-

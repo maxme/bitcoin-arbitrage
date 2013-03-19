@@ -12,6 +12,7 @@ sys.path.append('.')
 import config
 from decimal import Decimal
 
+
 class PrivateBitcoinCentral(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
     trade_url = "https://bitcoin-central.net/api/v1/trade_orders/"
@@ -31,7 +32,7 @@ class PrivateBitcoinCentral(Market):
             'Content-type': 'application/json',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-            }
+        }
         if extra_headers is not None:
             for k, v in extra_headers.iteritems():
                 headers[k] = v
@@ -54,9 +55,8 @@ class PrivateBitcoinCentral(Market):
             return json.loads(jsonstr)
         return None
 
-
     def trade(self, amount, ttype, price=None):
-        #params = [("amount", amount), ("currency", self.currency), ("type", ttype)]
+        # params = [("amount", amount), ("currency", self.currency), ("type", ttype)]
         params = {"amount": amount, "currency": self.currency, "type": ttype}
         if price:
             params["price"] = price
@@ -78,7 +78,7 @@ class PrivateBitcoinCentral(Market):
             self.eur_balance = Decimal(response["EUR"])
 
     def __str__(self):
-        return str({ "btc_balance": self.btc_balance, "eur_balance": self.eur_balance })
+        return str({"btc_balance": self.btc_balance, "eur_balance": self.eur_balance})
 
 
 if __name__ == "__main__":

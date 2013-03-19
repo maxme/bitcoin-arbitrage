@@ -3,6 +3,7 @@ import json
 import logging
 from market import Market
 
+
 class MtGoxEUR(Market):
     def __init__(self):
         super(MtGoxEUR, self).__init__("EUR")

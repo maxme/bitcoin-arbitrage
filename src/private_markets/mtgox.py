@@ -13,13 +13,14 @@ import config
 import re
 from decimal import Decimal
 
+
 class PrivateMtGox(Market):
-    ticker_url = { "method": "GET", "url": "https://mtgox.com/api/1/BTCUSD/public/ticker" }
-    buy_url = { "method": "POST", "url": "https://mtgox.com/api/1/BTCUSD/private/order/add" }
-    sell_url = { "method": "POST", "url": "https://mtgox.com/api/1/BTCUSD/private/order/add" }
-    order_url = { "method": "POST", "url": "https://mtgox.com/api/1/generic/private/order/result" }
-    open_orders_url = { "method": "POST", "url": "https://mtgox.com/api/1/generic/private/orders" }
-    info_url = { "method": "POST", "url": "https://mtgox.com/api/1/generic/private/info" }
+    ticker_url = {"method": "GET", "url": "https://mtgox.com/api/1/BTCUSD/public/ticker"}
+    buy_url = {"method": "POST", "url": "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+    sell_url = {"method": "POST", "url": "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+    order_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/order/result"}
+    open_orders_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/orders"}
+    info_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/info"}
 
     def __init__(self):
         super(Market, self).__init__()
@@ -64,7 +65,7 @@ class PrivateMtGox(Market):
             'Content-type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-            }
+        }
         if extra_headers is not None:
             for k, v in extra_headers.iteritems():
                 headers[k] = v
@@ -83,9 +84,9 @@ class PrivateMtGox(Market):
 
         self.buy_url["url"] = self._change_currency_url(self.buy_url["url"], self.currency)
 
-        params = [ ("nonce", self._create_nonce()),
-                   ("amount_int", str(amount)),
-                   ("type", ttype) ]
+        params = [("nonce", self._create_nonce()),
+                  ("amount_int", str(amount)),
+                  ("type", ttype)]
         if price:
             params.append(("price_int", str(price)))
 
@@ -101,7 +102,7 @@ class PrivateMtGox(Market):
         return self.trade(amount, "ask", price)
 
     def get_info(self):
-        params = [ ("nonce", self._create_nonce()) ]
+        params = [("nonce", self._create_nonce())]
         response = self._send_request(self.info_url, params)
         if response and "result" in response and response["result"] == "success":
             self.btc_balance = self._from_int_amount(int(response["return"]["Wallets"]["BTC"]["Balance"]["value_int"]))
@@ -109,14 +110,13 @@ class PrivateMtGox(Market):
             return 1
         return None
 
-
     def __str__(self):
-        return str({ "btc_balance": self.btc_balance, "eur_balance": self.eur_balance })
+        return str({"btc_balance": self.btc_balance, "eur_balance": self.eur_balance})
 
 
 if __name__ == "__main__":
     mtgox = PrivateMtGox()
     mtgox.get_info()
-    #mtgox.buy(0.01, "EUR")
-    #mtgox.sell(0.01, "EUR")
+    # mtgox.buy(0.01, "EUR")
+    # mtgox.sell(0.01, "EUR")
     print mtgox

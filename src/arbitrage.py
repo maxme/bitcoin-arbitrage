@@ -5,6 +5,7 @@ import time
 import logging
 import json
 
+
 class Arbitrer(object):
     def __init__(self):
         self.markets = []
@@ -17,14 +18,14 @@ class Arbitrer(object):
         self.market_names = markets
         for market_name in markets:
             exec('import public_markets.' + market_name.lower())
-            market =  eval('public_markets.' + market_name.lower() + '.' + market_name + '()')
+            market = eval('public_markets.' + market_name.lower() + '.' + market_name + '()')
             self.markets.append(market)
 
     def init_observers(self, observers):
         self.observer_names = observers
         for observer_name in observers:
             exec('import observers.' + observer_name.lower())
-            observer =  eval('observers.' + observer_name.lower() + '.' + observer_name + '()')
+            observer = eval('observers.' + observer_name.lower() + '.' + observer_name + '()')
             self.observers.append(observer)
 
     def get_profit_for(self, mi, mj, kask, kbid):
@@ -98,12 +99,12 @@ class Arbitrer(object):
                     best_i, best_j = (i, j)
                     best_w_buyprice, best_w_sellprice = (w_buyprice, w_sellprice)
         return best_profit, best_volume, self.depths[kask]["asks"][best_i]["price"],\
-               self.depths[kbid]["bids"][best_j]["price"], best_w_buyprice, best_w_sellprice
+            self.depths[kbid]["bids"][best_j]["price"], best_w_buyprice, best_w_sellprice
 
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
         perc = (bid["price"] - ask["price"]) / bid["price"] * 100
         profit, volume, buyprice, sellprice, weighted_buyprice,\
-                weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
+            weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
         if volume == 0 or buyprice == 0:
             return
         perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
@@ -141,7 +142,7 @@ class Arbitrer(object):
 
         for kmarket1 in self.depths:
             for kmarket2 in self.depths:
-                if kmarket1 == kmarket2: # same market
+                if kmarket1 == kmarket2:  # same market
                     continue
                 market1 = self.depths[kmarket1]
                 market2 = self.depths[kmarket2]
@@ -157,6 +158,7 @@ class Arbitrer(object):
             self.tickers()
             self.tick()
             time.sleep(30)
+
 
 def main():
     import argparse
