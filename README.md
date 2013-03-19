@@ -17,7 +17,7 @@ Currently supported exchanges to automate trade:
 
 To add a new exchange see this [doc/add-new-exchange.md](doc/add-new-exchange.md)
 
-Donation are always welcome: 1Maxime7WnLqq24hasMA872JZ4VBGMDbKk
+Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 
 # WARNING
 
@@ -41,7 +41,7 @@ Then edit config.py file to setup your preferences: watched markets and observer
 Note, this example is real, it has happened when the blockchain
 forked. MtGox is a very reactive market, price dropped significally in
 1 hour, this kind of situation opens very good arbitrage
-opportunities.
+opportunities with slower exchanges.
 
 # TODO
 
