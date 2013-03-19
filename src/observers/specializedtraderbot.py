@@ -17,7 +17,7 @@ class SpecializedTraderBot(Observer):
         }
         self.profit_thresholds = {  # Graph
             "MtGoxEUR": {"BitcoinCentralEUR": 10},
-            "BitcoinCentralEUR": {"MtGoxEUR": 1},
+            "BitcoinCentralEUR": {"MtGoxEUR": 2},
         }
         self.trade_wait = 60 * 3  # in seconds
         self.last_trade = 0
@@ -59,6 +59,7 @@ class SpecializedTraderBot(Observer):
                          % (volume, config.min_tx_volume))
             return
 
+        current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
             logging.warn("Can't automate this trade, last trade occured %s seconds ago" % (
                 current_time - self.last_trade))
