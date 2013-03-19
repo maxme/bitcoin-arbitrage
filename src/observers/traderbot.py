@@ -16,8 +16,8 @@ class TraderBot(Observer):
             "BitcoinCentralEUR": self.btcentral,
             "BitcoinCentralUSD": self.btcentral
         }
-        self.profit_thresh = 5  # in EUR
-        self.perc_thresh = 2  # in %
+        self.profit_thresh = config.profit_thresh  # in EUR
+        self.perc_thresh = config.perc_thresh  # in %
         self.trade_wait = 120  # in seconds
         self.last_trade = 0
         self.potential_trades = []
