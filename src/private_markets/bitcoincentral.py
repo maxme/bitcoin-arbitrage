@@ -1,16 +1,14 @@
 from market import Market
 import time
 import base64
-import hmac
-import urllib
 import urllib2
-import hashlib
 import sys
 import json
 sys.path.append('../')
 sys.path.append('.')
 import config
 from decimal import Decimal
+
 
 class PrivateBitcoinCentral(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
@@ -31,7 +29,7 @@ class PrivateBitcoinCentral(Market):
             'Content-type': 'application/json',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-            }
+        }
         if extra_headers is not None:
             for k, v in extra_headers.iteritems():
                 headers[k] = v
@@ -41,22 +39,24 @@ class PrivateBitcoinCentral(Market):
             req = urllib2.Request(url, json.dumps(params), headers=headers)
         else:
             req = urllib2.Request(url, headers=headers)
-        base64string = base64.encodestring('%s:%s' % (self.username, self.password)).replace('\n', '')
+        base64string = base64.encodestring('%s:%s'
+                                           % (self.username,
+                                           self.password)).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
         code = 422
         try:
             response = urllib2.urlopen(req)
             code = response.getcode()
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             code = 422
         if code == 200:
             jsonstr = response.read()
             return json.loads(jsonstr)
         return None
 
-
     def trade(self, amount, ttype, price=None):
-        #params = [("amount", amount), ("currency", self.currency), ("type", ttype)]
+        # params = [("amount", amount), ("currency", self.currency),
+        #           ("type", ttype)]
         params = {"amount": amount, "currency": self.currency, "type": ttype}
         if price:
             params["price"] = price
@@ -78,11 +78,10 @@ class PrivateBitcoinCentral(Market):
             self.eur_balance = Decimal(response["EUR"])
 
     def __str__(self):
-        return str({ "btc_balance": self.btc_balance, "eur_balance": self.eur_balance })
+        return str({"btc_balance": self.btc_balance,
+                    "eur_balance": self.eur_balance})
 
 
 if __name__ == "__main__":
     mtgox = PrivateBitcoinCentral()
-#    mtgox.buy(0.01)
-#    mtgox.sell(0.01)
     print mtgox
