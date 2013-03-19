@@ -5,7 +5,7 @@ markets = ["MtGoxEUR",
            "IntersangoEUR"]
 
 # observers if any
-# ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper"]
+# ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
 observers = ["Logger"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
