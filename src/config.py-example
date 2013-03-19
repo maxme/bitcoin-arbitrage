@@ -3,13 +3,12 @@
 markets = ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR"]
 
 # observers if any
-# ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper"]
+# ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
 observers = ["Logger"]
 
 market_expiration_time = 120 # in seconds: 2 minutes
 
 #### Trader Bot Config
-
 # Access to Private APIs
 mtgox_key = "FIXME"
 mtgox_secret = "FIXME"
@@ -18,5 +17,15 @@ bitcoincentral_username = "FIXME"
 bitcoincentral_password = "FIXME"
 
 # SafeGuards
-max_tx_volume = 10 # in BTC
-balance_margin = 0.05 # 5%
+max_tx_volume = 10  # in BTC
+balance_margin = 0.05  # 5%
+profit_thresh = 1  # in EUR
+perc_thresh = 2  # in %
+
+#### Emailer Observer Config
+smtp_host = 'FIXME'
+smtp_login = 'FIXME'
+smtp_passwd = 'FIXME'
+smtp_from = 'FIXME'
+smtp_to = 'FIXME'
+
