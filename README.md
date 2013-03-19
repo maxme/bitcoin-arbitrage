@@ -9,6 +9,7 @@ Currently supported exchanges to get data:
  - Intersango
  - Bitstamp
  - MtGox
+ - BTC-e
 
 Currently supported exchanges to automate trade:
  - Bitcoin-Central
@@ -46,7 +47,6 @@ opportunities.
 
  * Tests
  * Add other exchanges:
-   * btc-e
    * icbit
  * Update order books with a WebSocket client for supported exchanges (MtGox, Bitcoin-Central)
  * Better documentation
