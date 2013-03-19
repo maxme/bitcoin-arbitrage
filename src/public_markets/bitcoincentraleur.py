@@ -2,6 +2,7 @@ import urllib2
 import json
 from market import Market
 
+
 class BitcoinCentralEUR(Market):
     def __init__(self):
         super(BitcoinCentralEUR, self).__init__("EUR")
@@ -10,7 +11,8 @@ class BitcoinCentralEUR(Market):
         self.update_rate = 24 * 60 * 60 / 2500
 
     def update_depth(self):
-        res = urllib2.urlopen('https://bitcoin-central.net/api/v1/depth?currency=EUR')
+        res = urllib2.urlopen(
+            'https://bitcoin-central.net/api/v1/depth?currency=EUR')
         depth = json.loads(res.read())
         self.depth = self.format_depth(depth)
 
@@ -18,7 +20,8 @@ class BitcoinCentralEUR(Market):
         l.sort(key=lambda x: float(x['price']), reverse=reverse)
         r = []
         for i in l:
-            r.append({'price': float(i['price']), 'amount': float(i['amount'])})
+            r.append({'price': float(i['price']),
+                     'amount': float(i['amount'])})
         return r
 
     def format_depth(self, depth):
@@ -29,4 +32,3 @@ class BitcoinCentralEUR(Market):
 if __name__ == "__main__":
     market = BitcoinCentralEUR()
     print market.get_ticker()
-

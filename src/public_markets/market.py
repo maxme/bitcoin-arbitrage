@@ -1,10 +1,10 @@
 import time
-import urllib2
 import sys
 sys.path.append("../")
 sys.path.append(".")
 import config
 import logging
+
 
 class Market(object):
     def __init__(self, currency):
@@ -20,7 +20,8 @@ class Market(object):
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
             logging.warn('Market: %s order book is expired' % self.name)
-            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
+            self.depth = {'asks': [{'price': 0, 'amount': 0}],
+                          'bids': [{'price': 0, 'amount': 0}]}
         return self.depth
 
     def ask_update_depth(self):
@@ -45,4 +46,3 @@ class Market(object):
 
     def sell(self, price, amount):
         pass
-

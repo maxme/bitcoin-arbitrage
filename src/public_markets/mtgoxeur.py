@@ -3,13 +3,15 @@ import json
 import logging
 from market import Market
 
+
 class MtGoxEUR(Market):
     def __init__(self):
         super(MtGoxEUR, self).__init__("EUR")
         self.update_rate = 60
 
     def update_depth(self):
-        res = urllib2.urlopen('https://data.mtgox.com/api/0/data/getDepth.php?Currency=EUR')
+        res = urllib2.urlopen(
+            'https://data.mtgox.com/api/0/data/getDepth.php?Currency=EUR')
         jsonstr = res.read()
         try:
             depth = json.loads(jsonstr)
