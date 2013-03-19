@@ -1,5 +1,3 @@
-
-
 import urllib2
 import json
 from market import Market
