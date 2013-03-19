@@ -9,12 +9,12 @@ class MtGoxEUR(Market):
         self.update_rate = 60
 
     def update_depth(self):
-        res = urllib2.urlopen('https://mtgox.com/api/0/data/getDepth.php?Currency=EUR')
+        res = urllib2.urlopen('https://data.mtgox.com/api/0/data/getDepth.php?Currency=EUR')
         jsonstr = res.read()
         try:
             depth = json.loads(jsonstr)
             self.depth = self.format_depth(depth)
-        except e:
+        except Exception:
             logging.warn("Can't parse json:" + jsonstr)
 
     def sort_and_format(self, l, reverse=False):
