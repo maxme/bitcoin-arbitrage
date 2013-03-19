@@ -17,7 +17,7 @@ class SpecializedTraderBot(Observer):
         }
         self.profit_thresholds = {  # Graph
             "MtGoxEUR": {"BitcoinCentralEUR": 10},
-            "BitcoinCentralEUR": {"MtGoxEUR": 2},
+            "BitcoinCentralEUR": {"MtGoxEUR": 4},
         }
         self.trade_wait = 60 * 3  # in seconds
         self.last_trade = 0
