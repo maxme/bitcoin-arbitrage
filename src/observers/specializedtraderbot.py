@@ -61,7 +61,7 @@ class SpecializedTraderBot(Observer):
         max_volume = self.get_min_tradeable_volume(buyprice, self.clients[kask].eur_balance,
                                                    self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
-        logging.debug("max evaluated volume=%f" % volume)
+
         if volume < config.min_tx_volume:
             logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f"
                          % (volume, config.min_tx_volume))
@@ -75,13 +75,10 @@ class SpecializedTraderBot(Observer):
 
         self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice])
 
-    def watch_balances(self):
-        pass
-
     def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
-        send_email("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid),
+        send_email("Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),
                    "weighted_buyprice=%f weighted_sellprice=%f" % (weighted_buyprice, weighted_sellprice))
         self.clients[kask].buy(volume)
         self.clients[kbid].sell(volume)
