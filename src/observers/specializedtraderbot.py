@@ -17,9 +17,9 @@ class SpecializedTraderBot(Observer):
         }
         self.profit_thresholds = {  # Graph
             "MtGoxEUR": {"BitcoinCentralEUR": 10},
-            "BitcoinCentralEUR": {"MtGoxEUR": 4},
+            "BitcoinCentralEUR": {"MtGoxEUR": 5},
         }
-        self.trade_wait = 60 * 3  # in seconds
+        self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0
         self.potential_trades = []
 
@@ -38,6 +38,10 @@ class SpecializedTraderBot(Observer):
         min2 = float(btc_bal) / (1 + config.balance_margin)
         return min(min1, min2)
 
+    def update_balance(self):
+        for kclient in self.clients:
+            self.clients[kclient].get_info()
+
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
         if kask not in self.clients:
             logging.warn("Can't automate this trade, client not available: %s" % (kask))
@@ -50,10 +54,14 @@ class SpecializedTraderBot(Observer):
                          % (profit, self.profit_thresholds[kask][kbid]))
             return
 
+        # Update client balance
+        self.update_balance()
+
         # maximum volume transaction with current balances
         max_volume = self.get_min_tradeable_volume(buyprice, self.clients[kask].eur_balance,
                                                    self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
+        logging.debug("max evaluated volume=%f" % volume)
         if volume < config.min_tx_volume:
             logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f"
                          % (volume, config.min_tx_volume))
