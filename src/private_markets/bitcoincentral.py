@@ -55,8 +55,6 @@ class PrivateBitcoinCentral(Market):
         return None
 
     def trade(self, amount, ttype, price=None):
-        # params = [("amount", amount), ("currency", self.currency),
-        #           ("type", ttype)]
         params = {"amount": amount, "currency": self.currency, "type": ttype}
         if price:
             params["price"] = price
@@ -78,10 +76,10 @@ class PrivateBitcoinCentral(Market):
             self.eur_balance = Decimal(response["EUR"])
 
     def __str__(self):
-        return str({"btc_balance": self.btc_balance,
-                    "eur_balance": self.eur_balance})
+        return str({"btc_balance": self.btc_balance, "eur_balance": self.eur_balance})
 
 
 if __name__ == "__main__":
     mtgox = PrivateBitcoinCentral()
     print mtgox
+

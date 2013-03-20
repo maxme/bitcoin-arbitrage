@@ -16,6 +16,7 @@ class TraderBot(Observer):
             "BitcoinCentralEUR": self.btcentral,
             "BitcoinCentralUSD": self.btcentral
         }
+
         self.profit_thresh = config.profit_thresh  # in EUR
         self.perc_thresh = config.perc_thresh  # in %
         self.trade_wait = 120  # in seconds
@@ -47,30 +48,25 @@ class TraderBot(Observer):
         volume = min(config.max_tx_volume, volume)
 
         # Check balances
-        if (volume * buyprice) * (1 + config.balance_margin) \
-                > self.clients[kask].eur_balance:
-            logging.warn("Can't automate this trade, not enough money on:"
-                         " %s - need %f got %f"
-                         % (kask, (volume * buyprice)
-                            * (1 + config.balance_margin),
+        if (volume * buyprice) * (1 + config.balance_margin) > self.clients[kask].eur_balance:
+            logging.warn("Can't automate this trade, not enough money on: %s - need %f got %f"
+                         % (kask, (volume * buyprice) * (1 + config.balance_margin),
                          self.clients[kask].eur_balance))
             return
-        if volume * (1 + config.balance_margin) > \
-                self.clients[kbid].btc_balance:
-            logging.warn("Can't automate this trade, not enough money on:"
-                         " %s - need %f got %f"
+        if volume * (1 + config.balance_margin) > self.clients[kbid].btc_balance:
+            logging.warn("Can't automate this trade, not enough money on: %s - need %f got %f"
                          % (kbid, volume * (1 + config.balance_margin),
                          self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
-            logging.warn("Can't automate this trade, last trade occured %s"
-                         " seconds ago" % (current_time - self.last_trade))
+            logging.warn("Can't automate this trade, last trade occured %s seconds ago" % (
+                current_time - self.last_trade))
             return
 
-        self.potential_trades.append([profit, volume, kask, kbid,
-                                      weighted_buyprice, weighted_sellprice])
+        self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice])
+
 
     def watch_balances(self):
         pass

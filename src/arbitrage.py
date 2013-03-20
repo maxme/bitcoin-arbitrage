@@ -17,16 +17,16 @@ class Arbitrer(object):
         self.market_names = markets
         for market_name in markets:
             exec('import public_markets.' + market_name.lower())
-            market = eval('public_markets.' + market_name.lower()
-                          + '.' + market_name + '()')
+            market = eval(
+                'public_markets.' + market_name.lower() + '.' + market_name + '()')
             self.markets.append(market)
 
     def init_observers(self, observers):
         self.observer_names = observers
         for observer_name in observers:
             exec('import observers.' + observer_name.lower())
-            observer = eval('observers.' + observer_name.lower()
-                            + '.' + observer_name + '()')
+            observer = eval(
+                'observers.' + observer_name.lower() + '.' + observer_name + '()')
             self.observers.append(observer)
 
     def get_profit_for(self, mi, mj, kask, kbid):
@@ -108,12 +108,11 @@ class Arbitrer(object):
                     best_profit = profit
                     best_volume = volume
                     best_i, best_j = (i, j)
-                    best_w_buyprice, best_w_sellprice = (w_buyprice,
-                                                         w_sellprice)
-        return best_profit, best_volume, \
-            self.depths[kask]["asks"][best_i]["price"], \
-            self.depths[kbid]["bids"][best_j]["price"], \
-            best_w_buyprice, best_w_sellprice
+                    best_w_buyprice, best_w_sellprice = (
+                        w_buyprice, w_sellprice)
+        return best_profit, best_volume, self.depths[kask]["asks"][best_i]["price"],\
+            self.depths[kbid]["bids"][best_j][
+                "price"], best_w_buyprice, best_w_sellprice
 
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
         # perc = (bid["price"] - ask["price"]) \
@@ -205,3 +204,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

@@ -15,20 +15,19 @@ from decimal import Decimal
 
 
 class PrivateMtGox(Market):
-    ticker_url = {"method": "GET",
-                  "url": "https://data.mtgox.com/api/1/BTCUSD/public/ticker"}
-    buy_url = {"method": "POST",
-               "url": "https://data.mtgox.com/api/1/BTCUSD/private/order/add"}
-    sell_url = {"method": "POST",
-                "url": "https://data.mtgox.com/api/1/BTCUSD/private/order/add"}
-    order_url = {"method": "POST",
-                 "url": "https://data.mtgox.com/api/1/"
-                 "generic/private/order/result"}
-    open_orders_url = {"method": "POST",
-                       "url": "https://data.mtgox.com/api/1/"
-                       "generic/private/orders"}
-    info_url = {"method": "POST",
-                "url": "https://data.mtgox.com/api/1/generic/private/info"}
+
+    ticker_url = {"method": "GET", "url":
+                  "https://mtgox.com/api/1/BTCUSD/public/ticker"}
+    buy_url = {"method": "POST", "url":
+               "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+    sell_url = {"method": "POST", "url":
+                "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+    order_url = {"method": "POST", "url":
+                 "https://mtgox.com/api/1/generic/private/order/result"}
+    open_orders_url = {"method": "POST", "url":
+                       "https://mtgox.com/api/1/generic/private/orders"}
+    info_url = {"method": "POST", "url":
+                "https://mtgox.com/api/1/generic/private/info"}
 
     def __init__(self):
         super(Market, self).__init__()
@@ -125,11 +124,13 @@ class PrivateMtGox(Market):
         return None
 
     def __str__(self):
-        return str({"btc_balance": self.btc_balance,
-                    "eur_balance": self.eur_balance})
+        return str({"btc_balance": self.btc_balance, "eur_balance": self.eur_balance})
 
 
 if __name__ == "__main__":
     mtgox = PrivateMtGox()
     mtgox.get_info()
+    # mtgox.buy(0.01, "EUR")
+    # mtgox.sell(0.01, "EUR")
     print mtgox
+
