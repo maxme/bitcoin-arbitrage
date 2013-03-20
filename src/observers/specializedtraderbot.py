@@ -65,14 +65,14 @@ class SpecializedTraderBot(Observer):
         if volume < config.min_tx_volume:
             logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f"
                          % (volume, config.min_tx_volume))
-            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC"(kask, self.clients[kask].eur_balance,
-                                                                         kbid, self.clients[kbid].btc_balance))
+            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask, self.clients[kask].eur_balance,
+                                                                            kbid, self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
-            logging.warn("Can't automate this trade, last trade occured %s seconds ago" % (
-                current_time - self.last_trade))
+            logging.warn("Can't automate this trade, last trade occured %s seconds ago"
+                         % (current_time - self.last_trade))
             return
 
         self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice])
