@@ -7,7 +7,7 @@ from market import Market
 class MtGoxEUR(Market):
     def __init__(self):
         super(MtGoxEUR, self).__init__("EUR")
-        self.update_rate = 25
+        self.update_rate = 60
 
     def update_depth(self):
         res = urllib2.urlopen('https://data.mtgox.com/api/0/data/getDepth.php?Currency=EUR')
