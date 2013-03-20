@@ -28,7 +28,7 @@ class Market(object):
         try:
             self.update_depth()
             self.depth_updated = time.time()
-        except HTTPError:
+        except (urllib2.HTTPError, urllib2.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)
 
     def get_ticker(self):
