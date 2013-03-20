@@ -4,11 +4,12 @@ sys.path.append('../')
 sys.path.append('.')
 from traderbot import TraderBot
 import json
+import config
 
 
 class MockMarket(object):
-    def __init__(self, name, fee=0, eur_balance=500.,
-                 btc_balance=15., persistent=True):
+    def __init__(self, name, fee=0, eur_balance=40.,
+                 btc_balance=1., persistent=True):
         self.name = name
         self.filename = "traderbot-sim-" + name + ".json"
         self.eur_balance = eur_balance
@@ -65,8 +66,8 @@ class TraderBotSim(TraderBot):
             "IntersangoEUR": self.intersango,
             "BitstampEUR": self.bitstamp,
         }
-        self.profit_thresh = 1  # in EUR
-        self.perc_thresh = 0.1  # in %
+        self.profit_thresh = config.profit_thresh  # in EUR
+        self.perc_thresh = config.perc_thresh  # in %
         self.trade_wait = 120
         self.last_trade = 0
 
@@ -83,3 +84,4 @@ class TraderBotSim(TraderBot):
 if __name__ == "__main__":
     t = TraderBotSim()
     print t.total_balance(33)
+
