@@ -117,6 +117,4 @@ class PrivateMtGox(Market):
 if __name__ == "__main__":
     mtgox = PrivateMtGox()
     mtgox.get_info()
-    # mtgox.buy(0.01, "EUR")
-    # mtgox.sell(0.01, "EUR")
     print mtgox
