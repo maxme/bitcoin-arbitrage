@@ -32,6 +32,15 @@ class TraderBot(Observer):
         # Execute only the best (more profitable)
         self.execute_trade(*self.potential_trades[0][1:])
 
+    def get_min_tradeable_volume(self, buyprice, eur_bal, btc_bal):
+        min1 = float(eur_bal) / ((1 + config.balance_margin) * buyprice)
+        min2 = float(btc_bal) / (1 + config.balance_margin)
+        return min(min1, min2)
+
+    def update_balance(self):
+        for kclient in self.clients:
+            self.clients[kclient].get_info()
+
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
         if profit < self.profit_thresh or perc < self.perc_thresh:
             return
@@ -43,16 +52,17 @@ class TraderBot(Observer):
             return
         volume = min(config.max_tx_volume, volume)
 
-        # Check balances
-        if (volume * buyprice) * (1 + config.balance_margin) > self.clients[kask].eur_balance:
-            logging.warn("Can't automate this trade, not enough money on: %s - need %f got %f"
-                         % (kask, (volume * buyprice) * (1 + config.balance_margin),
-                         self.clients[kask].eur_balance))
-            return
-        if volume * (1 + config.balance_margin) > self.clients[kbid].btc_balance:
-            logging.warn("Can't automate this trade, not enough money on: %s - need %f got %f"
-                         % (kbid, volume * (1 + config.balance_margin),
-                         self.clients[kbid].btc_balance))
+        # Update client balance
+        self.update_balance()
+
+        # maximum volume transaction with current balances
+        max_volume = self.get_min_tradeable_volume(buyprice, self.clients[kask].eur_balance,
+                                                   self.clients[kbid].btc_balance)
+        volume = min(volume, max_volume, config.max_tx_volume)
+
+        if volume < config.min_tx_volume:
+            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f"
+                         % (volume, config.min_tx_volume))
             return
 
         current_time = time.time()
