@@ -39,4 +39,5 @@ nosetests.xml
 
 # Project
 src/config.py
+src/observers/khertan_traderbot.py
 old/

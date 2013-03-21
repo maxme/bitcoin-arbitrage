@@ -13,6 +13,7 @@ from decimal import Decimal
 class PrivateBitcoinCentral(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
     trade_url = "https://bitcoin-central.net/api/v1/trade_orders/"
+    withdraw_url = "https://bitcoin-central.net/api/v1/transfers/send_bitcoins/"
 
     def __init__(self):
         self.name = self.__class__.__name__
@@ -69,6 +70,14 @@ class PrivateBitcoinCentral(Market):
         response = self.trade(amount, "sell", price)
         print response
 
+    def withdraw(self, amount, address):
+        params = {"amount": amount, "address": address}
+        response = self._send_request(self.trade_url, params)
+        return response
+
+    def deposit(self, ):
+        return config.bitcoincentral_address
+
     def get_info(self):
         response = self._send_request(self.balance_url)
         if response:
@@ -82,4 +91,5 @@ class PrivateBitcoinCentral(Market):
 if __name__ == "__main__":
     mtgox = PrivateBitcoinCentral()
     print mtgox
+    print mtgox.deposit()
 

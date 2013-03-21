@@ -28,6 +28,10 @@ class PrivateMtGox(Market):
                        "https://mtgox.com/api/1/generic/private/orders"}
     info_url = {"method": "POST", "url":
                 "https://mtgox.com/api/1/generic/private/info"}
+    withdraw_url = {"method": "POST", "url":
+                    "https://mtgox.com/api/1/generic/bitcoin/send_simple"}
+    deposit_url = {"method": "POST", "url":
+                   "https://mtgox.com/api/1/generic/bitcoin/address"}
 
     def __init__(self):
         super(Market, self).__init__()
@@ -111,6 +115,23 @@ class PrivateMtGox(Market):
     def sell(self, amount, price=None):
         return self.trade(amount, "ask", price)
 
+    def withdraw(self, amount, address):
+        params = [("amount_int", str(self._to_int_amount(amount))),
+                  ("address", address)]
+        response = self._send_request(self.withdraw_url, params)
+        if response and "result" in response \
+                and response["result"] == "success":
+            return response["return"]
+        return None
+
+    def deposit(self, ):
+        params = [("nonce", self._create_nonce())]
+        response = self._send_request(self.deposit_url, params)
+        if response and "result" in response \
+                and response["result"] == "success":
+            return response["return"]
+        return None
+
     def get_info(self):
         params = [("nonce", self._create_nonce())]
         response = self._send_request(self.info_url, params)
@@ -133,4 +154,5 @@ if __name__ == "__main__":
     # mtgox.buy(0.01, "EUR")
     # mtgox.sell(0.01, "EUR")
     print mtgox
+    print mtgox.deposit()
 
