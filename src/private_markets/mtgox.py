@@ -9,6 +9,7 @@ import sys
 import json
 import re
 from decimal import Decimal
+import config
 
 
 class PrivateMtGox(Market):
