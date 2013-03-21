@@ -8,6 +8,7 @@ import hashlib
 import sys
 import json
 import re
+import logging
 from decimal import Decimal
 import config
 
@@ -19,6 +20,8 @@ class PrivateMtGox(Market):
     order_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/order/result"}
     open_orders_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/orders"}
     info_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/info"}
+    withdraw_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/bitcoin/send_simple"}
+    deposit_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/bitcoin/address"}
 
     def __init__(self):
         super(Market, self).__init__()
@@ -74,7 +77,7 @@ class PrivateMtGox(Market):
                 jsonstr = response.read()
                 return json.loads(jsonstr)
         except Exception, err:
-            logging.error('Can t request MTGox, %s' % err)
+            logging.error('Can\'t request MTGox, %s' % err)
         return None
 
     def trade(self, amount, ttype, price=None):
@@ -101,6 +104,22 @@ class PrivateMtGox(Market):
     def sell(self, amount, price=None):
         return self.trade(amount, "ask", price)
 
+    def withdraw(self, amount, address):
+        params = [("nonce", self._create_nonce()),
+                  ("amount_int", str(self._to_int_amount(amount))),
+                  ("address", address)]
+        response = self._send_request(self.withdraw_url, params)
+        if response and "result" in response and response["result"] == "success":
+            return response["return"]
+        return None
+
+    def deposit(self):
+        params = [("nonce", self._create_nonce())]
+        response = self._send_request(self.deposit_url, params)
+        if response and "result" in response and response["result"] == "success":
+            return response["return"]
+        return None
+
     def get_info(self):
         params = [("nonce", self._create_nonce())]
         response = self._send_request(self.info_url, params)
@@ -116,5 +135,5 @@ class PrivateMtGox(Market):
 
 if __name__ == "__main__":
     mtgox = PrivateMtGox()
-    mtgox.get_info()
     print mtgox
+

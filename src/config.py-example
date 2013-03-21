@@ -15,6 +15,7 @@ mtgox_secret = "FIXME"
 
 bitcoincentral_username = "FIXME"
 bitcoincentral_password = "FIXME"
+bitcoincentral_address = "FIXME" # to deposit btc from markets / wallets
 
 # SafeGuards
 max_tx_volume = 10  # in BTC

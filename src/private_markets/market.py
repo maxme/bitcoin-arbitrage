@@ -11,5 +11,12 @@ class Market(object):
     def sell(self, price, amount):
         pass
 
+    def deposit(self):
+        pass
+
+    def withdraw(self, amount, address):
+        pass
+
     def get_info(self):
         pass
+
