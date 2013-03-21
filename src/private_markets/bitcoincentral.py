@@ -7,9 +7,6 @@ import urllib2
 import hashlib
 import sys
 import json
-sys.path.append('../')
-sys.path.append('.')
-import config
 from decimal import Decimal
 
 

@@ -1,7 +1,4 @@
 import logging
-import sys
-sys.path.append('../')
-sys.path.append('.')
 import config
 from observer import Observer
 from private_markets import mtgox

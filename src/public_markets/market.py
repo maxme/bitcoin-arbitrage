@@ -1,8 +1,5 @@
 import time
 import urllib2
-import sys
-sys.path.append("../")
-sys.path.append(".")
 import config
 import logging
 
