@@ -8,7 +8,7 @@ import hashlib
 import sys
 import json
 from decimal import Decimal
-
+import config
 
 class PrivateBitcoinCentral(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
