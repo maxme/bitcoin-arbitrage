@@ -47,6 +47,8 @@ class MockMarket(object):
     def balance_total(self, price):
         return self.eur_balance + self.btc_balance * price
 
+    def get_info(self):
+        pass
 
 class TraderBotSim(TraderBot):
     def __init__(self):
