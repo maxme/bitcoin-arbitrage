@@ -1,7 +1,8 @@
 import logging
-import sys
-sys.path.append('../')
-sys.path.append('.')
+import config
+from observer import Observer
+from private_markets import mtgox
+from private_markets import bitcoincentral
 from traderbot import TraderBot
 import json
 import config
@@ -54,9 +55,9 @@ class MockMarket(object):
 class TraderBotSim(TraderBot):
     def __init__(self):
         self.mtgox = MockMarket("mtgox", 0.006)  # 0.6% fee
-        self.btcentral = MockMarket("bitcoin-central")
-        self.intersango = MockMarket("intersango")
-        self.bitcoin24 = MockMarket("bitcoin24")
+        self.btcentral = MockMarket("bitcoin-central", 0.00489)
+        self.intersango = MockMarket("intersango", 0.0065)
+        self.bitcoin24 = MockMarket("bitcoin24", 0)
         self.bitstamp = MockMarket("bitstamp", 0.005)  # 0.5% fee
         self.clients = {
             "MtGoxEUR": self.mtgox,

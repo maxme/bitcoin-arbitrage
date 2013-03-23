@@ -4,11 +4,8 @@ import base64
 import urllib2
 import sys
 import json
-sys.path.append('../')
-sys.path.append('.')
-import config
 from decimal import Decimal
-
+import config
 
 class PrivateBitcoinCentral(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
@@ -64,7 +61,6 @@ class PrivateBitcoinCentral(Market):
 
     def buy(self, amount, price=None):
         response = self.trade(amount, "buy", price)
-        print response
 
     def sell(self, amount, price=None):
         response = self.trade(amount, "sell", price)

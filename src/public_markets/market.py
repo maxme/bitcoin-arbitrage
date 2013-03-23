@@ -1,7 +1,5 @@
 import time
-import sys
-sys.path.append("../")
-sys.path.append(".")
+import urllib2
 import config
 import logging
 
@@ -28,13 +26,15 @@ class Market(object):
         try:
             self.update_depth()
             self.depth_updated = time.time()
-        except socket.HTTPError:
+        except (urllib2.HTTPError, urllib2.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)
 
     def get_ticker(self):
         depth = self.get_depth()
-        res = {'ask': depth['asks'][0],
-               'bid': depth['bids'][0]}
+        res = {'ask': 0, 'bid': 0}
+        if len(depth['asks']) > 0 and len(depth["bids"]) > 0:
+            res = {'ask': depth['asks'][0],
+                   'bid': depth['bids'][0]}
         return res
 
     ## Abstract methods
