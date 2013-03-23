@@ -117,7 +117,8 @@ class PrivateMtGox(Market):
 
     def withdraw(self, amount, address):
         params = [("amount_int", str(self._to_int_amount(amount))),
-                  ("address", address)]
+                  ("address", address),
+		  ("nonce", self._create_nonce())]
         response = self._send_request(self.withdraw_url, params)
         if response and "result" in response \
                 and response["result"] == "success":
