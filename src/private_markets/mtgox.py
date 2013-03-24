@@ -93,7 +93,7 @@ class PrivateMtGox(Market):
             price = self._to_int_price(price, self.currency)
         amount = self._to_int_amount(amount)
 
-        self.buy_url["url"] = self._change_currency_url(self.buy_url["url"],
+        self.buy_url["path"] = self._change_currency_url(self.buy_url["path"],
                                                         self.currency)
 
         params = [("nonce", self._create_nonce()),
