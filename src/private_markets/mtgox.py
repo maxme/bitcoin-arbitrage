@@ -5,7 +5,6 @@ import hmac
 import urllib
 import urllib2
 import hashlib
-import sys
 import json
 import re
 from decimal import Decimal
@@ -14,22 +13,22 @@ import config
 
 class PrivateMtGox(Market):
 
-    ticker_url = {"method": "GET", "url":
-                  "https://mtgox.com/api/1/BTCUSD/public/ticker"}
-    buy_url = {"method": "POST", "url":
-               "https://mtgox.com/api/1/BTCUSD/private/order/add"}
-    sell_url = {"method": "POST", "url":
-                "https://mtgox.com/api/1/BTCUSD/private/order/add"}
-    order_url = {"method": "POST", "url":
-                 "https://mtgox.com/api/1/generic/private/order/result"}
-    open_orders_url = {"method": "POST", "url":
-                       "https://mtgox.com/api/1/generic/private/orders"}
-    info_url = {"method": "POST", "url":
-                "https://mtgox.com/api/1/generic/private/info"}
-    withdraw_url = {"method": "POST", "url":
-                    "https://mtgox.com/api/1/generic/bitcoin/send_simple"}
-    deposit_url = {"method": "POST", "url":
-                   "https://mtgox.com/api/1/generic/bitcoin/address"}
+    ticker_url = {"method": "GET", "path":
+                  "BTCUSD/public/ticker"}
+    buy_url = {"method": "POST", "path":
+               "BTCUSD/private/order/add"}
+    sell_url = {"method": "POST", "path":
+                "BTCUSD/private/order/add"}
+    order_url = {"method": "POST", "path":
+                 "generic/private/order/result"}
+    open_orders_url = {"method": "POST", "path":
+                       "generic/private/orders"}
+    info_url = {"method": "POST", "path":
+                "generic/private/info"}
+    withdraw_url = {"method": "POST", "path":
+                    "generic/bitcoin/send_simple"}
+    deposit_url = {"method": "POST", "path":
+                   "generic/bitcoin/address"}
 
     def __init__(self):
         super(Market, self).__init__()
@@ -37,9 +36,6 @@ class PrivateMtGox(Market):
         self.secret = config.mtgox_secret
         self.currency = "EUR"
         self.get_info()
-
-    def _create_nonce(self):
-        return int(time.time() * 1000000)
 
     def _change_currency_url(self, url, currency):
         return re.sub(r'BTC\w{3}', r'BTC' + currency, url)
@@ -66,13 +62,18 @@ class PrivateMtGox(Market):
         # FIXME: should take JPY and SEK into account
         return Decimal(amount) / Decimal(100000.)
 
-    def _send_request(self, url, params, extra_headers=None):
+    def _send_request(self, path, params=[], extra_headers=None):
+        url = 'https://data.mtgox.com/api/2/' + path.path
+        params += [(u'nonce', str(int(time.time() * 1000)))]
+        post_data = urllib.urlencode(params)
+
+        api2postdatatohash = path.path + chr(0) + post_data
+        ahmac = base64.b64encode(str(hmac.new(base64.b64decode(
+            self.secret), api2postdatatohash, hashlib.sha512).digest()))
+
         headers = {
             'Rest-Key': self.key,
-            'Rest-Sign': base64.b64encode(str(
-                hmac.new(base64.b64decode(self.secret),
-                         urllib.urlencode(params), hashlib.sha512).digest())),
-            'Content-type': 'application/x-www-form-urlencoded',
+            'Rest-Sign': ahmac,
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
         }
@@ -80,7 +81,7 @@ class PrivateMtGox(Market):
             for k, v in extra_headers.iteritems():
                 headers[k] = v
 
-        req = urllib2.Request(url['url'], urllib.urlencode(params), headers)
+        req = urllib2.Request(url, post_data, headers)
         response = urllib2.urlopen(req)
         if response.getcode() == 200:
             jsonstr = response.read()
@@ -116,7 +117,7 @@ class PrivateMtGox(Market):
     def withdraw(self, amount, address):
         params = [("amount_int", str(self._to_int_amount(amount))),
                   ("address", address),
-		  ("nonce", self._create_nonce())]
+                  ("nonce", self._create_nonce())]
         response = self._send_request(self.withdraw_url, params)
         if response and "result" in response \
                 and response["result"] == "success":
