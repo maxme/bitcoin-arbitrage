@@ -5,7 +5,6 @@ import smtplib
 
 
 def send_email(subject, message):
-    _from = config.smtp_from
     to = config.smtp_to
     mime_message = """From: Python Arbitrage Script <%(_from)s>
 To: <%(to)s>
@@ -15,7 +14,7 @@ Subject: %(subject)s
 """ % locals()
     try:
         smtpObj = smtplib.SMTP(config.smtp_host)
-        smtpObj.sendmail(config.smtp_from, [config.smtp_to], mime_message)
+        smtpObj.sendmail(config.smtp_from, [to], mime_message)
     except smtplib.SMTPException:
         logging.warn("Unable to send email")
 
@@ -30,3 +29,4 @@ buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%
 
 if __name__ == "__main__":
     send_email("test", "hey!")
+

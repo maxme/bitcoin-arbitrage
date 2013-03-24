@@ -63,13 +63,18 @@ class PrivateMtGox(Market):
         return Decimal(amount) / Decimal(100000.)
 
     def _send_request(self, path, params=[], extra_headers=None):
-        url = 'https://data.mtgox.com/api/2/' + path.path
-        params += [(u'nonce', str(int(time.time() * 1000)))]
+        #API 2 Seems not yet ready
+	#url = 'https://mtgox.com/api/2/' + path['path']
+        url = 'https://mtgox.com/api/1/' + path['path']
+	params += [(u'nonce', str(int(time.time() * 1000)))]
         post_data = urllib.urlencode(params)
 
-        api2postdatatohash = path.path + chr(0) + post_data
-        ahmac = base64.b64encode(str(hmac.new(base64.b64decode(
-            self.secret), api2postdatatohash, hashlib.sha512).digest()))
+        #API 2 Seems not yet ready
+	#api2postdatatohash = path['path'] + chr(0) + post_data
+        #ahmac = base64.b64encode(str(hmac.new(base64.b64decode(
+        #    self.secret), api2postdatatohash, hashlib.sha512).digest()))
+	ahmac = base64.b64encode(str(hmac.new(base64.b64decode(self.secret),
+                                 post_data, hashlib.sha512).digest())) 
 
         headers = {
             'Rest-Key': self.key,
@@ -82,8 +87,9 @@ class PrivateMtGox(Market):
                 headers[k] = v
 
         req = urllib2.Request(url, post_data, headers)
-        response = urllib2.urlopen(req)
-        if response.getcode() == 200:
+        print url
+	response = urllib2.urlopen(req)
+	if response.getcode() == 200:
             jsonstr = response.read()
             return json.loads(jsonstr)
         return None
@@ -94,10 +100,9 @@ class PrivateMtGox(Market):
         amount = self._to_int_amount(amount)
 
         self.buy_url["path"] = self._change_currency_url(self.buy_url["path"],
-                                                        self.currency)
+                                                         self.currency)
 
-        params = [("nonce", self._create_nonce()),
-                  ("amount_int", str(amount)),
+        params = [("amount_int", str(amount)),
                   ("type", ttype)]
         if price:
             params.append(("price_int", str(price)))
@@ -116,8 +121,7 @@ class PrivateMtGox(Market):
 
     def withdraw(self, amount, address):
         params = [("amount_int", str(self._to_int_amount(amount))),
-                  ("address", address),
-                  ("nonce", self._create_nonce())]
+                  ("address", address)]
         response = self._send_request(self.withdraw_url, params)
         if response and "result" in response \
                 and response["result"] == "success":
@@ -125,7 +129,7 @@ class PrivateMtGox(Market):
         return None
 
     def deposit(self, ):
-        params = [("nonce", self._create_nonce())]
+        params = []
         response = self._send_request(self.deposit_url, params)
         if response and "result" in response \
                 and response["result"] == "success":
@@ -133,7 +137,7 @@ class PrivateMtGox(Market):
         return None
 
     def get_info(self):
-        params = [("nonce", self._create_nonce())]
+	params = [] 
         response = self._send_request(self.info_url, params)
         if response and "result" in response \
                 and response["result"] == "success":

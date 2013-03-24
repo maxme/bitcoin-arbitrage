@@ -43,7 +43,7 @@ class TraderBot(Observer):
             self.clients[kclient].get_info()
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
-
+         
         if profit < self.profit_thresh or perc < self.perc_thresh:
             return
         if kask not in self.clients:
@@ -62,6 +62,7 @@ class TraderBot(Observer):
         # maximum volume transaction with current balances
         max_volume = self.get_min_tradeable_volume(buyprice, self.clients[kask].eur_balance,
                                                    self.clients[kbid].btc_balance)
+                                                   
         volume = min(volume, max_volume, config.max_tx_volume)
 
         if volume < config.min_tx_volume:
