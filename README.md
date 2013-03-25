@@ -1,4 +1,5 @@
 # bitcoin-arbitrage - opportunity detector and automated trading
+# Khertan Fork
 
 It gets order books from supported exchanges and calculate arbitrage
 opportunities between each markets. It takes market depth into account.
@@ -17,7 +18,7 @@ Currently supported exchanges to automate trade:
 
 To add a new exchange see this [doc/add-new-exchange.md](doc/add-new-exchange.md)
 
-Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+Donation are always welcome: ****
 
 # WARNING
 

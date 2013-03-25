@@ -14,7 +14,7 @@ Subject: %(subject)s
 %(message)s
 """ % locals()
     try:
-        smtpObj = smtplib.SMTP(config.smtp_host)
+        smtpObj = smtplib.SMTP(config.smtp_host, config.smtp_port)
         smtpObj.sendmail(_from, [_to], mime_message)
     except smtplib.SMTPException:
         logging.warn("Unable to send email")

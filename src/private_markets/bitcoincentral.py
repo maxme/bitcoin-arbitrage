@@ -7,6 +7,7 @@ import json
 from decimal import Decimal
 import config
 
+
 class PrivateBitcoinCentral(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
     trade_url = "https://bitcoin-central.net/api/v1/trade_orders/"
@@ -61,6 +62,7 @@ class PrivateBitcoinCentral(Market):
 
     def buy(self, amount, price=None):
         response = self.trade(amount, "buy", price)
+        print response
 
     def sell(self, amount, price=None):
         response = self.trade(amount, "sell", price)
@@ -88,4 +90,3 @@ if __name__ == "__main__":
     mtgox = PrivateBitcoinCentral()
     print mtgox
     print mtgox.deposit()
-

@@ -9,6 +9,7 @@ import json
 import re
 from decimal import Decimal
 import config
+import logging
 
 
 class PrivateMtGox(Market):
@@ -63,18 +64,18 @@ class PrivateMtGox(Market):
         return Decimal(amount) / Decimal(100000.)
 
     def _send_request(self, path, params=[], extra_headers=None):
-        #API 2 Seems not yet ready
-	#url = 'https://mtgox.com/api/2/' + path['path']
+        # API 2 Seems not yet ready
+        # url = 'https://mtgox.com/api/2/' + path['path']
         url = 'https://mtgox.com/api/1/' + path['path']
-	params += [(u'nonce', str(int(time.time() * 1000)))]
+        params += [(u'nonce', str(int(time.time() * 1000)))]
         post_data = urllib.urlencode(params)
 
-        #API 2 Seems not yet ready
-	#api2postdatatohash = path['path'] + chr(0) + post_data
-        #ahmac = base64.b64encode(str(hmac.new(base64.b64decode(
+        # API 2 Seems not yet ready
+        # api2postdatatohash = path['path'] + chr(0) + post_data
+        # ahmac = base64.b64encode(str(hmac.new(base64.b64decode(
         #    self.secret), api2postdatatohash, hashlib.sha512).digest()))
-	ahmac = base64.b64encode(str(hmac.new(base64.b64decode(self.secret),
-                                 post_data, hashlib.sha512).digest())) 
+        ahmac = base64.b64encode(str(hmac.new(base64.b64decode(self.secret),
+                                 post_data, hashlib.sha512).digest()))
 
         headers = {
             'Rest-Key': self.key,
@@ -87,15 +88,15 @@ class PrivateMtGox(Market):
                 headers[k] = v
 
         try:
-		req = urllib2.Request(url, post_data, headers)
-		response = urllib2.urlopen(req)
-		if response.getcode() == 200:
-        	    jsonstr = response.read()
-            	return json.loads(jsonstr)
+            req = urllib2.Request(url, post_data, headers)
+            response = urllib2.urlopen(req)
+            if response.getcode() == 200:
+                jsonstr = response.read()
+            return json.loads(jsonstr)
         except Exception, err:
-		logging.error('Can t request MTGox, %s' % err)
-		return None
-	return None
+            logging.error('Can t request MTGox, %s' % err)
+            return None
+        return None
 
     def trade(self, amount, ttype, price=None):
         if price:
@@ -140,7 +141,7 @@ class PrivateMtGox(Market):
         return None
 
     def get_info(self):
-	params = [] 
+        params = []
         response = self._send_request(self.info_url, params)
         if response and "result" in response \
                 and response["result"] == "success":
@@ -160,4 +161,3 @@ if __name__ == "__main__":
     mtgox.get_info()
     print mtgox
     print mtgox.deposit()
-
