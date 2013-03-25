@@ -12,5 +12,6 @@ class Observer(object):
 
     ## abstract
     @abc.abstractmethod
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
+    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid,
+                    perc, weighted_buyprice, weighted_sellprice):
         pass

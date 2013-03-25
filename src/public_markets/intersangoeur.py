@@ -9,7 +9,8 @@ class IntersangoEUR(Market):
         self.update_rate = 30
 
     def update_depth(self):
-        res = urllib2.urlopen('https://intersango.com//api/depth.php?currency_pair_id=2')
+        res = urllib2.urlopen(
+            'https://intersango.com//api/depth.php?currency_pair_id=2')
         depth = json.loads(res.read())
         self.depth = self.format_depth(depth)
 

@@ -1,6 +1,5 @@
 import urllib2
 import json
-import sys
 from market import Market
 
 
@@ -26,8 +25,10 @@ class BitstampEUR(Market):
         return r
 
     def format_depth(self, depth):
-        bids = self.sort_and_format(depth['bids'], True, float(self.eurusd["buy"]))
-        asks = self.sort_and_format(depth['asks'], False, float(self.eurusd["sell"]))
+        bids = self.sort_and_format(depth['bids'], True,
+                                    float(self.eurusd["buy"]))
+        asks = self.sort_and_format(depth['asks'], False,
+                                    float(self.eurusd["sell"]))
         return {'asks': asks, 'bids': bids}
 
 if __name__ == "__main__":

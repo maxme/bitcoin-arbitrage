@@ -18,7 +18,8 @@ class Market(object):
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
             logging.warn('Market: %s order book is expired' % self.name)
-            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
+            self.depth = {'asks': [{'price': 0, 'amount': 0}],
+                          'bids': [{'price': 0, 'amount': 0}]}
         return self.depth
 
     def ask_update_depth(self):

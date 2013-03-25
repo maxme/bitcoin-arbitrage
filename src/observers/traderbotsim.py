@@ -5,10 +5,12 @@ from private_markets import mtgox
 from private_markets import bitcoincentral
 from traderbot import TraderBot
 import json
+import config
 
 
 class MockMarket(object):
-    def __init__(self, name, fee=0, eur_balance=500., btc_balance=15., persistent=True):
+    def __init__(self, name, fee=0, eur_balance=40.,
+                 btc_balance=1., persistent=True):
         self.name = name
         self.filename = "traderbot-sim-" + name + ".json"
         self.eur_balance = eur_balance
@@ -22,14 +24,16 @@ class MockMarket(object):
                 pass
 
     def buy(self, volume, price):
-        logging.info("execute buy %f BTC @ %f on %s" % (volume, price, self.name))
+        logging.info("execute buy %f BTC @ %f on %s"
+                     % (volume, price, self.name))
         self.eur_balance -= price * volume
         self.btc_balance += volume - volume * self.fee
         if self.persistent:
             self.save()
 
     def sell(self, volume, price):
-        logging.info("execute sell %f BTC @ %f on %s" % (volume, price, self.name))
+        logging.info("execute sell %f BTC @ %f on %s"
+                     % (volume, price, self.name))
         self.btc_balance -= volume
         self.eur_balance += price * volume - price * volume * self.fee
         if self.persistent:
@@ -47,6 +51,8 @@ class MockMarket(object):
     def balance_total(self, price):
         return self.eur_balance + self.btc_balance * price
 
+    def get_info(self):
+        pass
 
 class TraderBotSim(TraderBot):
     def __init__(self):
@@ -63,19 +69,22 @@ class TraderBotSim(TraderBot):
             "IntersangoEUR": self.intersango,
             "BitstampEUR": self.bitstamp,
         }
-        self.profit_thresh = 1  # in EUR
-        self.perc_thresh = 0.6  # in %
+        self.profit_thresh = config.profit_thresh  # in EUR
+        self.perc_thresh = config.perc_thresh  # in %
         self.trade_wait = 120
         self.last_trade = 0
 
     def total_balance(self, price):
-        market_balances = [i.balance_total(price) for i in set(self.clients.values())]
+        market_balances = [i.balance_total(price)
+                           for i in set(self.clients.values())]
         return sum(market_balances)
 
-    def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice):
+    def execute_trade(self, volume, kask, kbid,
+                      weighted_buyprice, weighted_sellprice):
         self.clients[kask].buy(volume, weighted_buyprice)
         self.clients[kbid].sell(volume, weighted_sellprice)
 
 if __name__ == "__main__":
     t = TraderBotSim()
     print t.total_balance(33)
+

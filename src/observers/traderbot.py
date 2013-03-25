@@ -16,8 +16,9 @@ class TraderBot(Observer):
             "BitcoinCentralEUR": self.btcentral,
             "BitcoinCentralUSD": self.btcentral
         }
-        self.profit_thresh = 5  # in EUR
-        self.perc_thresh = 2  # in %
+
+        self.profit_thresh = config.profit_thresh  # in EUR
+        self.perc_thresh = config.perc_thresh  # in %
         self.trade_wait = 120  # in seconds
         self.last_trade = 0
         self.potential_trades = []
@@ -42,13 +43,16 @@ class TraderBot(Observer):
             self.clients[kclient].get_info()
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
+         
         if profit < self.profit_thresh or perc < self.perc_thresh:
             return
         if kask not in self.clients:
-            logging.warn("Can't automate this trade, client not available: %s" % (kask))
+            logging.warn("Can't automate this trade, client not available: %s"
+                         % (kask))
             return
         if kbid not in self.clients:
-            logging.warn("Can't automate this trade, client not available: %s" % (kbid))
+            logging.warn("Can't automate this trade, client not available: %s"
+                         % (kbid))
             return
         volume = min(config.max_tx_volume, volume)
 
@@ -58,6 +62,7 @@ class TraderBot(Observer):
         # maximum volume transaction with current balances
         max_volume = self.get_min_tradeable_volume(buyprice, self.clients[kask].eur_balance,
                                                    self.clients[kbid].btc_balance)
+                                                   
         volume = min(volume, max_volume, config.max_tx_volume)
 
         if volume < config.min_tx_volume:
@@ -73,10 +78,12 @@ class TraderBot(Observer):
 
         self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice])
 
+
     def watch_balances(self):
         pass
 
-    def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice):
+    def execute_trade(self, volume, kask, kbid,
+                      weighted_buyprice, weighted_sellprice):
         self.last_trade = time.time()
         self.clients[kask].buy(volume)
         self.clients[kbid].sell(volume)
