@@ -15,9 +15,9 @@ class SpecializedTraderBot(Observer):
             "MtGoxEUR": self.mtgox,
             "BitcoinCentralEUR": self.btcentral,
         }
-        self.profit_thresholds = {  # Graph
-            "MtGoxEUR": {"BitcoinCentralEUR": 15},
-            "BitcoinCentralEUR": {"MtGoxEUR": 5},
+        self.profit_percentage_thresholds = {  # Graph
+            "MtGoxEUR": {"BitcoinCentralEUR": 3.5},
+            "BitcoinCentralEUR": {"MtGoxEUR": 1},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0
@@ -36,7 +36,7 @@ class SpecializedTraderBot(Observer):
     def get_min_tradeable_volume(self, buyprice, eur_bal, btc_bal):
         min1 = float(eur_bal) / ((1. + config.balance_margin) * buyprice)
         min2 = float(btc_bal) / (1. + config.balance_margin)
-        return min(min1, min2)
+        return min(min1, min2) * 0.95
 
     def update_balance(self):
         for kclient in self.clients:
@@ -50,9 +50,13 @@ class SpecializedTraderBot(Observer):
         if kbid not in self.clients:
             logging.warn("Can't automate this trade, client not available: %s" % (kbid))
             return
-        if profit < self.profit_thresholds[kask][kbid]:
+        if perc < self.profit_percentage_thresholds[kask][kbid]:
             logging.warn("Can't automate this trade, profit=%f is lower than defined threshold %f"
-                         % (profit, self.profit_thresholds[kask][kbid]))
+                         % (perc, self.profit_percentage_thresholds[kask][kbid]))
+            return
+
+        if perc > 20:
+            logging.warn("Profit=%f seems malformed" % (perc, ))
             return
 
         # Update client balance
