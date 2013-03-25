@@ -67,12 +67,14 @@ class PrivateMtGox(Market):
         if extra_headers is not None:
             for k, v in extra_headers.iteritems():
                 headers[k] = v
-
-        req = urllib2.Request(url['url'], urllib.urlencode(params), headers)
-        response = urllib2.urlopen(req)
-        if response.getcode() == 200:
-            jsonstr = response.read()
-            return json.loads(jsonstr)
+        try:
+            req = urllib2.Request(url['url'], urllib.urlencode(params), headers)
+            response = urllib2.urlopen(req)
+            if response.getcode() == 200:
+                jsonstr = response.read()
+                return json.loads(jsonstr)
+        except Exception, err:
+            logging.error('Can t request MTGox, %s' % err)
         return None
 
     def trade(self, amount, ttype, price=None):

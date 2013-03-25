@@ -5,20 +5,19 @@ import smtplib
 
 
 def send_email(subject, message):
+    _to = config.smtp_to
     _from = config.smtp_from
-    to = config.smtp_to
     mime_message = """From: Python Arbitrage Script <%(_from)s>
-To: <%(to)s>
+To: <%(_to)s>
 Subject: %(subject)s
 
 %(message)s
 """ % locals()
     try:
         smtpObj = smtplib.SMTP(config.smtp_host)
-        smtpObj.sendmail(config.smtp_from, [config.smtp_to], mime_message)
+        smtpObj.sendmail(_from, [_to], mime_message)
     except smtplib.SMTPException:
         logging.warn("Unable to send email")
-
 
 class Emailer(Observer):
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
