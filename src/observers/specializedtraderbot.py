@@ -16,7 +16,7 @@ class SpecializedTraderBot(Observer):
             "BitcoinCentralEUR": self.btcentral,
         }
         self.profit_percentage_thresholds = {  # Graph
-            "MtGoxEUR": {"BitcoinCentralEUR": 2},
+            "MtGoxEUR": {"BitcoinCentralEUR": 3.5},
             "BitcoinCentralEUR": {"MtGoxEUR": 1},
         }
         self.trade_wait = 60 * 5  # in seconds
@@ -36,7 +36,7 @@ class SpecializedTraderBot(Observer):
     def get_min_tradeable_volume(self, buyprice, eur_bal, btc_bal):
         min1 = float(eur_bal) / ((1. + config.balance_margin) * buyprice)
         min2 = float(btc_bal) / (1. + config.balance_margin)
-        return min(min1, min2)
+        return min(min1, min2) * 0.95
 
     def update_balance(self):
         for kclient in self.clients:
@@ -53,6 +53,10 @@ class SpecializedTraderBot(Observer):
         if perc < self.profit_percentage_thresholds[kask][kbid]:
             logging.warn("Can't automate this trade, profit=%f is lower than defined threshold %f"
                          % (perc, self.profit_percentage_thresholds[kask][kbid]))
+            return
+
+        if perc > 20: # suspicous profit, added after discovering btc-central may send corrupted order book
+            logging.warn("Profit=%f seems malformed" % (perc, ))
             return
 
         # Update client balance
