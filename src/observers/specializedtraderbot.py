@@ -55,7 +55,7 @@ class SpecializedTraderBot(Observer):
                          % (perc, self.profit_percentage_thresholds[kask][kbid]))
             return
 
-        if perc > 20: # suspicous profit, added after discovering btc-central may send corrupted order book
+        if perc > 20:  # suspicous profit, added after discovering btc-central may send corrupted order book
             logging.warn("Profit=%f seems malformed" % (perc, ))
             return
 

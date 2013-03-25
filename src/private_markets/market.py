@@ -19,4 +19,3 @@ class Market(object):
 
     def get_info(self):
         pass
-
