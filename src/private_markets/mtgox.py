@@ -136,4 +136,3 @@ class PrivateMtGox(Market):
 if __name__ == "__main__":
     mtgox = PrivateMtGox()
     print mtgox
-

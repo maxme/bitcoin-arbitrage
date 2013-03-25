@@ -10,6 +10,7 @@ import json
 from decimal import Decimal
 import config
 
+
 class PrivateBitcoinCentral(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
     trade_url = "https://bitcoin-central.net/api/v1/trade_orders/"
@@ -91,8 +92,8 @@ if __name__ == "__main__":
 #    mtgox.buy(0.01)
 #    mtgox.sell(0.01)
     print mtgox
-<<<<<<< HEAD
-=======
+<<<< << < HEAD
+== == == =
     print mtgox.deposit()
 
->>>>>>> 12aa4e2... Add widthdraw and deposit method to transfer btc between exchange place
+>>>>>> > 12aa4e2... Add widthdraw and deposit method to transfer btc between exchange place

@@ -50,6 +50,7 @@ class MockMarket(object):
     def get_info(self):
         pass
 
+
 class TraderBotSim(TraderBot):
     def __init__(self):
         self.mtgox = MockMarket("mtgox", 0.006)  # 0.6% fee
