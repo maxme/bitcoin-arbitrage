@@ -61,7 +61,7 @@ class Arbitrer(object):
             if amount < 0:
                 break
             sell_total += amount
-            if w_sellprice == 0:
+            if w_sellprice == 0 or sell_total == 0:
                 w_sellprice = price
             else:
                 w_sellprice = (w_sellprice * (sell_total - amount) + price * amount) / sell_total
