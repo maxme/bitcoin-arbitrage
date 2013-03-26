@@ -88,12 +88,7 @@ class PrivateBitcoinCentral(Market):
 
 
 if __name__ == "__main__":
-    mtgox = PrivateBitcoinCentral()
-#    mtgox.buy(0.01)
-#    mtgox.sell(0.01)
-    print mtgox
-<<<< << < HEAD
-== == == =
-    print mtgox.deposit()
+    market = PrivateBitcoinCentral()
+    print market
 
->>>>>> > 12aa4e2... Add widthdraw and deposit method to transfer btc between exchange place
+
