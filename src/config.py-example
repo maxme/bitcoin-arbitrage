@@ -19,6 +19,7 @@ bitcoincentral_address = "FIXME"  # to deposit btc from markets / wallets
 
 # SafeGuards
 max_tx_volume = 10  # in BTC
+min_tx_volume = 1 # in BTC 
 balance_margin = 0.05  # 5%
 profit_thresh = 1  # in EUR
 perc_thresh = 2  # in %
