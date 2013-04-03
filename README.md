@@ -32,7 +32,11 @@ Then edit config.py file to setup your preferences: watched markets and observer
 
 # Run
 
-You need Python3 to run this program.
+You need Python3 to run this program. To use the observer: XMPPMessager you will need to install sleekxmpp:
+
+    $ pip3 install sleekxmpp
+
+To run the program:
 
     $ python3 src/arbitrage.py
     2013-03-12 03:52:14,341 [INFO] profit: 30.539722 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 29.4670 (Bitcoin24EUR) ~10.41%

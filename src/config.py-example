@@ -30,3 +30,8 @@ smtp_login = 'FIXME'
 smtp_passwd = 'FIXME'
 smtp_from = 'FIXME'
 smtp_to = 'FIXME'
+
+#### XMPP Observer
+xmpp_jid = "FROM@jabber.org"
+xmpp_password = "FIXME"
+xmpp_to = "TO@jabber.org"
