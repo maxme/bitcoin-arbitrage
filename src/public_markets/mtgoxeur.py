@@ -1,18 +1,22 @@
-import urllib2
+import urllib.request
+import urllib.error
+import urllib.parse
 import json
 import logging
-from market import Market
+from .market import Market
 
 
 class MtGoxEUR(Market):
     def __init__(self):
         super(MtGoxEUR, self).__init__("EUR")
         self.update_rate = 60
-        self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
+        self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
+            {'price': 0, 'amount': 0}]}
 
     def update_depth(self):
-        res = urllib2.urlopen('http://data.mtgox.com/api/2/BTCEUR/money/depth')
-        jsonstr = res.read()
+        res = urllib.request.urlopen(
+            'http://data.mtgox.com/api/2/BTCEUR/money/depth')
+        jsonstr = res.read().decode('utf8')
         try:
             data = json.loads(jsonstr)
         except Exception:
@@ -26,7 +30,8 @@ class MtGoxEUR(Market):
         l.sort(key=lambda x: float(x["price"]), reverse=reverse)
         r = []
         for i in l:
-            r.append({'price': float(i["price"]), 'amount': float(i["amount"])})
+            r.append({'price': float(i[
+                     "price"]), 'amount': float(i["amount"])})
         return r
 
     def format_depth(self, depth):
@@ -36,4 +41,4 @@ class MtGoxEUR(Market):
 
 if __name__ == "__main__":
     market = MtGoxEUR()
-    print market.get_depth()
+    print(market.get_depth())

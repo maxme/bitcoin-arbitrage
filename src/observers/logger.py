@@ -1,5 +1,5 @@
 import logging
-from observer import Observer
+from .observer import Observer
 
 
 class Logger(Observer):

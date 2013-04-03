@@ -1,6 +1,8 @@
-import urllib2
+import urllib.request
+import urllib.error
+import urllib.parse
 import json
-from market import Market
+from .market import Market
 
 
 class BtceUSD(Market):
@@ -11,7 +13,7 @@ class BtceUSD(Market):
         self.update_rate = 60
 
     def update_depth(self):
-        res = urllib2.urlopen('https://btc-e.com/api/2/btc_usd/depth')
+        res = urllib.request.urlopen('https://btc-e.com/api/2/btc_usd/depth')
         depth = json.loads(res.read())
         self.depth = self.format_depth(depth)
 
@@ -29,4 +31,4 @@ class BtceUSD(Market):
 
 if __name__ == "__main__":
     market = BtceUSD()
-    print market.get_ticker()
+    print(market.get_ticker())
