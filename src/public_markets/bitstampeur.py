@@ -15,12 +15,12 @@ class BitstampEUR(Market):
 
     def update_depth(self):
         res = urllib.request.urlopen('https://www.bitstamp.net/api/eur_usd/')
-        self.eurusd = json.loads(res.read())
+        self.eurusd = json.loads(res.read().decode('utf8'))
         if self.eurusd["buy"] == "None" or self.eurusd["sell"] == "None":
             raise Exception("Can't fetch Bitstamp EUR/USD convertion rate")
         res = urllib.request.urlopen(
             'https://www.bitstamp.net/api/order_book/')
-        depth = json.loads(res.read())
+        depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
     def sort_and_format(self, l, reverse, rate):

@@ -14,7 +14,7 @@ class BtceUSD(Market):
 
     def update_depth(self):
         res = urllib.request.urlopen('https://btc-e.com/api/2/btc_usd/depth')
-        depth = json.loads(res.read())
+        depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
     def sort_and_format(self, l, reverse=False):
