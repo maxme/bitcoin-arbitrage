@@ -26,7 +26,7 @@ class Emailer(Observer):
             message = """profit: %f EUR with volume: %f BTC
 buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%
 """ % (profit, volume, buyprice, kask, sellprice, kbid, perc)
-            send_email(config.smtp_from, config.smtp_to, "", message)
+            send_email("Arbitrage Bot", message)
 
 if __name__ == "__main__":
     send_email("test", "hey!")
