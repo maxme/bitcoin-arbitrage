@@ -1,5 +1,7 @@
 import time
-import urllib2
+import urllib.request
+import urllib.error
+import urllib.parse
 import config
 import logging
 
@@ -18,14 +20,15 @@ class Market(object):
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
             logging.warn('Market: %s order book is expired' % self.name)
-            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
+            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
+                {'price': 0, 'amount': 0}]}
         return self.depth
 
     def ask_update_depth(self):
         try:
             self.update_depth()
             self.depth_updated = time.time()
-        except (urllib2.HTTPError, urllib2.URLError) as e:
+        except (urllib.error.HTTPError, urllib.error.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)
         except Exception as e:
             logging.error("Can't update market: %s - %s" % (self.name, str(e)))

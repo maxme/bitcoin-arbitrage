@@ -1,7 +1,7 @@
 import logging
 import config
 import time
-from observer import Observer
+from .observer import Observer
 from private_markets import mtgox
 from private_markets import bitcoincentral
 
@@ -45,10 +45,12 @@ class TraderBot(Observer):
         if profit < self.profit_thresh or perc < self.perc_thresh:
             return
         if kask not in self.clients:
-            logging.warn("Can't automate this trade, client not available: %s" % (kask))
+            logging.warn(
+                "Can't automate this trade, client not available: %s" % (kask))
             return
         if kbid not in self.clients:
-            logging.warn("Can't automate this trade, client not available: %s" % (kbid))
+            logging.warn(
+                "Can't automate this trade, client not available: %s" % (kbid))
             return
         volume = min(config.max_tx_volume, volume)
 
@@ -56,8 +58,9 @@ class TraderBot(Observer):
         self.update_balance()
 
         # maximum volume transaction with current balances
-        max_volume = self.get_min_tradeable_volume(buyprice, self.clients[kask].eur_balance,
-                                                   self.clients[kbid].btc_balance)
+        max_volume = self.get_min_tradeable_volume(
+            buyprice, self.clients[kask].eur_balance,
+            self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
 
         if volume < config.min_tx_volume:
@@ -71,7 +74,8 @@ class TraderBot(Observer):
                 current_time - self.last_trade))
             return
 
-        self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice])
+        self.potential_trades.append(
+            [profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice])
 
     def watch_balances(self):
         pass

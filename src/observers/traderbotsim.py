@@ -1,9 +1,9 @@
 import logging
 import config
-from observer import Observer
+from .observer import Observer
 from private_markets import mtgox
 from private_markets import bitcoincentral
-from traderbot import TraderBot
+from .traderbot import TraderBot
 import json
 
 
@@ -22,14 +22,16 @@ class MockMarket(object):
                 pass
 
     def buy(self, volume, price):
-        logging.info("execute buy %f BTC @ %f on %s" % (volume, price, self.name))
+        logging.info("execute buy %f BTC @ %f on %s" %
+                     (volume, price, self.name))
         self.eur_balance -= price * volume
         self.btc_balance += volume - volume * self.fee
         if self.persistent:
             self.save()
 
     def sell(self, volume, price):
-        logging.info("execute sell %f BTC @ %f on %s" % (volume, price, self.name))
+        logging.info("execute sell %f BTC @ %f on %s" %
+                     (volume, price, self.name))
         self.btc_balance -= volume
         self.eur_balance += price * volume - price * volume * self.fee
         if self.persistent:
@@ -72,7 +74,8 @@ class TraderBotSim(TraderBot):
         self.last_trade = 0
 
     def total_balance(self, price):
-        market_balances = [i.balance_total(price) for i in set(self.clients.values())]
+        market_balances = [i.balance_total(
+            price) for i in set(self.clients.values())]
         return sum(market_balances)
 
     def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice):
@@ -81,4 +84,4 @@ class TraderBotSim(TraderBot):
 
 if __name__ == "__main__":
     t = TraderBotSim()
-    print t.total_balance(33)
+    print(t.total_balance(33))

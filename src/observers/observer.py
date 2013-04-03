@@ -1,9 +1,7 @@
 import abc
 
 
-class Observer(object):
-    __metaclass__ = abc.ABCMeta
-
+class Observer(object, metaclass=abc.ABCMeta):
     def begin_opportunity_finder(self, depths):
         pass
 

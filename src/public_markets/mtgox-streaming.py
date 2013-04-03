@@ -6,15 +6,15 @@ websocket._debug = True
 
 
 def on_message(ws, message):
-    print message
+    print(message)
 
 
 def on_error(ws, error):
-    print error
+    print(error)
 
 
 def on_close(ws):
-    print "### closed ###"
+    print("### closed ###")
 
 
 def on_open(ws):
@@ -24,7 +24,7 @@ def on_open(ws):
             ws.send("Hello %d" % i)
         time.sleep(1)
         ws.close()
-        print "thread terminating..."
+        print("thread terminating...")
     thread.start_new_thread(run, ())
 
 if __name__ == "__main__":

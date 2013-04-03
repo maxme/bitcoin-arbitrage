@@ -1,9 +1,13 @@
-from market import Market
+from .market import Market
 import time
 import base64
 import hmac
-import urllib
-import urllib2
+import urllib.request
+import urllib.parse
+import urllib.error
+import urllib.request
+import urllib.error
+import urllib.parse
 import hashlib
 import sys
 import json
@@ -14,14 +18,22 @@ import config
 
 
 class PrivateMtGox(Market):
-    ticker_url = {"method": "GET", "url": "https://mtgox.com/api/1/BTCUSD/public/ticker"}
-    buy_url = {"method": "POST", "url": "https://mtgox.com/api/1/BTCUSD/private/order/add"}
-    sell_url = {"method": "POST", "url": "https://mtgox.com/api/1/BTCUSD/private/order/add"}
-    order_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/order/result"}
-    open_orders_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/orders"}
-    info_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/private/info"}
-    withdraw_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/bitcoin/send_simple"}
-    deposit_url = {"method": "POST", "url": "https://mtgox.com/api/1/generic/bitcoin/address"}
+    ticker_url = {"method": "GET", "url":
+                  "https://mtgox.com/api/1/BTCUSD/public/ticker"}
+    buy_url = {"method": "POST", "url":
+               "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+    sell_url = {"method": "POST", "url":
+                "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+    order_url = {"method": "POST", "url":
+                 "https://mtgox.com/api/1/generic/private/order/result"}
+    open_orders_url = {"method": "POST", "url":
+                       "https://mtgox.com/api/1/generic/private/orders"}
+    info_url = {"method": "POST", "url":
+                "https://mtgox.com/api/1/generic/private/info"}
+    withdraw_url = {"method": "POST", "url":
+                    "https://mtgox.com/api/1/generic/bitcoin/send_simple"}
+    deposit_url = {"method": "POST", "url":
+                   "https://mtgox.com/api/1/generic/bitcoin/address"}
 
     def __init__(self):
         super(Market, self).__init__()
@@ -62,21 +74,24 @@ class PrivateMtGox(Market):
         headers = {
             'Rest-Key': self.key,
             'Rest-Sign': base64.b64encode(str(hmac.new(base64.b64decode(self.secret),
-                                                       urllib.urlencode(params), hashlib.sha512).digest())),
+                                                       urllib.parse.urlencode(
+                                                           params), hashlib.sha512).digest(
+                                                           ))),
             'Content-type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
         }
         if extra_headers is not None:
-            for k, v in extra_headers.iteritems():
+            for k, v in extra_headers.items():
                 headers[k] = v
         try:
-            req = urllib2.Request(url['url'], urllib.urlencode(params), headers)
-            response = urllib2.urlopen(req)
+            req = urllib.request.Request(url[
+                                         'url'], urllib.parse.urlencode(params), headers)
+            response = urllib.request.urlopen(req)
             if response.getcode() == 200:
                 jsonstr = response.read()
                 return json.loads(jsonstr)
-        except Exception, err:
+        except Exception as err:
             logging.error('Can\'t request MTGox, %s' % err)
         return None
 
@@ -85,7 +100,8 @@ class PrivateMtGox(Market):
             price = self._to_int_price(price, self.currency)
         amount = self._to_int_amount(amount)
 
-        self.buy_url["url"] = self._change_currency_url(self.buy_url["url"], self.currency)
+        self.buy_url["url"] = self._change_currency_url(
+            self.buy_url["url"], self.currency)
 
         params = [("nonce", self._create_nonce()),
                   ("amount_int", str(amount)),
@@ -124,8 +140,10 @@ class PrivateMtGox(Market):
         params = [("nonce", self._create_nonce())]
         response = self._send_request(self.info_url, params)
         if response and "result" in response and response["result"] == "success":
-            self.btc_balance = self._from_int_amount(int(response["return"]["Wallets"]["BTC"]["Balance"]["value_int"]))
-            self.eur_balance = self._from_int_price(int(response["return"]["Wallets"]["EUR"]["Balance"]["value_int"]))
+            self.btc_balance = self._from_int_amount(int(response[
+                                                     "return"]["Wallets"]["BTC"]["Balance"]["value_int"]))
+            self.eur_balance = self._from_int_price(int(response[
+                                                    "return"]["Wallets"]["EUR"]["Balance"]["value_int"]))
             return 1
         return None
 
@@ -135,4 +153,4 @@ class PrivateMtGox(Market):
 
 if __name__ == "__main__":
     mtgox = PrivateMtGox()
-    print mtgox
+    print(mtgox)
