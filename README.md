@@ -54,6 +54,7 @@ opportunities with slower exchanges.
  * Tests
  * Add other exchanges:
    * icbit
+   * bitfloor
  * Update order books with a WebSocket client for supported exchanges (MtGox, Bitcoin-Central)
  * Better documentation
  * Add fiat currency converters USD / EUR
