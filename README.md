@@ -4,16 +4,17 @@ It gets order books from supported exchanges and calculate arbitrage
 opportunities between each markets. It takes market depth into account.
 
 Currently supported exchanges to get data:
- - Bitcoin24
- - Bitcoin-Central
- - Intersango
- - Bitstamp
- - MtGox
- - BTC-e
+ - MtGox (USD, EUR)
+ - Bitstamp (USD, ~EUR)
+ - Bitcoin24 (EUR)
+ - Bitfloor (USD)
+ - Bitcoin-Central (EUR)
+ - BTC-e (USD)
+ - Intersango (EUR)
 
 Currently supported exchanges to automate trade:
- - Bitcoin-Central
- - MtGox
+ - MtGox (EUR)
+ - Bitcoin-Central (EUR)
 
 To add a new exchange see this [doc/add-new-exchange.md](doc/add-new-exchange.md)
 
@@ -54,7 +55,6 @@ opportunities with slower exchanges.
  * Tests
  * Add other exchanges:
    * icbit
-   * bitfloor
  * Update order books with a WebSocket client for supported exchanges (MtGox, Bitcoin-Central)
  * Better documentation
  * Add fiat currency converters USD / EUR
