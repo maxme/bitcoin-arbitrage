@@ -46,8 +46,10 @@ class PrivateBitcoinCentral(Market):
                 url, json.dumps(params), headers=headers)
         else:
             req = urllib.request.Request(url, headers=headers)
-        base64string = base64.encodestring('%s:%s' % (
-            self.username, self.password)).replace('\n', '')
+
+        userpass = '%s:%s' % (
+            self.username, self.password)
+        base64string = base64.encodestring(bytes(userpass, "UTF-8")).replace(b'\n',b'')
         req.add_header("Authorization", "Basic %s" % base64string)
         code = 422
         try:
