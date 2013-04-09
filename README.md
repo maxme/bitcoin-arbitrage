@@ -9,7 +9,7 @@ Currently supported exchanges to get data:
  - Bitcoin24 (EUR)
  - Bitfloor (USD)
  - Bitcoin-Central (EUR)
- - BTC-e (USD)
+ - BTC-e (USD, EUR)
  - Intersango (EUR)
 
 Currently supported exchanges to automate trade:
@@ -64,6 +64,7 @@ opportunities with slower exchanges.
    * Coupons
    * Ripple ?
    * Negative Operations
+   * use Litecoin or other cryptocurrencies trades
 
 # LICENSE
 
