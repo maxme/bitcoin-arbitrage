@@ -73,8 +73,8 @@ class PrivateMtGox(Market):
     def _send_request(self, url, params, extra_headers=None):
         urlparams = bytes(urllib.parse.urlencode(params), "UTF-8")
         secret_from_b64 = base64.b64decode(bytes(self.secret, "UTF-8"))
-        hmac_secret= hmac.new(secret_from_b64,urlparams, hashlib.sha512)
-        
+        hmac_secret = hmac.new(secret_from_b64, urlparams, hashlib.sha512)
+
         headers = {
             'Rest-Key': self.key,
             'Rest-Sign': base64.b64encode(hmac_secret.digest()),

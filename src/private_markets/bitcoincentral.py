@@ -21,7 +21,7 @@ class PrivateBitcoinCentral(Market):
     withdraw_url = "https://bitcoin-central.net/api/v1/transfers/send_bitcoins/"
 
     def __init__(self):
-        self.name = self.__class__.__name__
+        super(Market, self).__init__()
         self.username = config.bitcoincentral_username
         self.password = config.bitcoincentral_password
         self.currency = "EUR"
@@ -49,7 +49,8 @@ class PrivateBitcoinCentral(Market):
 
         userpass = '%s:%s' % (
             self.username, self.password)
-        base64string = base64.encodestring(bytes(userpass, "UTF-8")).replace(b'\n',b'')
+        base64string = base64.encodestring(bytes(
+            userpass, "UTF-8")).replace(b'\n', b'')
         req.add_header("Authorization", "Basic %s" % base64string)
         code = 422
         try:
