@@ -36,7 +36,7 @@ class PrivateMtGox(Market):
                    "https://mtgox.com/api/1/generic/bitcoin/address"}
 
     def __init__(self):
-        super(Market, self).__init__()
+        super().__init__()
         self.key = config.mtgox_key
         self.secret = config.mtgox_secret
         self.currency = "EUR"
@@ -147,10 +147,6 @@ class PrivateMtGox(Market):
                                                     "return"]["Wallets"]["EUR"]["Balance"]["value_int"]))
             return 1
         return None
-
-    def __str__(self):
-        return str({"btc_balance": self.btc_balance, "eur_balance": self.eur_balance})
-
 
 if __name__ == "__main__":
     mtgox = PrivateMtGox()

@@ -18,8 +18,8 @@ class Arbitrer(object):
         self.market_names = markets
         for market_name in markets:
             exec('import public_markets.' + market_name.lower())
-            market = eval(
-                'public_markets.' + market_name.lower() + '.' + market_name + '()')
+            market = eval('public_markets.' + market_name.lower() + '.' +
+                          market_name + '()')
             self.markets.append(market)
 
     def init_observers(self, _observers):
@@ -176,27 +176,39 @@ class Arbitrer(object):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-v", "--verbose", help="more verbose", action="store_true")
-    parser.add_argument("-r", "--replay-history",
-                        type=str, help="replay history from a directory")
+    parser.add_argument("-v", "--verbose", help="more verbose",
+                        action="store_true")
     parser.add_argument("-o", "--observers", type=str, help="observers")
     parser.add_argument("-m", "--markets", type=str, help="markets")
+    parser.add_argument("command", nargs='*', default="watch",
+                        help='verb: "watch|replay-history|get-balance"')
     args = parser.parse_args()
     level = logging.INFO
     if args.verbose:
         level = logging.DEBUG
-    logging.basicConfig(
-        format='%(asctime)s [%(levelname)s] %(message)s', level=level)
+    logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
+                        level=level)
     arbitrer = Arbitrer()
-    if args.replay_history:
-        if args.observers:
-            arbitrer.init_observers(args.observers.split(","))
-        if args.markets:
-            arbitrer.init_markets(args.markets.split(","))
-        arbitrer.replay_history(args.replay_history)
-    else:
+    if args.observers:
+        arbitrer.init_observers(args.observers.split(","))
+    if args.markets:
+        arbitrer.init_markets(args.markets.split(","))
+
+    if "watch" in args.command:
         arbitrer.loop()
+    if "replay-history" in args.command:
+        arbitrer.replay_history(args.replay_history)
+    if "get-balance" in args.command:
+        pmarkets = ["MtGox", "BitcoinCentral"]  # FIXME: remove this
+                                               #  hard coded list
+        pmarketsi = []
+        for pmarket in pmarkets:
+            exec('import private_markets.' + pmarket.lower())
+            market = eval('private_markets.' + pmarket.lower() + '.Private' +
+                          pmarket + '()')
+            pmarketsi.append(market)
+        for market in pmarketsi:
+            print(market)
 
 if __name__ == '__main__':
     main()

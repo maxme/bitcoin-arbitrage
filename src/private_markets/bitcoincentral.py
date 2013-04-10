@@ -21,7 +21,7 @@ class PrivateBitcoinCentral(Market):
     withdraw_url = "https://bitcoin-central.net/api/v1/transfers/send_bitcoins/"
 
     def __init__(self):
-        super(Market, self).__init__()
+        super().__init__()
         self.username = config.bitcoincentral_username
         self.password = config.bitcoincentral_password
         self.currency = "EUR"
@@ -46,20 +46,14 @@ class PrivateBitcoinCentral(Market):
                 url, json.dumps(params), headers=headers)
         else:
             req = urllib.request.Request(url, headers=headers)
-
-        userpass = '%s:%s' % (
-            self.username, self.password)
-        base64string = base64.encodestring(bytes(
-            userpass, "UTF-8")).replace(b'\n', b'')
+        userpass = '%s:%s' % (self.username, self.password)
+        base64string = base64.b64encode(bytes(
+            userpass, 'utf-8')).decode('ascii')
         req.add_header("Authorization", "Basic %s" % base64string)
-        code = 422
-        try:
-            response = urllib.request.urlopen(req)
-            code = response.getcode()
-        except urllib.error.HTTPError as e:
-            code = 422
+        response = urllib.request.urlopen(req)
+        code = response.getcode()
         if code == 200:
-            jsonstr = response.read()
+            jsonstr = response.read().decode('utf-8')
             return json.loads(jsonstr)
         return None
 
@@ -93,10 +87,8 @@ class PrivateBitcoinCentral(Market):
             self.btc_balance = Decimal(response["BTC"])
             self.eur_balance = Decimal(response["EUR"])
 
-    def __str__(self):
-        return str({"btc_balance": self.btc_balance, "eur_balance": self.eur_balance})
-
 
 if __name__ == "__main__":
     market = PrivateBitcoinCentral()
+    market.get_info()
     print(market)

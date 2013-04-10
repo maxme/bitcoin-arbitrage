@@ -4,6 +4,10 @@ class Market(object):
         self.btc_balance = 0
         self.eur_balance = 0
 
+    def __str__(self):
+        return "%s: %s" % (self.name, str({"btc_balance": self.btc_balance,
+                                           "eur_balance": self.eur_balance}))
+
     ## Abstract methods
     def buy(self, price, amount):
         pass
