@@ -1,7 +1,8 @@
 # watch the following markets
 # ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR", "Bitcoin24EUR",
 # "BitstampEUR", "BtceUSD", "MtGoxUSD", "BitfloorUSD", "BitstampUSD"]
-markets = ["BtceUSD", "MtGoxUSD", "BitstampUSD", "CampBXUSD]  # BitfloorUSD (closed)
+markets = ["BtceUSD", "MtGoxUSD", "BitstampUSD", "CampBXUSD", "BitcoinCentralUSD",
+           "Bitcoin24USD"]  # BitfloorUSD (closed)
 
 # observers if any
 # ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
