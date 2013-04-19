@@ -1,16 +1,19 @@
-import urllib2
+import urllib.request
+import urllib.error
+import urllib.parse
 import json
-from market import Market
+from .market import Market
 
 
 class Bitcoin24USD(Market):
     def __init__(self):
         super(Bitcoin24USD, self).__init__("USD")
-        self.update_rate = 20
+        self.update_rate = 60
 
     def update_depth(self):
-        res = urllib2.urlopen('https://bitcoin-24.com/api/USD/orderbook.json')
-        depth = json.loads(res.read())
+        res = urllib.request.urlopen(
+            'https://bitcoin-24.com/api/USD/orderbook.json')
+        depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
     def sort_and_format(self, l, reverse=False):
@@ -27,4 +30,4 @@ class Bitcoin24USD(Market):
 
 if __name__ == "__main__":
     market = Bitcoin24USD()
-    print json.dumps(market.get_ticker())
+    print(json.dumps(market.get_ticker()))
