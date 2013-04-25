@@ -4,6 +4,7 @@ import config
 import time
 import logging
 import json
+from concurrent.futures import ThreadPoolExecutor, wait
 
 
 class Arbitrer(object):
@@ -13,6 +14,7 @@ class Arbitrer(object):
         self.depths = {}
         self.init_markets(config.markets)
         self.init_observers(config.observers)
+        self.threadpool = ThreadPoolExecutor(max_workers=10)
 
     def init_markets(self, markets):
         self.market_names = markets
@@ -125,10 +127,16 @@ class Arbitrer(object):
                 profit, volume, buyprice, kask, sellprice, kbid,
                 perc2, weighted_buyprice, weighted_sellprice)
 
+    def __get_market_depth(self, market, depths):
+        depths[market.name] = market.get_depth()
+
     def update_depths(self):
         depths = {}
+        futures = []
         for market in self.markets:
-            depths[market.name] = market.get_depth()
+            futures.append(self.threadpool.submit(self.__get_market_depth, market,
+                                                  depths))
+        wait(futures, timeout=20)
         return depths
 
     def tickers(self):
