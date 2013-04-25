@@ -38,6 +38,6 @@ nosetests.xml
 *.json
 
 # Project
-src/config.py
+config.py
 old/
 tmp/
