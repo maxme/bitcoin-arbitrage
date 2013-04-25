@@ -22,7 +22,8 @@ Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 
 # WARNING
 
-**Real trading bots are included. Don't put your API keys in config.py if you don't know what you are doing.**
+**Real trading bots are included. Don't put your API keys in config.py
+  if you don't know what you are doing.**
 
 # Configuration
 
@@ -50,14 +51,20 @@ forked. MtGox is a very reactive market, price dropped significally in
 1 hour, this kind of situation opens very good arbitrage
 opportunities with slower exchanges.
 
+# Run tests
+
+    $ nosetests arbitrage/
+
 # TODO
 
  * Tests
+ * Threading fetchs
+ * Write documentation
  * Add other exchanges:
    * icbit
- * Update order books with a WebSocket client for supported exchanges (MtGox, Bitcoin-Central)
- * Better documentation
- * Add fiat currency converters USD / EUR
+ * Update order books with a WebSocket client for supported exchanges
+   (MtGox, Bitcoin-Central)
+ * Add fiat currency converters USD / EUR that permits mixing currencies
  * Replace float by Decimal
  * Better history handling for observer "HistoryDumper" (Redis ?)
  * Move EUR / USD from a market to an other:
