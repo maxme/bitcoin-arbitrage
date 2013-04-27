@@ -11,7 +11,6 @@ import urllib.parse
 import hashlib
 import sys
 import json
-from decimal import Decimal
 import config
 
 
@@ -84,8 +83,8 @@ class PrivateBitcoinCentral(Market):
     def get_info(self):
         response = self._send_request(self.balance_url)
         if response:
-            self.btc_balance = Decimal(response["BTC"])
-            self.eur_balance = Decimal(response["EUR"])
+            self.btc_balance = response["BTC"]
+            self.eur_balance = response["EUR"]
 
 
 if __name__ == "__main__":

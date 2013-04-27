@@ -13,7 +13,6 @@ import sys
 import json
 import re
 import logging
-from decimal import Decimal
 import config
 
 
@@ -52,23 +51,23 @@ class PrivateMtGox(Market):
         ret_price = None
         if currency in ["USD", "EUR", "GBP", "PLN", "CAD", "AUD", "CHF", "CNY",
                         "NZD", "RUB", "DKK", "HKD", "SGD", "THB"]:
-            ret_price = Decimal(price)
+            ret_price = price
             ret_price = int(price * 100000)
         elif currency in ["JPY", "SEK"]:
-            ret_price = Decimal(price)
+            ret_price = price
             ret_price = int(price * 1000)
         return ret_price
 
     def _to_int_amount(self, amount):
-        amount = Decimal(amount)
+        amount = amount
         return int(amount * 100000000)
 
     def _from_int_amount(self, amount):
-        return Decimal(amount) / Decimal(100000000.)
+        return amount / 100000000.
 
     def _from_int_price(self, amount):
         # FIXME: should take JPY and SEK into account
-        return Decimal(amount) / Decimal(100000.)
+        return amount / 100000.
 
     def _send_request(self, url, params, extra_headers=None):
         urlparams = bytes(urllib.parse.urlencode(params), "UTF-8")
@@ -111,7 +110,8 @@ class PrivateMtGox(Market):
             params.append(("price_int", str(price)))
 
         response = self._send_request(self.buy_url, params)
-        if response and "result" in response and response["result"] == "success":
+        if response and "result" in response and \
+           response["result"] == "success":
             return response["return"]
         return None
 
@@ -126,14 +126,16 @@ class PrivateMtGox(Market):
                   ("amount_int", str(self._to_int_amount(amount))),
                   ("address", address)]
         response = self._send_request(self.withdraw_url, params)
-        if response and "result" in response and response["result"] == "success":
+        if response and "result" in response and \
+           response["result"] == "success":
             return response["return"]
         return None
 
     def deposit(self):
         params = [("nonce", self._create_nonce())]
         response = self._send_request(self.deposit_url, params)
-        if response and "result" in response and response["result"] == "success":
+        if response and "result" in response and \
+           response["result"] == "success":
             return response["return"]
         return None
 
@@ -141,13 +143,9 @@ class PrivateMtGox(Market):
         params = [("nonce", self._create_nonce())]
         response = self._send_request(self.info_url, params)
         if response and "result" in response and response["result"] == "success":
-            self.btc_balance = self._from_int_amount(int(response[
-                                                     "return"]["Wallets"]["BTC"]["Balance"]["value_int"]))
-            self.eur_balance = self._from_int_price(int(response[
-                                                    "return"]["Wallets"]["EUR"]["Balance"]["value_int"]))
+            self.btc_balance = self._from_int_amount(int(
+                response["return"]["Wallets"]["BTC"]["Balance"]["value_int"]))
+            self.eur_balance = self._from_int_price(int(
+                response["return"]["Wallets"]["EUR"]["Balance"]["value_int"]))
             return 1
         return None
-
-if __name__ == "__main__":
-    mtgox = PrivateMtGox()
-    print(mtgox)

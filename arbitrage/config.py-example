@@ -19,6 +19,9 @@ bitcoincentral_username = "FIXME"
 bitcoincentral_password = "FIXME"
 bitcoincentral_address = "FIXME"  # to deposit btc from markets / wallets
 
+bitstamp_username = "FIXME"
+bitstamp_password = "FIXME"
+
 # SafeGuards
 max_tx_volume = 10  # in BTC
 min_tx_volume = 1  # in BTC
