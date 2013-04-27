@@ -15,8 +15,7 @@ Currently supported exchanges to get data:
 Currently supported exchanges to automate trade:
  - MtGox (EUR)
  - Bitcoin-Central (EUR)
-
-To add a new exchange see this [doc/add-new-exchange.md](doc/add-new-exchange.md)
+ - Bitstamp (USD)
 
 Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 
@@ -29,18 +28,20 @@ Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 
     cp src/config.py-example src/config.py
 
-Then edit config.py file to setup your preferences: watched markets and observers
+Then edit config.py file to setup your preferences: watched markets
+and observers
 
 
 # Run
 
-You need Python3 to run this program. To use the observer: XMPPMessager you will need to install sleekxmpp:
+You need Python3 to run this program. To use the observer:
+XMPPMessager you will need to install sleekxmpp:
 
     $ pip3 install sleekxmpp
 
-To run the program:
+## To run the opportunity watcher:
 
-    $ python3 src/arbitrage.py
+    $ python3 arbitrage/arbitrage.py
     2013-03-12 03:52:14,341 [INFO] profit: 30.539722 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 29.4670 (Bitcoin24EUR) ~10.41%
     2013-03-12 03:52:14,356 [INFO] profit: 66.283642 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (BitcoinCentralEUR) ~22.59%
     2013-03-12 03:52:14,357 [INFO] profit: 31.811390 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (IntersangoEUR) ~10.84%
@@ -51,6 +52,10 @@ forked. MtGox is a very reactive market, price dropped significally in
 1 hour, this kind of situation opens very good arbitrage
 opportunities with slower exchanges.
 
+## To check you balance on an exchange:
+
+    $ python3 arbitrage/arbitrage.py get-balance
+
 # Run tests
 
     $ nosetests arbitrage/
@@ -58,7 +63,6 @@ opportunities with slower exchanges.
 # TODO
 
  * Tests
- * Threading fetchs
  * Write documentation
  * Add other exchanges:
    * icbit
