@@ -26,7 +26,7 @@ Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 
 # Configuration
 
-    cp src/config.py-example src/config.py
+    cp arbitrage/config.py-example arbitrage/config.py
 
 Then edit config.py file to setup your preferences: watched markets
 and observers
@@ -34,10 +34,20 @@ and observers
 
 # Run
 
-You need Python3 to run this program. To use the observer:
+You need Python3 to run this program.
+
+To install on Debian, Ubuntu, or variants of them, use:
+
+    $ apt-get install python3 python3-pip
+    
+**NOTE**: We are assuming proper permissions. If it asks if you are root, run it again with "sudo" at the beginning.
+
+To use the observer:
 XMPPMessager you will need to install sleekxmpp:
 
     $ pip3 install sleekxmpp
+    
+**NOTE**: Again, if you see some output telling you "permission denied", add "sudo" to the beginning to give pip3 root privileges.
 
 ## To run the opportunity watcher:
 
