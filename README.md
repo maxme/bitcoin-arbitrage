@@ -34,20 +34,14 @@ and observers
 
 # Run
 
-You need Python3 to run this program.
+You need Python3 to run this program. To install on Debian, Ubuntu, or
+variants of them, use:
 
-To install on Debian, Ubuntu, or variants of them, use:
+    $ sudo apt-get install python3 python3-pip
 
-    $ apt-get install python3 python3-pip
-    
-**NOTE**: We are assuming proper permissions. If it asks if you are root, run it again with "sudo" at the beginning.
-
-To use the observer:
-XMPPMessager you will need to install sleekxmpp:
+To use the observer XMPPMessager you will need to install sleekxmpp:
 
     $ pip3 install sleekxmpp
-    
-**NOTE**: Again, if you see some output telling you "permission denied", add "sudo" to the beginning to give pip3 root privileges.
 
 ## To run the opportunity watcher:
 
