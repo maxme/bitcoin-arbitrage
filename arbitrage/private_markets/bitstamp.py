@@ -47,15 +47,17 @@ class PrivateBitstamp(Market):
             return json.loads(jsonstr)
         return None
 
-    def buy(self, amount, price):
+    def _buy(self, amount, price):
         """Create a buy limit order"""
+        raise Exception("Should not be there")
         params = {"amount": amount, "price": price}
         response = self._send_request(self.buy_url, params)
         if "error" in response:
             raise TradeException(response["error"])
 
-    def sell(self, amount, price):
+    def _sell(self, amount, price):
         """Create a sell limit order"""
+        raise Exception("Should not be there")
         params = {"amount": amount, "price": price}
         response = self._send_request(self.sell_url, params)
         if "error" in response:

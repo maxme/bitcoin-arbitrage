@@ -23,10 +23,7 @@ Subject: %(subject)s
 class Emailer(Observer):
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
         if profit > config.profit_thresh and perc > config.perc_thresh:
-            message = """profit: %f EUR with volume: %f BTC
+            message = """profit: %f USD with volume: %f BTC
 buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%
 """ % (profit, volume, buyprice, kask, sellprice, kbid, perc)
             send_email("Arbitrage Bot", message)
-
-if __name__ == "__main__":
-    send_email("test", "hey!")

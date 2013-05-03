@@ -1,3 +1,5 @@
+# Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+
 from .market import Market
 import time
 import base64
@@ -115,10 +117,12 @@ class PrivateMtGox(Market):
             return response["return"]
         return None
 
-    def buy(self, amount, price=None):
+    def _buy(self, amount, price):
+        raise Exception("Should not be there")
         return self.trade(amount, "bid", price)
 
-    def sell(self, amount, price=None):
+    def _sell(self, amount, price):
+        raise Exception("Should not be there")
         return self.trade(amount, "ask", price)
 
     def withdraw(self, amount, address):
@@ -147,5 +151,6 @@ class PrivateMtGox(Market):
                 response["return"]["Wallets"]["BTC"]["Balance"]["value_int"]))
             self.eur_balance = self._from_int_price(int(
                 response["return"]["Wallets"]["EUR"]["Balance"]["value_int"]))
+            self.usd_balance = self.fc.convert(self.eur_balance, "EUR", "USD")
             return 1
         return None

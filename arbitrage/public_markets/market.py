@@ -4,6 +4,7 @@ import urllib.error
 import urllib.parse
 import config
 import logging
+from fiatconverter import FiatConverter
 
 
 class Market(object):
@@ -12,6 +13,8 @@ class Market(object):
         self.currency = currency
         self.depth_updated = 0
         self.update_rate = 60
+        self.fc = FiatConverter()
+        self.fc.update()
 
     def get_depth(self):
         timediff = time.time() - self.depth_updated
@@ -24,9 +27,17 @@ class Market(object):
                 {'price': 0, 'amount': 0}]}
         return self.depth
 
+    def convert_to_usd(self):
+        if self.currency == "USD":
+            return
+        for direction in ("asks", "bids"):
+            for order in self.depth[direction]:
+                order["price"] = self.fc.convert(order["price"], self.currency, "USD")
+
     def ask_update_depth(self):
         try:
             self.update_depth()
+            self.convert_to_usd()
             self.depth_updated = time.time()
         except (urllib.error.HTTPError, urllib.error.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)

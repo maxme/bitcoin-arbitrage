@@ -1,3 +1,5 @@
+# Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+
 import public_markets
 import observers
 import config

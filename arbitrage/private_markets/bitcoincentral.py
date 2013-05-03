@@ -20,6 +20,8 @@ class PrivateBitcoinCentral(Market):
     withdraw_url = "https://bitcoin-central.net/api/v1/transfers/send_bitcoins/"
 
     def __init__(self):
+        # FIXME: update this file when bitcoin central re-opens
+        raise Exception("BitcoinCentral is closed")
         super().__init__()
         self.username = config.bitcoincentral_username
         self.password = config.bitcoincentral_password
@@ -85,7 +87,7 @@ class PrivateBitcoinCentral(Market):
         if response:
             self.btc_balance = response["BTC"]
             self.eur_balance = response["EUR"]
-
+            self.usd_balance = self.fc.convert(self.eur_balance, "EUR", "USD")
 
 if __name__ == "__main__":
     market = PrivateBitcoinCentral()

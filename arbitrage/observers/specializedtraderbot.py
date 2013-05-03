@@ -42,9 +42,8 @@ class SpecializedTraderBot(Observer):
         for kclient in self.clients:
             self.clients[kclient].get_info()
 
-    def opportunity(
-        self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice,
-            weighted_sellprice):
+    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
+                    weighted_buyprice, weighted_sellprice):
         if kask not in self.clients:
             logging.warn(
                 "Can't automate this trade, client not available: %s" % (kask))
@@ -71,11 +70,8 @@ class SpecializedTraderBot(Observer):
             self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f"
-                         % (volume, config.min_tx_volume))
-            logging.info(
-                "Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask, self.clients[kask].eur_balance,
-                                                                   kbid, self.clients[kbid].btc_balance))
+            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f" % (volume, config.min_tx_volume))
+            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask, self.clients[kask].eur_balance, kbid, self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()
@@ -84,8 +80,8 @@ class SpecializedTraderBot(Observer):
                          % (current_time - self.last_trade))
             return
 
-        self.potential_trades.append(
-            [profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice])
+        self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice,
+                                      weighted_sellprice])
 
     def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice):
         self.last_trade = time.time()
