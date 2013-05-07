@@ -19,8 +19,8 @@ class TraderBot(Observer):
             "BitstampUSD": self.bitstamp,
         }
         self.fc = FiatConverter()
-        self.profit_thresh = 1  # in USD
-        self.perc_thresh = 0  # in %
+        self.profit_thresh = 100  # in USD
+        self.perc_thresh = 4  # in %
         self.trade_wait = 120  # in seconds
         self.last_trade = 0
         self.potential_trades = []
@@ -67,8 +67,8 @@ class TraderBot(Observer):
                                                    self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction not" +
-                         " reached %f/%f" % (volume, config.min_tx_volume))
+            logging.warn("Can't automate this trade, minimum volume transaction"+
+                         " not reached %f/%f" % (volume, config.min_tx_volume))
             logging.warn("Balance on %s: %f USD - Balance on %s: %f BTC"
                          % (kask, self.clients[kask].usd_balance, kbid,
                             self.clients[kbid].btc_balance))
@@ -76,21 +76,22 @@ class TraderBot(Observer):
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
             logging.warn("[TraderBot] Can't automate this trade, last trade " +
-                         "occured %.2f seconds ago" % (current_time - self.last_trade))
+                         "occured %.2f seconds ago" %
+                         (current_time - self.last_trade))
             return
-        self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice,
-                                      weighted_sellprice, buyprice, sellprice])
+        self.potential_trades.append([profit, volume, kask, kbid,
+                                      weighted_buyprice, weighted_sellprice,
+                                      buyprice, sellprice])
 
     def watch_balances(self):
         pass
 
-    def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice,
-                      buyprice, sellprice):
+    def execute_trade(self, volume, kask, kbid, weighted_buyprice,
+                      weighted_sellprice, buyprice, sellprice):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
-        #FIXME
-        #        send_email("Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),
-        #                   "weighted_buyprice=%f weighted_sellprice=%f" % (weighted_buyprice,
-        #                                                                   weighted_sellprice))
+        send_email("Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),
+                   "weighted_buyprice=%f weighted_sellprice=%f" %
+                   (weighted_buyprice, weighted_sellprice))
         self.clients[kask].buy(volume, buyprice)
         self.clients[kbid].sell(volume, sellprice)

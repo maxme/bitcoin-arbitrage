@@ -118,11 +118,9 @@ class PrivateMtGox(Market):
         return None
 
     def _buy(self, amount, price):
-        raise Exception("Should not be there")
         return self.trade(amount, "bid", price)
 
     def _sell(self, amount, price):
-        raise Exception("Should not be there")
         return self.trade(amount, "ask", price)
 
     def withdraw(self, amount, address):
