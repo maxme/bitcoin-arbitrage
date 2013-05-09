@@ -19,28 +19,21 @@ import config
 
 
 class PrivateMtGox(Market):
-    ticker_url = {"method": "GET", "url":
-                  "https://mtgox.com/api/1/BTCUSD/public/ticker"}
-    buy_url = {"method": "POST", "url":
-               "https://mtgox.com/api/1/BTCUSD/private/order/add"}
-    sell_url = {"method": "POST", "url":
-                "https://mtgox.com/api/1/BTCUSD/private/order/add"}
-    order_url = {"method": "POST", "url":
-                 "https://mtgox.com/api/1/generic/private/order/result"}
-    open_orders_url = {"method": "POST", "url":
-                       "https://mtgox.com/api/1/generic/private/orders"}
-    info_url = {"method": "POST", "url":
-                "https://mtgox.com/api/1/generic/private/info"}
-    withdraw_url = {"method": "POST", "url":
-                    "https://mtgox.com/api/1/generic/bitcoin/send_simple"}
-    deposit_url = {"method": "POST", "url":
-                   "https://mtgox.com/api/1/generic/bitcoin/address"}
-
     def __init__(self):
         super().__init__()
+        self.order_url = {"method": "POST", "url":
+                          "https://mtgox.com/api/1/generic/private/order/result"}
+        self.open_orders_url = {"method": "POST", "url":
+                                "https://mtgox.com/api/1/generic/private/orders"}
+        self.info_url = {"method": "POST", "url":
+                         "https://mtgox.com/api/1/generic/private/info"}
+        self.withdraw_url = {"method": "POST", "url":
+                        "https://mtgox.com/api/1/generic/bitcoin/send_simple"}
+        self.deposit_url = {"method": "POST", "url":
+                            "https://mtgox.com/api/1/generic/bitcoin/address"}
+
         self.key = config.mtgox_key
         self.secret = config.mtgox_secret
-        self.currency = "EUR"
         self.get_info()
 
     def _create_nonce(self):
@@ -87,8 +80,9 @@ class PrivateMtGox(Market):
             for k, v in extra_headers.items():
                 headers[k] = v
         try:
-            req = urllib.request.Request(url[
-                                         'url'], bytes(urllib.parse.urlencode(params), "UTF-8"), headers)
+            req = urllib.request.Request(url['url'],
+                                         bytes(urllib.parse.urlencode(params),
+                                               "UTF-8"), headers)
             response = urllib.request.urlopen(req)
             if response.getcode() == 200:
                 jsonstr = response.read()
@@ -141,6 +135,17 @@ class PrivateMtGox(Market):
             return response["return"]
         return None
 
+class PrivateMtGoxEUR(PrivateMtGox):
+    def __init__(self):
+        super().__init__()
+        self.ticker_url = {"method": "GET", "url":
+                           "https://mtgox.com/api/1/BTCEUR/public/ticker"}
+        self.buy_url = {"method": "POST", "url":
+                        "https://mtgox.com/api/1/BTCEUR/private/order/add"}
+        self.sell_url = {"method": "POST", "url":
+                         "https://mtgox.com/api/1/BTCEUR/private/order/add"}
+        self.currency = "EUR"
+
     def get_info(self):
         params = [("nonce", self._create_nonce())]
         response = self._send_request(self.info_url, params)
@@ -150,5 +155,27 @@ class PrivateMtGox(Market):
             self.eur_balance = self._from_int_price(int(
                 response["return"]["Wallets"]["EUR"]["Balance"]["value_int"]))
             self.usd_balance = self.fc.convert(self.eur_balance, "EUR", "USD")
+            return 1
+        return None
+
+class PrivateMtGoxUSD(PrivateMtGox):
+    def __init__(self):
+        super().__init__()
+        self.ticker_url = {"method": "GET", "url":
+                           "https://mtgox.com/api/1/BTCUSD/public/ticker"}
+        self.buy_url = {"method": "POST", "url":
+                        "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+        self.sell_url = {"method": "POST", "url":
+                         "https://mtgox.com/api/1/BTCUSD/private/order/add"}
+        self.currency = "USD"
+
+    def get_info(self):
+        params = [("nonce", self._create_nonce())]
+        response = self._send_request(self.info_url, params)
+        if response and "result" in response and response["result"] == "success":
+            self.btc_balance = self._from_int_amount(int(
+                response["return"]["Wallets"]["BTC"]["Balance"]["value_int"]))
+            self.usd_balance = self._from_int_price(int(
+                response["return"]["Wallets"]["USD"]["Balance"]["value_int"]))
             return 1
         return None

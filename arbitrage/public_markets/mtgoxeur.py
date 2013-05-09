@@ -9,7 +9,7 @@ from .market import Market
 class MtGoxEUR(Market):
     def __init__(self):
         super(MtGoxEUR, self).__init__("EUR")
-        self.update_rate = 60
+        self.update_rate = 20
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}
 

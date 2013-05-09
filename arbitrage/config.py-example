@@ -10,6 +10,8 @@ observers = ["Logger"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
+refresh_rate = 20
+
 #### Trader Bot Config
 # Access to Private APIs
 mtgox_key = "FIXME"

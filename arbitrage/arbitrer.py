@@ -188,4 +188,4 @@ class Arbitrer(object):
             self.depths = self.update_depths()
             self.tickers()
             self.tick()
-            time.sleep(30)
+            time.sleep(config.refresh_rate)

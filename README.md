@@ -13,9 +13,9 @@ Currently supported exchanges to get data:
  - Intersango (EUR)
 
 Currently supported exchanges to automate trade:
- - MtGox (EUR)
- - Bitcoin-Central (EUR)
+ - MtGox (EUR, USD)
  - Bitstamp (USD)
+ - Bitcoin-Central (EUR) - closed
 
 Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 
@@ -72,7 +72,6 @@ opportunities with slower exchanges.
    * icbit
  * Update order books with a WebSocket client for supported exchanges
    (MtGox, Bitcoin-Central)
- * Add fiat currency converters USD / EUR that permits mixing currencies
  * Replace float by Decimal
  * Better history handling for observer "HistoryDumper" (Redis ?)
  * Move EUR / USD from a market to an other:

@@ -11,16 +11,15 @@ from private_markets import bitstamp
 
 class TraderBot(Observer):
     def __init__(self):
-        self.mtgox = mtgox.PrivateMtGox()
+        self.mtgoxeur = mtgox.PrivateMtGoxEUR()
+        self.mtgoxusd = mtgox.PrivateMtGoxUSD()
         self.bitstamp = bitstamp.PrivateBitstamp()
         self.clients = {
-            "MtGoxEUR": self.mtgox,
-            "MtGoxUSD": self.mtgox,
+            "MtGoxEUR": self.mtgoxeur,
+            "MtGoxUSD": self.mtgoxusd,
             "BitstampUSD": self.bitstamp,
         }
         self.fc = FiatConverter()
-        self.profit_thresh = 100  # in USD
-        self.perc_thresh = 4  # in %
         self.trade_wait = 120  # in seconds
         self.last_trade = 0
         self.potential_trades = []
@@ -46,7 +45,7 @@ class TraderBot(Observer):
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
                     weighted_buyprice, weighted_sellprice):
-        if profit < self.profit_thresh or perc < self.perc_thresh:
+        if profit < config.profit_thresh or perc < config.perc_thresh:
             logging.debug("[TraderBot] Profit or profit percentage lower than"+
                           " thresholds")
             return
@@ -90,8 +89,5 @@ class TraderBot(Observer):
                       weighted_sellprice, buyprice, sellprice):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
-        send_email("Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),
-                   "weighted_buyprice=%f weighted_sellprice=%f" %
-                   (weighted_buyprice, weighted_sellprice))
         self.clients[kask].buy(volume, buyprice)
         self.clients[kbid].sell(volume, sellprice)
