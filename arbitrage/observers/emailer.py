@@ -19,9 +19,9 @@ Subject: %(subject)s
     except smtplib.SMTPException:
         logging.warn("Unable to send email")
 
-
 class Emailer(Observer):
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
+    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
+                    weighted_buyprice, weighted_sellprice):
         if profit > config.profit_thresh and perc > config.perc_thresh:
             message = """profit: %f USD with volume: %f BTC
 buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%

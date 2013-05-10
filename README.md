@@ -24,15 +24,12 @@ Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 **Real trading bots are included. Don't put your API keys in config.py
   if you don't know what you are doing.**
 
-# Configuration
+# Installation And Configuration
 
     cp arbitrage/config.py-example arbitrage/config.py
 
 Then edit config.py file to setup your preferences: watched markets
 and observers
-
-
-# Run
 
 You need Python3 to run this program. To install on Debian, Ubuntu, or
 variants of them, use:
@@ -43,7 +40,9 @@ To use the observer XMPPMessager you will need to install sleekxmpp:
 
     $ pip3 install sleekxmpp
 
-## To run the opportunity watcher:
+# Run
+
+To run the opportunity watcher:
 
     $ python3 arbitrage/arbitrage.py
     2013-03-12 03:52:14,341 [INFO] profit: 30.539722 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 29.4670 (Bitcoin24EUR) ~10.41%
@@ -56,11 +55,12 @@ forked. MtGox is a very reactive market, price dropped significally in
 1 hour, this kind of situation opens very good arbitrage
 opportunities with slower exchanges.
 
-## To check you balance on an exchange:
+To check you balance on an exchange:
 
-    $ python3 arbitrage/arbitrage.py get-balance
+    $ python3 arbitrage.py -m MtGoxEUR get-balance
+    $ python3 arbitrage.py -m MtGoxEUR,MtGoxUSD,BitstampUSD get-balance
 
-# Run tests
+Run tests
 
     $ nosetests arbitrage/
 
@@ -72,7 +72,6 @@ opportunities with slower exchanges.
    * icbit
  * Update order books with a WebSocket client for supported exchanges
    (MtGox, Bitcoin-Central)
- * Replace float by Decimal
  * Better history handling for observer "HistoryDumper" (Redis ?)
  * Move EUR / USD from a market to an other:
    * Coupons

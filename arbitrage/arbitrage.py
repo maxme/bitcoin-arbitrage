@@ -15,8 +15,7 @@ class ArbitrerCLI:
         if "replay-history" in args.command:
             self.arbitrer.replay_history(args.replay_history)
         if "get-balance" in args.command:
-            # FIXME: remove this hard coded list
-            pmarkets = ["MtGox", "Bitstamp"]
+            pmarkets = args.markets.split(",")
             pmarketsi = []
             for pmarket in pmarkets:
                 exec('import private_markets.' + pmarket.lower())
@@ -37,8 +36,10 @@ class ArbitrerCLI:
         parser = argparse.ArgumentParser()
         parser.add_argument("-v", "--verbose", help="more verbose",
                             action="store_true")
-        parser.add_argument("-o", "--observers", type=str, help="observers")
-        parser.add_argument("-m", "--markets", type=str, help="markets")
+        parser.add_argument("-o", "--observers", type=str,
+                            help="observers, example: -oLogger,Emailer")
+        parser.add_argument("-m", "--markets", type=str,
+                            help="markets, example: -mMtGox,Bitstamp")
         parser.add_argument("command", nargs='*', default="watch",
                             help='verb: "watch|replay-history|get-balance"')
         args = parser.parse_args()

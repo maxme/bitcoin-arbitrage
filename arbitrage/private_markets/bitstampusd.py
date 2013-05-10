@@ -1,3 +1,5 @@
+# Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+
 from .market import Market, TradeException
 import time
 import base64
@@ -14,7 +16,7 @@ import json
 import config
 
 
-class PrivateBitstamp(Market):
+class PrivateBitstampUSD(Market):
     balance_url = "https://www.bitstamp.net/api/balance/"
     buy_url = "https://www.bitstamp.net/api/buy/"
     sell_url = "https://www.bitstamp.net/api/sell/"
