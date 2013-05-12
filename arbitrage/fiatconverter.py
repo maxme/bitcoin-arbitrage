@@ -17,7 +17,8 @@ class FiatConverter:
         self.rates = {
             "USD": 1,
             "EUR": 0.77,
-            "CNY": 6.15
+            "CNY": 6.15,
+            "SEK": 6.6,
         }
         self.update_delay = 60 * 60 # every hour
         self.last_update = 0

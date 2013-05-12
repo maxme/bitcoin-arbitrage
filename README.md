@@ -55,7 +55,7 @@ forked. MtGox is a very reactive market, price dropped significally in
 1 hour, this kind of situation opens very good arbitrage
 opportunities with slower exchanges.
 
-To check you balance on an exchange:
+To check your balance on an exchange (also a good way to check your accounts configuration):
 
     $ python3 arbitrage.py -m MtGoxEUR get-balance
     $ python3 arbitrage.py -m MtGoxEUR,MtGoxUSD,BitstampUSD get-balance

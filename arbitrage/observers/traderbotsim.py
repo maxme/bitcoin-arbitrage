@@ -8,10 +8,10 @@ import json
 
 
 class MockMarket(object):
-    def __init__(self, name, fee=0, eur_balance=500., btc_balance=15., persistent=True):
+    def __init__(self, name, fee=0, usd_balance=500., btc_balance=15., persistent=True):
         self.name = name
         self.filename = "traderbot-sim-" + name + ".json"
-        self.eur_balance = eur_balance
+        self.usd_balance = usd_balance
         self.btc_balance = btc_balance
         self.fee = fee
         self.persistent = persistent
@@ -24,7 +24,7 @@ class MockMarket(object):
     def buy(self, volume, price):
         logging.info("execute buy %f BTC @ %f on %s" %
                      (volume, price, self.name))
-        self.eur_balance -= price * volume
+        self.usd_balance -= price * volume
         self.btc_balance += volume - volume * self.fee
         if self.persistent:
             self.save()
@@ -33,21 +33,21 @@ class MockMarket(object):
         logging.info("execute sell %f BTC @ %f on %s" %
                      (volume, price, self.name))
         self.btc_balance -= volume
-        self.eur_balance += price * volume - price * volume * self.fee
+        self.usd_balance += price * volume - price * volume * self.fee
         if self.persistent:
             self.save()
 
     def load(self):
         data = json.load(open(self.filename, "r"))
-        self.eur_balance = data["eur"]
+        self.usd_balance = data["usd"]
         self.btc_balance = data["btc"]
 
     def save(self):
-        data = {'eur': self.eur_balance, 'btc': self.btc_balance}
+        data = {'usd': self.usd_balance, 'btc': self.btc_balance}
         json.dump(data, open(self.filename, "w"))
 
     def balance_total(self, price):
-        return self.eur_balance + self.btc_balance * price
+        return self.usd_balance + self.btc_balance * price
 
     def get_info(self):
         pass
@@ -63,10 +63,7 @@ class TraderBotSim(TraderBot):
         self.clients = {
             "MtGoxEUR": self.mtgox,
             "MtGoxUSD": self.mtgox,
-            "BitcoinCentralEUR": self.btcentral,
-            "Bitcoin24EUR": self.bitcoin24,
-            "IntersangoEUR": self.intersango,
-            "BitstampEUR": self.bitstamp,
+            "BitstampUSD": self.bitstamp,
         }
         self.profit_thresh = 1  # in EUR
         self.perc_thresh = 0.6  # in %
