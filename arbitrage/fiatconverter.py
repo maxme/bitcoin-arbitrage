@@ -32,7 +32,7 @@ class FiatConverter:
         if "rate" in data:
             rate = data["rate"] * (1.0 - self.bank_fee)
         else:
-            logging.error("Can't update fiat convertion rate: %s", url)
+            logging.error("Can't update fiat conversion rate: %s", url)
         return rate
 
     def update_currency_pair(self, code_to):
