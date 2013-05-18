@@ -2,6 +2,7 @@
 
 import logging
 import argparse
+import sys
 from arbitrer import Arbitrer
 
 
@@ -15,6 +16,9 @@ class ArbitrerCLI:
         if "replay-history" in args.command:
             self.arbitrer.replay_history(args.replay_history)
         if "get-balance" in args.command:
+            if not args.markets:
+                logging.error("You must use --markets argument to specify markets")
+                sys.exit(2)
             pmarkets = args.markets.split(",")
             pmarketsi = []
             for pmarket in pmarkets:
