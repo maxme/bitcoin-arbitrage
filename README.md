@@ -70,6 +70,7 @@ Run tests
  * Write documentation
  * Add other exchanges:
    * icbit
+   * BitFinex
  * Update order books with a WebSocket client for supported exchanges
    (MtGox, Bitcoin-Central)
  * Better history handling for observer "HistoryDumper" (Redis ?)
