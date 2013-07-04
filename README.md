@@ -11,6 +11,7 @@ Currently supported exchanges to get data:
  - Bitcoin-Central (EUR)
  - BTC-e (USD, EUR)
  - Intersango (EUR)
+ - Bitfinex (USD)
 
 Currently supported exchanges to automate trade:
  - MtGox (EUR, USD)
