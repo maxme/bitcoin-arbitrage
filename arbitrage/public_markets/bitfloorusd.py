@@ -4,6 +4,7 @@ import urllib.parse
 import json
 from .market import Market
 
+# FIXME : cleanup / closed
 
 class BitfloorUSD(Market):
     def __init__(self):
@@ -26,6 +27,7 @@ class BitfloorUSD(Market):
         bids = self.sort_and_format(depth['bids'], True)
         asks = self.sort_and_format(depth['asks'], False)
         return {'asks': asks, 'bids': bids}
+
 
 if __name__ == "__main__":
     market = BitfloorUSD()

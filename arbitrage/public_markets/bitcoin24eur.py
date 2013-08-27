@@ -4,6 +4,7 @@ import urllib.parse
 import json
 from .market import Market
 
+#FIXME : bitcoin24 is dead
 
 class Bitcoin24EUR(Market):
     def __init__(self):
@@ -27,6 +28,7 @@ class Bitcoin24EUR(Market):
         bids = self.sort_and_format(depth['bids'], True)
         asks = self.sort_and_format(depth['asks'], False)
         return {'asks': asks, 'bids': bids}
+
 
 if __name__ == "__main__":
     market = Bitcoin24EUR()
