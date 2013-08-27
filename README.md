@@ -1,3 +1,6 @@
+Fork from the work of Maxime Biais : https://github.com/maxme/bitcoin-arbitrage
+Work in progress for change / improvement
+
 # bitcoin-arbitrage - opportunity detector and automated trading
 
 It gets order books from supported exchanges and calculate arbitrage
