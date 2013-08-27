@@ -8,7 +8,8 @@ from .market import Market
 class CampBXUSD(Market):
     def __init__(self):
         super(CampBXUSD, self).__init__("USD")
-        self.update_rate = 60
+        self.trade_fee = 0.0055
+        self.update_rate = 60   # "ensure that there is at least 500 millisecond latency between two calls"
 
     def update_depth(self):
         res = urllib.request.urlopen('http://campbx.com/api/xdepth.php')
@@ -26,6 +27,7 @@ class CampBXUSD(Market):
         bids = self.sort_and_format(depth['Bids'], True)
         asks = self.sort_and_format(depth['Asks'], False)
         return {'asks': asks, 'bids': bids}
+
 
 if __name__ == "__main__":
     market = CampBXUSD()

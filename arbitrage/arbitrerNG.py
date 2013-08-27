@@ -71,12 +71,17 @@ class ArbitrerNG(object):
         total_volume = 0
         total_buy = 0
         total_sell = 0
+        total_fee = 0
+
+        fee_buy = list(filter(lambda m: m.name == kask, self.markets))[0].trade_fee
+        fee_sell = list(filter(lambda m: m.name == kbid, self.markets))[0].trade_fee
 
         while True:
             v_to_buy = min(c_ask_amount, c_bid_amount, max_volume - total_volume)
 
             buy = v_to_buy * d_ask[cursor_ask]['price']
             sell = v_to_buy * d_bid[cursor_bid]['price']
+            fee = buy * fee_buy + sell * fee_sell
 
             c_ask_amount -= v_to_buy
             c_bid_amount -= v_to_buy
@@ -87,7 +92,8 @@ class ArbitrerNG(object):
 
             total_buy += buy
             total_sell += sell
-            total_profit = total_sell - total_buy
+            total_fee += fee
+            total_profit = total_sell - total_buy - total_fee
             total_volume += v_to_buy
 
             if total_profit > best_profit:
@@ -111,6 +117,7 @@ class ArbitrerNG(object):
         # profit, volume, buyprice, sellprice, weighted_buyprice, weighted_sellprice
         w_buy = 0 if total_volume == 0 else total_buy / total_volume
         w_sell = 0 if total_volume == 0 else total_sell / total_volume
+        # FIXME : improve the result to take trade fee into account better
         return best_profit, best_volume, \
                d_ask[best_ask]['price'], d_bid[best_bid]['price'], \
                w_buy, w_sell
@@ -161,15 +168,14 @@ class ArbitrerNG(object):
                     and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
                     if market1["asks"][0]['price'] < market2["bids"][0]['price']:
                         self.arbitrage_opportunity(kmarket1, kmarket2, config.max_tx_volume)
-                        self.arbitrage_opportunity(kmarket1, kmarket2, 10)
-                        self.arbitrage_opportunity(kmarket1, kmarket2, 20)
 
         for observer in self.observers:
             observer.end_opportunity_finder()
 
     def loop(self):
+        time_to_wait = self.markets.sort(key=lambda m: m.update_rate, True)[0]
         while True:
             self.depths = self.update_depths()
             self.tickers()
             self.tick()
-            time.sleep(config.refresh_rate)
+            time.sleep(max(config.refresh_rate, time_to_wait))

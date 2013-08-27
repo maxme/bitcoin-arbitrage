@@ -13,6 +13,7 @@ class Market(object):
         self.currency = currency
         self.depth_updated = 0
         self.update_rate = 60
+        self.trade_fee = 0
         self.fc = FiatConverter()
         self.fc.update()
 
@@ -22,9 +23,11 @@ class Market(object):
             self.ask_update_depth()
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
-            logging.warn('Market: %s order book is expired' % self.name)
-            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
-                {'price': 0, 'amount': 0}]}
+            logging.warning('Market: %s order book is expired' % self.name)
+            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
+        if self.depth['bids'][0]['price'] > self.depth['asks'][0]['price']:
+            logging.warning('Market: %s order book is invalid (bid>ask : quotation is stopped ?)' % self.name)
+            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
         return self.depth
 
     def convert_to_usd(self):

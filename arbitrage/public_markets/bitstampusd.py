@@ -9,7 +9,8 @@ from .market import Market
 class BitstampUSD(Market):
     def __init__(self):
         super(BitstampUSD, self).__init__("USD")
-        self.update_rate = 20
+        self.trade_fee = 0.0050     # more complex than that : https://www.bitstamp.net/fee_schedule/
+        self.update_rate = 60       # "Do not make more than 600 request per 10 minutes"
 
     def update_depth(self):
         res = urllib.request.urlopen(
@@ -28,6 +29,7 @@ class BitstampUSD(Market):
         bids = self.sort_and_format(depth['bids'], True)
         asks = self.sort_and_format(depth['asks'], False)
         return {'asks': asks, 'bids': bids}
+
 
 if __name__ == "__main__":
     market = BitstampUSD()

@@ -16,7 +16,8 @@ from .market import Market
 class MtGoxUSD(Market):
     def __init__(self):
         super(MtGoxUSD, self).__init__("USD")
-        self.update_rate = 20
+        self.update_rate = 60       # "caching and rate limit :30 seconds" -> we can use MtGoxEUR AND USD, so let's be careful
+        self.trade_fee = 0.0060     # more complex than that https://www.mtgox.com/fee-schedule
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}
 
