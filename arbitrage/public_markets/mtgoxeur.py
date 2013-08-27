@@ -5,6 +5,7 @@ import json
 import logging
 from .market import Market
 
+#FIXME : factoriser avec MTGOXUSD
 
 class MtGoxEUR(Market):
     def __init__(self):
@@ -31,13 +32,14 @@ class MtGoxEUR(Market):
         r = []
         for i in l:
             r.append({'price': float(i[
-                     "price"]), 'amount': float(i["amount"])})
+                "price"]), 'amount': float(i["amount"])})
         return r
 
     def format_depth(self, depth):
         bids = self.sort_and_format(depth['bids'], True)
         asks = self.sort_and_format(depth['asks'], False)
         return {'asks': asks, 'bids': bids}
+
 
 if __name__ == "__main__":
     market = MtGoxEUR()
