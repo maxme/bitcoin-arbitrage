@@ -173,7 +173,7 @@ class ArbitrerNG(object):
             observer.end_opportunity_finder()
 
     def loop(self):
-        time_to_wait = self.markets.sort(key=lambda m: m.update_rate, True)[0]
+        time_to_wait = sorted([m.update_rate for m in self.markets], reverse=True)[0]
         while True:
             self.depths = self.update_depths()
             self.tickers()
