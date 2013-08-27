@@ -36,7 +36,7 @@ class Arbitrer(object):
 
     def get_profit_for(self, mi, mj, kask, kbid):
         if self.depths[kask]["asks"][mi]["price"] \
-           >= self.depths[kbid]["bids"][mj]["price"]:
+                >= self.depths[kbid]["bids"][mj]["price"]:
             return 0, 0, 0, 0
 
         max_amount_buy = 0
@@ -52,7 +52,7 @@ class Arbitrer(object):
         for i in range(mi + 1):
             price = self.depths[kask]["asks"][i]["price"]
             amount = min(max_amount, buy_total + self.depths[
-                         kask]["asks"][i]["amount"]) - buy_total
+                kask]["asks"][i]["amount"]) - buy_total
             if amount <= 0:
                 break
             buy_total += amount
@@ -67,7 +67,7 @@ class Arbitrer(object):
         for j in range(mj + 1):
             price = self.depths[kbid]["bids"][j]["price"]
             amount = min(max_amount, sell_total + self.depths[
-                         kbid]["bids"][j]["amount"]) - sell_total
+                kbid]["bids"][j]["amount"]) - sell_total
             if amount < 0:
                 break
             sell_total += amount
@@ -83,17 +83,17 @@ class Arbitrer(object):
     def get_max_depth(self, kask, kbid):
         i = 0
         if len(self.depths[kbid]["bids"]) != 0 and \
-           len(self.depths[kask]["asks"]) != 0:
+                        len(self.depths[kask]["asks"]) != 0:
             while self.depths[kask]["asks"][i]["price"] \
-                  < self.depths[kbid]["bids"][0]["price"]:
+                    < self.depths[kbid]["bids"][0]["price"]:
                 if i >= len(self.depths[kask]["asks"]) - 1:
                     break
                 i += 1
         j = 0
         if len(self.depths[kask]["asks"]) != 0 and \
-           len(self.depths[kbid]["bids"]) != 0:
+                        len(self.depths[kbid]["bids"]) != 0:
             while self.depths[kask]["asks"][0]["price"] \
-                  < self.depths[kbid]["bids"][j]["price"]:
+                    < self.depths[kbid]["bids"][j]["price"]:
                 if j >= len(self.depths[kbid]["bids"]) - 1:
                     break
                 j += 1
@@ -122,8 +122,8 @@ class Arbitrer(object):
 
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
         perc = (bid["price"] - ask["price"]) / bid["price"] * 100
-        profit, volume, buyprice, sellprice, weighted_buyprice,\
-            weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
+        profit, volume, buyprice, sellprice, weighted_buyprice, \
+        weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
         if volume == 0 or buyprice == 0:
             return
         perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
@@ -153,6 +153,7 @@ class Arbitrer(object):
         import os
         import json
         import pprint
+
         files = os.listdir(directory)
         files.sort()
         for f in files:
@@ -174,9 +175,8 @@ class Arbitrer(object):
                 market1 = self.depths[kmarket1]
                 market2 = self.depths[kmarket2]
                 if market1["asks"] and market2["bids"] \
-                   and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
-                    if float(market1["asks"][0]['price'])\
-                       < float(market2["bids"][0]['price']):
+                    and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
+                    if market1["asks"][0]['price'] < market2["bids"][0]['price']:
                         self.arbitrage_opportunity(kmarket1, market1["asks"][0],
                                                    kmarket2, market2["bids"][0])
 
