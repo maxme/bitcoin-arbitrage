@@ -41,3 +41,9 @@ nosetests.xml
 config.py
 old/
 tmp/
+
+# PyCharm
+.idea/
+
+# run
+*.log
