@@ -3,7 +3,8 @@
 import logging
 import argparse
 import sys
-from arbitrer import Arbitrer
+
+from arbitrerNG import ArbitrerNG
 
 
 class ArbitrerCLI:
@@ -11,10 +12,13 @@ class ArbitrerCLI:
         pass
 
     def exec_command(self, args):
+
         if "watch" in args.command:
             self.arbitrer.loop()
+
         if "replay-history" in args.command:
             self.arbitrer.replay_history(args.replay_history)
+
         if "get-balance" in args.command:
             if not args.markets:
                 logging.error("You must use --markets argument to specify markets")
@@ -29,12 +33,14 @@ class ArbitrerCLI:
             for market in pmarketsi:
                 print(market)
 
+
     def create_arbitrer(self, args):
-        self.arbitrer = Arbitrer()
+        self.arbitrer = ArbitrerNG()
         if args.observers:
             self.arbitrer.init_observers(args.observers.split(","))
         if args.markets:
             self.arbitrer.init_markets(args.markets.split(","))
+
 
     def main(self):
         parser = argparse.ArgumentParser()
@@ -47,17 +53,21 @@ class ArbitrerCLI:
         parser.add_argument("command", nargs='*', default="watch",
                             help='verb: "watch|replay-history|get-balance"')
         args = parser.parse_args()
+
         level = logging.INFO
         if args.verbose:
             level = logging.DEBUG
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
                             level=level)
+
         self.create_arbitrer(args)
         self.exec_command(args)
+
 
 def main():
     cli = ArbitrerCLI()
     cli.main()
+
 
 if __name__ == "__main__":
     main()
