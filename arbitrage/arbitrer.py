@@ -175,7 +175,7 @@ class Arbitrer(object):
                 market2 = self.depths[kmarket2]
                 if market1["asks"] and market2["bids"] \
                    and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
-                    if float(market1["asks"][0]['price'])\
+                    if float(market1["asks"][0]['price']) \
                        < float(market2["bids"][0]['price']):
                         self.arbitrage_opportunity(kmarket1, market1["asks"][0],
                                                    kmarket2, market2["bids"][0])
