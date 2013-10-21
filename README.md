@@ -66,7 +66,7 @@ To check your balance on an exchange (also a good way to check your accounts con
 
 Run tests
 
-    $ nosetests arbitrage/
+    $ python3 arbitrage/run_tests.py
 
 # TODO
 
