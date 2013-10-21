@@ -4,7 +4,7 @@ sys.path.append('../')
 import unittest
 
 from arbitrage.public_markets.market import Market
-from arbitrage.test.mockmarket import MockMarket
+from arbitrage.unit_tests.mockmarket import MockMarket
 
 depth_bad = \
     {'asks': [{'amount': 4, 'price': 32.8},
