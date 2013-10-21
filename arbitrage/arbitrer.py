@@ -1,4 +1,5 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+# Heavily modified by Ryan Casey <ryepdx@gmail.com>
 
 import public_markets
 import observers
@@ -10,7 +11,11 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 
 class Arbitrer(object):
-    def __init__(self):
+    """Grabs prices from the markets defined in the config file
+    and does all the actual arbitrage calculations.
+
+    """
+    def __init__(self, config = config):
         self.markets = []
         self.observers = []
         self.depths = {}
@@ -18,7 +23,27 @@ class Arbitrer(object):
         self.init_observers(config.observers)
         self.threadpool = ThreadPoolExecutor(max_workers=10)
 
+
     def init_markets(self, markets):
+        """Instantiates the market classes and populates the markets list.
+
+        Market objects provide currency pair prices, and trading fee data.
+
+        Positional args:
+        markets - A dictionary of exchange names
+            mapped to lists of currency pair tuples.
+
+        Example:
+
+        >>> from types import SimpleNamespace
+        >>> mock_config = SimpleNamespace(markets = [], observers = [])
+        >>> arb = Arbitrer(config = mock_config)
+        >>> arb.init_markets(mock_self, {"Btce": [("BTC", "USD")]})
+        >>> arb.markets[0].name
+        'BtceMarket'
+
+        """
+
         self.market_names = markets
         for market_name, currency_pairs in markets.items():
             market_class_name = market_name.lower() + "_market"
@@ -31,7 +56,18 @@ class Arbitrer(object):
                 )
                 self.markets.append(market)
 
+
     def init_observers(self, _observers):
+        """Instantiates the observer classes and populates the observers list.
+
+        Observers allow for asynchronous output and/or order execution when the
+        `Arbitrer` object discovers profitable trades. 
+
+        Positional args:
+        _observers - A list of names of classes in the `observers` module.
+
+        """
+
         self.observer_names = _observers
         for observer_name in _observers:
             exec('import observers.' + observer_name.lower())
@@ -39,7 +75,22 @@ class Arbitrer(object):
                             observer_name + '()')
             self.observers.append(observer)
 
+
     def get_profit_for(self, mi, mj, kask, kbid):
+        """Returns a tuple containing the profit, volume, selling price,
+        and buying price for arbitrage between two given orders in the
+        depths dictionary.
+
+        Positional args:
+        mi - The index of the trade in the `Arbitrer.depths` list for the
+            exchange passed in as `kask`.
+        mj - The index of the trade in the `Arbitrer.depths` list for the
+            exchange passed in as `kbid`.
+        kask - The name of the market to buy from.
+        kbid - The name of the market to sell to.
+
+        """
+
         if self.depths[kask]["asks"][mi]["price"] \
                 >= self.depths[kbid]["bids"][mj]["price"]:
             return 0, 0, 0, 0
@@ -85,7 +136,18 @@ class Arbitrer(object):
         profit = sell_total * w_sellprice - buy_total * w_buyprice
         return profit, sell_total, w_buyprice, w_sellprice
 
+
     def get_max_depth(self, kask, kbid):
+        """Returns a tuple containing the maximum number of profitable
+        arbitrage trades executable by only using the top ask and bid
+        orders on the `Arbitrer.depths` lists for the given exchanges.
+
+        Positional args:
+        kask - The name of the market to buy from.
+        kbid - The name of the market to sell to.
+
+        """
+
         i = 0
         if len(self.depths[kbid]["bids"]) != 0 and \
                         len(self.depths[kask]["asks"]) != 0:
@@ -103,6 +165,7 @@ class Arbitrer(object):
                     break
                 j += 1
         return i, j
+
 
     def arbitrage_depth_opportunity(self, kask, kbid):
         maxi, maxj = self.get_max_depth(kask, kbid)
@@ -125,6 +188,7 @@ class Arbitrer(object):
                self.depths[kbid]["bids"][best_j]["price"], \
                best_w_buyprice, best_w_sellprice
 
+
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
         perc = (bid["price"] - ask["price"]) / bid["price"] * 100
         profit, volume, buyprice, sellprice, weighted_buyprice, \
@@ -137,8 +201,10 @@ class Arbitrer(object):
                 profit, volume, buyprice, kask, sellprice, kbid,
                 perc2, weighted_buyprice, weighted_sellprice)
 
+
     def __get_market_depth(self, market, depths):
         depths[market.name] = market.get_depth()
+
 
     def update_depths(self):
         depths = {}
@@ -149,10 +215,12 @@ class Arbitrer(object):
         wait(futures, timeout=20)
         return depths
 
+
     def tickers(self):
         for market in self.markets:
             logging.debug("ticker: " + market.name + " - " + str(
                 market.get_ticker()))
+
 
     def replay_history(self, directory):
         import os
@@ -168,6 +236,7 @@ class Arbitrer(object):
                 if market in depths:
                     self.depths[market] = depths[market]
             self.tick()
+
 
     def tick(self):
         for observer in self.observers:
@@ -187,6 +256,7 @@ class Arbitrer(object):
 
         for observer in self.observers:
             observer.end_opportunity_finder()
+
 
     def loop(self):
         while True:
