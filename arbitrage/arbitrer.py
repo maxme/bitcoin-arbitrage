@@ -20,11 +20,16 @@ class Arbitrer(object):
 
     def init_markets(self, markets):
         self.market_names = markets
-        for market_name in markets:
-            exec('import public_markets.' + market_name.lower())
-            market = eval('public_markets.' + market_name.lower() + '.' +
-                          market_name + '()')
-            self.markets.append(market)
+        for market_name, currency_pairs in markets.items():
+            market_class_name = market_name.lower() + "_market"
+            exec('import public_markets.' + market_class_name)
+            
+            for pair in currency_pairs:
+                market = eval('public_markets.' + market_class_name.lower() +
+                    '.' + market_name +
+                    'Market(from_currency="%s", to_currency="%s")' % pair
+                )
+                self.markets.append(market)
 
     def init_observers(self, _observers):
         self.observer_names = _observers

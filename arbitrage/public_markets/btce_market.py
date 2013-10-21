@@ -6,12 +6,6 @@ from .market import Market
 
 
 class BtceMarket(Market):
-    def __init__(self, from_currency="BTC", to_currency="USD", update_rate=60):
-        super(BtceMarket, self).__init__(to_currency)
-        self.update_rate = update_rate
-        self.from_currency = from_currency
-        self.to_currency = to_currency
-
     def update_depth(self):
         url = 'https://btc-e.com/api/2/%s_%s/depth' % (
             self.from_currency.lower(), self.to_currency.lower()

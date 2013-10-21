@@ -5,11 +5,10 @@ import json
 from .market import Market
 
 
-class CampBXUSD(Market):
-    def __init__(self):
-        super(CampBXUSD, self).__init__("USD")
+class CampBXMarket(Market):
+    def __init__(self, **kwargs):
+        super(CampBXMarket, self).__init__(**kwargs)
         self.trade_fee = 0.0055
-        self.update_rate = 60   # "ensure that there is at least 500 millisecond latency between two calls"
 
     def update_depth(self):
         res = urllib.request.urlopen('http://campbx.com/api/xdepth.php')
@@ -30,5 +29,5 @@ class CampBXUSD(Market):
 
 
 if __name__ == "__main__":
-    market = CampBXUSD()
+    market = CampBXMarket()
     print(market.get_ticker())

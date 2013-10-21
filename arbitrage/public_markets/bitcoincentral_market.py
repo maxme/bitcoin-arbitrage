@@ -5,22 +5,21 @@ import json
 from .market import Market
 
 
-class IntersangoEUR(Market):
-    def __init__(self):
-        super(IntersangoEUR, self).__init__("EUR")
-        self.update_rate = 30
-
+class BitcoinCentralMarket(Market):
     def update_depth(self):
         res = urllib.request.urlopen(
-            'https://intersango.com//api/depth.php?currency_pair_id=2')
+            'https://bitcoin-central.net/api/v1/depth?currency='
+            + self.to_currency
+        )
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
     def sort_and_format(self, l, reverse=False):
-        l.sort(key=lambda x: float(x[0]), reverse=reverse)
+        l.sort(key=lambda x: float(x['price']), reverse=reverse)
         r = []
         for i in l:
-            r.append({'price': float(i[0]), 'amount': float(i[1])})
+            r.append({'price': float(i[
+                     'price']), 'amount': float(i['amount'])})
         return r
 
     def format_depth(self, depth):
@@ -29,5 +28,5 @@ class IntersangoEUR(Market):
         return {'asks': asks, 'bids': bids}
 
 if __name__ == "__main__":
-    market = IntersangoEUR()
-    print(json.dumps(market.get_ticker()))
+    market = BitcoinCentralMarket()
+    print(market.get_ticker())

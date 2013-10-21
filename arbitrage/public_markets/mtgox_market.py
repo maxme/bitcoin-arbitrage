@@ -13,17 +13,19 @@ from .market import Market
 #FIXME passer sur du Decimal partout !!
 
 
-class MtGoxUSD(Market):
-    def __init__(self):
-        super(MtGoxUSD, self).__init__("USD")
-        self.update_rate = 60       # "caching and rate limit :30 seconds" -> we can use MtGoxEUR AND USD, so let's be careful
+class MtGoxMarket(Market):
+    def __init__(self, **kwargs):
+        super(MtGoxMarket, self).__init__(**kwargs)
         self.trade_fee = 0.0060     # more complex than that https://www.mtgox.com/fee-schedule
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}
 
     def update_depth(self):
         res = urllib.request.urlopen(
-            'http://data.mtgox.com/api/2/BTCUSD/money/depth')
+            'http://data.mtgox.com/api/2/%s%s/money/depth' % (
+                self.from_currency, self.to_currency
+            )
+        )
         jsonstr = res.read().decode('utf8')
         try:
             data = json.loads(jsonstr)
@@ -49,5 +51,5 @@ class MtGoxUSD(Market):
 
 
 if __name__ == "__main__":
-    market = MtGoxUSD()
+    market = MtGoxMarket()
     print(market.get_depth())

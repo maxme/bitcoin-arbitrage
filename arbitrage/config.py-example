@@ -1,7 +1,23 @@
 # watch the following markets
 # ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR",
 # "BitstampEUR", "BtceUSD", "MtGoxUSD", "BitstampUSD"]
-markets = ["BtceUSD", "MtGoxUSD", "BitstampUSD", "CampBXUSD", "BitcoinCentralUSD"]  # BitfloorUSD (closed)
+markets = {
+    "Btce": [
+        ("BTC", "USD")
+    ],
+    "MtGox": [
+        ("BTC", "USD")
+    ],
+    "Bitstamp": [
+        ("BTC", "USD")
+    ],
+    "CampBX": [
+        ("BTC", "USD")
+    ],
+    "BitcoinCentral": [
+        ("BTC", "USD")
+    ]
+}
 
 # observers if any
 # ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]

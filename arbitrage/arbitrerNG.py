@@ -6,38 +6,14 @@ import config
 import time
 import logging
 import json
+from arbitrer import Arbitrer
 from concurrent.futures import ThreadPoolExecutor, wait
 
 #FIXME : intégrer les taxes du marché dans le calcul du meilleur profit
 # en augmentant les volumes, on peut avoir un meilleur profit absolu, mais plus faible par rapport au montant de la transaction
 
 
-
-class ArbitrerNG(object):
-    def __init__(self):
-        self.markets = []
-        self.observers = []
-        self.depths = {}
-        self.init_markets(config.markets)
-        self.init_observers(config.observers)
-        self.threadpool = ThreadPoolExecutor(max_workers=10)
-
-    def init_markets(self, markets):
-        self.market_names = markets
-        for market_name in markets:
-            exec('import public_markets.' + market_name.lower())
-            market = eval('public_markets.' + market_name.lower() + '.' +
-                          market_name + '()')
-            self.markets.append(market)
-
-    def init_observers(self, _observers):
-        self.observer_names = _observers
-        for observer_name in _observers:
-            exec('import observers.' + observer_name.lower())
-            observer = eval('observers.' + observer_name.lower() + '.' +
-                            observer_name + '()')
-            self.observers.append(observer)
-
+class ArbitrerNG(Arbitrer):
 
     def arbitrage_opportunity(self, kask, kbid, max_volume):
         profit, volume, buyprice, sellprice, weighted_buyprice, weighted_sellprice = \

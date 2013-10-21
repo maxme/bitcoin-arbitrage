@@ -6,11 +6,16 @@ import sys
 from .market import Market
 
 
-class BitstampUSD(Market):
-    def __init__(self):
-        super(BitstampUSD, self).__init__("USD")
+class BitstampMarket(Market):
+    def __init__(self, **kwargs):
+        super(BitstampMarket, self).__init__(**kwargs)
         self.trade_fee = 0.0050     # more complex than that : https://www.bitstamp.net/fee_schedule/
-        self.update_rate = 60       # "Do not make more than 600 request per 10 minutes"
+
+        if self.to_currency != "USD" or self.from_currency != "BTC":
+            raise Exception("Invalid Bitstamp currency pair: %s/%s" % (
+                self.from_currency, self.to_currency
+            ))
+
 
     def update_depth(self):
         url = 'https://www.bitstamp.net/api/order_book/'
@@ -36,5 +41,5 @@ class BitstampUSD(Market):
 
 
 if __name__ == "__main__":
-    market = BitstampUSD()
+    market = BitstampMarket()
     print(market.get_ticker())

@@ -8,14 +8,18 @@ from fiatconverter import FiatConverter
 
 
 class Market(object):
-    def __init__(self, currency):
-        self.name = self.__class__.__name__
-        self.currency = currency
+    def __init__(self, to_currency="USD", from_currency="BTC", update_rate=60):
+        self.to_currency = to_currency
+        self.from_currency = from_currency
         self.depth_updated = 0
-        self.update_rate = 60
+        self.update_rate = update_rate
         self.trade_fee = 0
         self.fc = FiatConverter()
         self.fc.update()
+
+    @property
+    def name(self):
+        return self.__class__.__name__
 
     def get_depth(self):
         timediff = time.time() - self.depth_updated
@@ -31,11 +35,11 @@ class Market(object):
         return self.depth
 
     def convert_to_usd(self):
-        if self.currency == "USD":
+        if self.to_currency == "USD":
             return
         for direction in ("asks", "bids"):
             for order in self.depth[direction]:
-                order["price"] = self.fc.convert(order["price"], self.currency, "USD")
+                order["price"] = self.fc.convert(order["price"], self.to_currency, "USD")
 
     def ask_update_depth(self):
         try:

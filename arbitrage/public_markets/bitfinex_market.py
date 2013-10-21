@@ -5,35 +5,33 @@ import json
 import logging
 from .market import Market
 
-#FIXME : factoriser avec MTGOXUSD
 
-class MtGoxEUR(Market):
-    def __init__(self):
-        super(MtGoxEUR, self).__init__("EUR")
-        self.update_rate = 60       # "caching and rate limit :30 seconds" -> we can use MtGoxEUR AND USD, so let's be careful
-        self.trade_fee = 0.0060     # more complex than that https://www.mtgox.com/fee-schedule
+class BitfinexMarket(Market):
+    def __init__(self, **kwargs):
+        super(BitfinexMarket, self).__init__(**kwargs)
+        self.update_rate = 20
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}
 
     def update_depth(self):
         res = urllib.request.urlopen(
-            'http://data.mtgox.com/api/2/BTCEUR/money/depth')
+            'https://bitfinex.com/api/v1/book/%s%s' % (
+                self.from_currency.lower(), self.to_currency.lower()
+            )
+        )
         jsonstr = res.read().decode('utf8')
         try:
-            data = json.loads(jsonstr)
+            depth = json.loads(jsonstr)
         except Exception:
             logging.error("%s - Can't parse json: %s" % (self.name, jsonstr))
-        if data["result"] == "success":
-            self.depth = self.format_depth(data["data"])
-        else:
-            logging.error("%s - fetched data error" % (self.name))
+        self.depth = self.format_depth(depth)
 
     def sort_and_format(self, l, reverse=False):
         l.sort(key=lambda x: float(x["price"]), reverse=reverse)
         r = []
         for i in l:
-            r.append({'price': float(i[
-                "price"]), 'amount': float(i["amount"])})
+            r.append({'price': float(i['price']),
+                      'amount': float(i['amount'])})
         return r
 
     def format_depth(self, depth):
@@ -43,5 +41,5 @@ class MtGoxEUR(Market):
 
 
 if __name__ == "__main__":
-    market = MtGoxEUR()
+    market = BitfinexMarket()
     print(market.get_depth())
