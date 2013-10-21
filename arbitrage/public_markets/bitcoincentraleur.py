@@ -14,7 +14,7 @@ class BitcoinCentralEUR(Market):
 
     def update_depth(self):
         res = urllib.request.urlopen(
-            'https://bitcoin-central.net/api/v1/depth?currency=EUR')
+            'https://bitcoin-central.net/api/data/eur/depth')
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
