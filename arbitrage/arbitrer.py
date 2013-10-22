@@ -15,6 +15,7 @@ class Arbitrer(object):
     and does all the actual arbitrage calculations.
 
     """
+
     def __init__(self, config = config):
         self.markets = []
         self.observers = []
@@ -90,7 +91,7 @@ class Arbitrer(object):
         kbid - The name of the market to sell to.
 
         """
-
+        # TODO: Remove assumption that all prices are in USD.
         if self.depths[kask]["asks"][mi]["price"] \
                 >= self.depths[kbid]["bids"][mj]["price"]:
             return 0, 0, 0, 0
@@ -115,6 +116,8 @@ class Arbitrer(object):
             if w_buyprice == 0:
                 w_buyprice = price
             else:
+                # Calculate the average ask price for the profitable
+                # orders we found.
                 w_buyprice = (w_buyprice * (
                     buy_total - amount) + price * amount) / buy_total
 
@@ -130,6 +133,8 @@ class Arbitrer(object):
             if w_sellprice == 0 or sell_total == 0:
                 w_sellprice = price
             else:
+                # Calculate the average bid price for the profitable
+                # orders we found.
                 w_sellprice = (w_sellprice * (
                     sell_total - amount) + price * amount) / sell_total
 
@@ -147,6 +152,7 @@ class Arbitrer(object):
         kbid - The name of the market to sell to.
 
         """
+        # TODO: Remove assumption that all prices are in USD.
 
         i = 0
         if len(self.depths[kbid]["bids"]) != 0 and \
@@ -168,6 +174,18 @@ class Arbitrer(object):
 
 
     def arbitrage_depth_opportunity(self, kask, kbid):
+        """Goes down the order book defined in `Arbitrer.depths` and returns
+        the profit realized, volume required, averaged buy and sell prices,
+        and the buy and sell prices on most profitable trade pair in the
+        exchange books of the markets passed in.
+
+        Positional args:
+        kask - The name of the market to grab ask prices from.
+        kbid - The name of the market to grab bid prices from.
+        
+        """
+
+        # TODO: Remove assumption that all prices are in USD.
         maxi, maxj = self.get_max_depth(kask, kbid)
         best_profit = 0
         best_i, best_j = (0, 0)
@@ -189,8 +207,17 @@ class Arbitrer(object):
                best_w_buyprice, best_w_sellprice
 
 
-    def arbitrage_opportunity(self, kask, ask, kbid, bid):
-        perc = (bid["price"] - ask["price"]) / bid["price"] * 100
+    def arbitrage_opportunity(self, kask, kbid):
+        """Finds all profitable trades and passes on trade profit information
+        to all observers.
+
+        Positional args:
+        kask - The name of the market to use for ask prices.
+        kbid - The name of the market to use for bid prices.
+
+        """
+
+        # TODO: Remove assumption that all prices are in USD.
         profit, volume, buyprice, sellprice, weighted_buyprice, \
         weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
         if volume == 0 or buyprice == 0:
@@ -203,10 +230,19 @@ class Arbitrer(object):
 
 
     def __get_market_depth(self, market, depths):
+        """A callback used by `Arbitrer.update_depths` to asynchronously fetch
+        market depths.
+
+        """
         depths[market.name] = market.get_depth()
 
 
     def update_depths(self):
+        """Asynchronously grabs the order books from all markets in
+        `Arbitrer.markets` and returns a `depths` dictionary.
+
+        """
+
         depths = {}
         futures = []
         for market in self.markets:
@@ -217,12 +253,29 @@ class Arbitrer(object):
 
 
     def tickers(self):
+        """Logs the prices on every market."""
+
         for market in self.markets:
             logging.debug("ticker: " + market.name + " - " + str(
                 market.get_ticker()))
 
 
     def replay_history(self, directory):
+        """Takes the path of a directory containing JSON files named in such
+        a way that a naive sort by filename puts them in chronological order
+        and steps through them, treating each JSON file as a snapshot of the
+        market depths at a single point in time, and calculating arbitrage
+        profitability.
+
+        Running the bot with the HistoryDumper observer enabled will generate
+        JSON files that can be used to replay the market movements that
+        occurred while the bot was running.
+
+        Positional args:
+        directory - The path to the directory containing the market history
+        JSON files.
+
+        """
         import os
         import json
         import pprint
@@ -239,6 +292,14 @@ class Arbitrer(object):
 
 
     def tick(self):
+        """Finds all arbitrage opportunities across all markets at the
+        present moment, and sends the opportunities on to the observers.
+
+        """
+
+        # Alert observers to the fact that we've now begun a tick.
+        # This allows them to, for example, instantiate an empty list
+        # where they might keep 
         for observer in self.observers:
             observer.begin_opportunity_finder(self.depths)
 
@@ -251,14 +312,14 @@ class Arbitrer(object):
                 if market1["asks"] and market2["bids"] \
                     and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
                     if market1["asks"][0]['price'] < market2["bids"][0]['price']:
-                        self.arbitrage_opportunity(kmarket1, market1["asks"][0],
-                                                   kmarket2, market2["bids"][0])
+                        self.arbitrage_opportunity(kmarket1, kmarket2)
 
         for observer in self.observers:
             observer.end_opportunity_finder()
 
 
     def loop(self):
+        """Find arbitrage opportunities forever. (infinite loop)"""
         while True:
             self.depths = self.update_depths()
             self.tickers()
