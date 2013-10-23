@@ -173,6 +173,28 @@ class Arbitrer(object):
         return i, j
 
 
+    def arbitrage_opportunity(self, kask, kbid):
+        """Finds all profitable trades and passes on trade profit information
+        to all observers.
+
+        Positional args:
+        kask - The name of the market to use for ask prices.
+        kbid - The name of the market to use for bid prices.
+
+        """
+
+        # TODO: Remove assumption that all prices are in USD.
+        profit, volume, buyprice, sellprice, weighted_buyprice, \
+        weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
+        if volume == 0 or buyprice == 0:
+            return
+        perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
+        for observer in self.observers:
+            observer.opportunity(
+                profit, volume, buyprice, kask, sellprice, kbid,
+                perc2, weighted_buyprice, weighted_sellprice)
+
+
     def arbitrage_depth_opportunity(self, kask, kbid):
         """Goes down the order book defined in `Arbitrer.depths` and returns
         the profit realized, volume required, averaged buy and sell prices,
@@ -205,28 +227,6 @@ class Arbitrer(object):
                self.depths[kask]["asks"][best_i]["price"], \
                self.depths[kbid]["bids"][best_j]["price"], \
                best_w_buyprice, best_w_sellprice
-
-
-    def arbitrage_opportunity(self, kask, kbid):
-        """Finds all profitable trades and passes on trade profit information
-        to all observers.
-
-        Positional args:
-        kask - The name of the market to use for ask prices.
-        kbid - The name of the market to use for bid prices.
-
-        """
-
-        # TODO: Remove assumption that all prices are in USD.
-        profit, volume, buyprice, sellprice, weighted_buyprice, \
-        weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
-        if volume == 0 or buyprice == 0:
-            return
-        perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
-        for observer in self.observers:
-            observer.opportunity(
-                profit, volume, buyprice, kask, sellprice, kbid,
-                perc2, weighted_buyprice, weighted_sellprice)
 
 
     def __get_market_depth(self, market, depths):
@@ -320,8 +320,9 @@ class Arbitrer(object):
 
     def loop(self):
         """Find arbitrage opportunities forever. (infinite loop)"""
+        time_to_wait = sorted([m.update_rate for m in self.markets], reverse=True)[0]
         while True:
             self.depths = self.update_depths()
             self.tickers()
             self.tick()
-            time.sleep(config.refresh_rate)
+            time.sleep(max(config.refresh_rate, time_to_wait))

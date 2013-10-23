@@ -14,10 +14,24 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 
 class ArbitrerNG(Arbitrer):
+    """Grabs prices from the markets defined in the config file
+    and does all the actual arbitrage calculations.
+
+    """
 
     def arbitrage_opportunity(self, kask, kbid, max_volume):
-        profit, volume, buyprice, sellprice, weighted_buyprice, weighted_sellprice = \
-            self.arbitrage_depth_opportunity(kask, kbid, max_volume)
+        """Finds all profitable trades and passes on trade profit information
+        to all observers.
+
+        Positional args:
+        kask - The name of the market to use for ask prices.
+        kbid - The name of the market to use for bid prices.
+
+        """
+
+        # TODO: Remove assumption that all prices are in USD.
+        profit, volume, buyprice, sellprice, weighted_buyprice, \
+        weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid, max_volume)
         if volume == 0 or profit == 0:
             return
         perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
@@ -26,10 +40,21 @@ class ArbitrerNG(Arbitrer):
                 profit, volume, buyprice, kask, sellprice, kbid,
                 perc2, weighted_buyprice, weighted_sellprice)
 
+
     def arbitrage_depth_opportunity(self, kask, kbid, max_volume):
+        """Goes down the order book defined in `Arbitrer.depths` and returns
+        the profit realized, volume required, averaged buy and sell prices,
+        and the buy and sell prices on most profitable trade pair in the
+        exchange books of the markets passed in.
+
+        Positional args:
+        kask - The name of the market to grab ask prices from.
+        kbid - The name of the market to grab bid prices from.
+        
+        """
         # to return :
         # profit, volume, buyprice, sellprice, weighted_buyprice, weighted_sellprice
-
+        # TODO: Remove assumption that all prices are in USD.
         d_ask = self.depths[kask]['asks']
         d_bid = self.depths[kbid]['bids']
 
@@ -98,39 +123,16 @@ class ArbitrerNG(Arbitrer):
                d_ask[best_ask]['price'], d_bid[best_bid]['price'], \
                w_buy, w_sell
 
-    def __get_market_depth(self, market, depths):
-        depths[market.name] = market.get_depth()
-
-    def update_depths(self):
-        depths = {}
-        futures = []
-        for market in self.markets:
-            futures.append(self.threadpool.submit(self.__get_market_depth,
-                                                  market, depths))
-        wait(futures, timeout=20)
-        return depths
-
-    def tickers(self):
-        for market in self.markets:
-            logging.debug("ticker: " + market.name + " - " + str(
-                market.get_ticker()))
-
-    def replay_history(self, directory):
-        import os
-        import json
-        import pprint
-
-        files = os.listdir(directory)
-        files.sort()
-        for f in files:
-            depths = json.load(open(directory + '/' + f, 'r'))
-            self.depths = {}
-            for market in self.market_names:
-                if market in depths:
-                    self.depths[market] = depths[market]
-            self.tick()
 
     def tick(self):
+        """Finds all arbitrage opportunities across all markets at the
+        present moment, and sends the opportunities on to the observers.
+
+        """
+
+        # Alert observers to the fact that we've now begun a tick.
+        # This allows them to, for example, instantiate an empty list
+        # where they might keep 
         for observer in self.observers:
             observer.begin_opportunity_finder(self.depths)
 
@@ -147,11 +149,3 @@ class ArbitrerNG(Arbitrer):
 
         for observer in self.observers:
             observer.end_opportunity_finder()
-
-    def loop(self):
-        time_to_wait = sorted([m.update_rate for m in self.markets], reverse=True)[0]
-        while True:
-            self.depths = self.update_depths()
-            self.tickers()
-            self.tick()
-            time.sleep(max(config.refresh_rate, time_to_wait))
