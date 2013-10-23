@@ -4,10 +4,15 @@ import urllib.parse
 import json
 from .market import Market
 
-class Kraken(Market):
-    def __init__(self, currency, code):
-        super().__init__(currency)
-        self.code = code
+class KrakenMarket(Market):
+    CODES = {
+        "USD": "XXBTZUSD",
+        "EUR": "XXBTZEUR"
+    }
+
+    def __init__(self, **kwargs):
+        super(KrakenMarket, self).__init__(**kwargs)
+        self.code = self.CODES[self.to_currency]
         self.update_rate = 30
 
     def update_depth(self):
