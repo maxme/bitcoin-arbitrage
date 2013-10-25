@@ -1,26 +1,35 @@
+from decimal import Decimal
+
 class Orderlist(object):
     """Allows for advancing down either a list of asks or a list of bids
     in small increments, returning the proceeds. Not an iterable, though.
 
     """
 
-    def __init__(self, orders, to_currency=None, from_currency=None):
-        """Instantiates a list of orders for the `to_currency` denominated
-        in the `from_currency`
+    def __init__(self, orders, amount_currency=None, price_currency=None):
+        """Instantiates a list of orders for the `amount_currency` denominated
+        in the `price_currency`
 
         Args:
         orders - A list of dictionaries with 'amount' and 'price' keys.
-        to_currency - The currency referred to in an order's 'amount'.
+        amount_currency - The currency referred to in an order's 'amount'.
         from_current - The currency referred to in an order's 'price'.
 
         """
 
-        if not to_currency or not from_currency:
-            raise Exception("Must define a to_currency and a from_currency!")
+        if not amount_currency or not price_currency:
+            raise Exception("Must define a amount_currency and a price_currency!")
 
-        self.to_currency = to_currency
-        self.from_currency = from_currency
+        self.amount_currency = amount_currency
+        self.price_currency = price_currency
         self.orders = orders
+
+
+    def uses(self, currency):
+        """Returns true if the currency is in this object's currency pair."""
+        return (currency == self.amount_currency
+        or currency == self.price_currency)
+
 
     def volume_to_next_price_as(self, currency):
         """Returns the amount of a given currency required to fill the order
@@ -31,12 +40,13 @@ class Orderlist(object):
 
         """
 
-        if currency == self.to_currency:
+        if currency == self.amount_currency:
             return self.orders[0]["amount"]
-        elif currency == self.from_currency:
-            return self.orders[0]["price"] * self.orders[0]["amount"]
+        elif currency == self.price_currency:
+            return float(Decimal(str(self.orders[0]["price"])) * Decimal(str(self.orders[0]["amount"])))
         else:
             self._raise_currency_exception(currency)
+
  
     def evaluate_trade_volume(self, volume, currency):
         """Returns the amount of currency that would be yielded if the trade
@@ -50,16 +60,16 @@ class Orderlist(object):
 
         """
 
-        if currency == self.to_currency:
-            gross = volume * self.orders[0]["price"]
+        if currency == self.amount_currency:
+            gross = Decimal(str(volume)) * Decimal(str(self.orders[0]["price"]))
 
-        elif currency == self.from_currency:
-            gross = volume / self.orders[0]["price"]
+        elif currency == self.price_currency:
+            gross = Decimal(str(volume)) / Decimal(str(self.orders[0]["price"]))
                 
         else:
             self._raise_currency_exception(currency)
 
-        return gross
+        return float(gross.quantize(Decimal('1.00000000')))
 
 
     def execute_trade_volume(self, volume, currency):
@@ -76,10 +86,10 @@ class Orderlist(object):
 
         gross = self.evaluate_trade_volume(volume, currency)
 
-        if currency == self.to_currency:
+        if currency == self.amount_currency:
             self.orders[0]["amount"] -= volume
 
-        elif currency == self.from_currency:
+        elif currency == self.price_currency:
             self.orders[0]["amount"] -= gross
 
         if self.orders[0]["amount"] <= 0:
@@ -92,5 +102,5 @@ class Orderlist(object):
         """Raises an exception stating the currency isn't supported."""
 
         raise Exception("Unsupported currency: %s. Require %s or %s." % (
-            currency, self.to_currency, self.from_currency
+            currency, self.amount_currency, self.price_currency
         ))

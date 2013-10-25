@@ -19,14 +19,24 @@ depth = \
 class TestOrderlist(unittest.TestCase):
     def setUp(self):
         self.orderlist = Orderlist(depth["asks"],
-            from_currency="USD", to_currency="BTC"
+            price_currency="USD", amount_currency="BTC"
         )
+
+
+    def test_validation_functions(self):
+        assert self.orderlist.uses("USD")
+        assert self.orderlist.uses("BTC")
+        assert not self.orderlist.uses("LTC")
+
 
     def test_volume_functions(self):
         # Should match the figures from the first order in the list.
         assert self.orderlist.volume_to_next_price_as("BTC") == 4
         assert self.orderlist.volume_to_next_price_as("USD") == 131.2
 
+        # Make sure it returns the amount of USD that 0.1 BTC would obtain.
+        assert self.orderlist.evaluate_trade_volume(0.1, "BTC") == 3.28   
+ 
         # Make sure it returns the amount of BTC that 65.60 USD would obtain.
         assert self.orderlist.evaluate_trade_volume(65.60, "USD") == 2       
  
