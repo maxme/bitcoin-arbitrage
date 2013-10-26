@@ -12,7 +12,7 @@ class KrakenMarket(Market):
 
     def __init__(self, **kwargs):
         super(KrakenMarket, self).__init__(**kwargs)
-        self.code = self.CODES[self.to_currency]
+        self.code = self.CODES[self.price_currency]
         self.update_rate = 30
 
     def update_depth(self):

@@ -1,5 +1,5 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
-# Heavily modified by Ryan Casey <ryepdx@gmail.com>
+# Copyleft (c) 2013, Ryan Casey <ryepdx@gmail.com>
 
 import public_markets
 import observers
@@ -10,7 +10,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor, wait
 
 
-class Arbitrer(object):
+class ArbitrerMulti(object):
     """Grabs prices from the markets defined in the config file
     and does all the actual arbitrage calculations.
 

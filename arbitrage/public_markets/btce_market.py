@@ -8,7 +8,7 @@ from .market import Market
 class BtceMarket(Market):
     def update_depth(self):
         url = 'https://btc-e.com/api/2/%s_%s/depth' % (
-            self.from_currency.lower(), self.to_currency.lower()
+            self.amount_currency.lower(), self.price_currency.lower()
         )
         req = urllib.request.Request(url, None, headers={
             "Content-Type": "application/x-www-form-urlencoded",

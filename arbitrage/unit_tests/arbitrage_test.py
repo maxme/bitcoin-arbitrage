@@ -3,7 +3,7 @@ import sys
 sys.path.append('../')
 import unittest
 
-from arbitrage.arbitrer import Arbitrer
+from arbitrage.arbitrermulti import ArbitrerMulti
 
 depths1 = {
     'BitcoinCentralEUR':
@@ -52,7 +52,7 @@ depths3 = {
 
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
-        self.arbitrer = Arbitrer()
+        self.arbitrer = ArbitrerMulti()
 
     def test_getprofit1(self):
         self.arbitrer.depths = depths2

@@ -1,4 +1,5 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+# Copyleft (c) 2013, Ryan Casey <ryepdx@gmail.com>
 
 import logging
 import argparse

@@ -11,9 +11,9 @@ class BitstampMarket(Market):
         super(BitstampMarket, self).__init__(**kwargs)
         self.trade_fee = 0.0050     # more complex than that : https://www.bitstamp.net/fee_schedule/
 
-        if self.to_currency != "USD" or self.from_currency != "BTC":
+        if self.price_currency != "USD" or self.amount_currency != "BTC":
             raise Exception("Invalid Bitstamp currency pair: %s/%s" % (
-                self.from_currency, self.to_currency
+                self.amount_currency, self.price_currency
             ))
 
 

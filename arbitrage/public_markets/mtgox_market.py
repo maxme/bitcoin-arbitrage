@@ -23,7 +23,7 @@ class MtGoxMarket(Market):
     def update_depth(self):
         res = urllib.request.urlopen(
             'http://data.mtgox.com/api/2/%s%s/money/depth' % (
-                self.from_currency, self.to_currency
+                self.amount_currency, self.price_currency
             )
         )
         jsonstr = res.read().decode('utf8')

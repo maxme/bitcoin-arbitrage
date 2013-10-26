@@ -16,7 +16,7 @@ class BitfinexMarket(Market):
     def update_depth(self):
         res = urllib.request.urlopen(
             'https://bitfinex.com/api/v1/book/%s%s' % (
-                self.from_currency.lower(), self.to_currency.lower()
+                self.amount_currency.lower(), self.price_currency.lower()
             )
         )
         jsonstr = res.read().decode('utf8')

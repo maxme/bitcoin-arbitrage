@@ -39,7 +39,7 @@ class IntersangoMarket(Market):
         return {'asks': asks, 'bids': bids}
 
     def _get_pair_id(self):
-        pair = "%s/%s" % (self.from_currency, self.to_currency)
+        pair = "%s/%s" % (self.amount_currency, self.price_currency)
 
         if pair not in PAIR_IDS:
             raise Exception("Invalid Intersango currency pair: %s" % pair)

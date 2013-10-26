@@ -9,7 +9,7 @@ class BitcoinCentralMarket(Market):
     def update_depth(self):
         res = urllib.request.urlopen(
             'https://bitcoin-central.net/api/v1/depth?currency='
-            + self.to_currency
+            + self.price_currency
         )
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
