@@ -76,10 +76,20 @@ class Market(object):
         or currency == self.price_currency)
 
 
-    def chainable_with(self, market):
+    def chainable_with(self, market, exclude = None):
         """Returns true if the two markets can be adjacent in a trade chain."""
-        return self.uses(market.price_currency) \
-        or self.uses(market.amount_currency)
+        return market != self and (
+            (self.uses(market.price_currency
+                ) and market.price_currency != exclude
+            ) or (self.uses(market.amount_currency
+                ) and market.amount_currency != exclude
+            )
+        )
+
+
+    def counter_currency(self, currency):
+        return self.amount_currency if self.amount_currency != currency \
+        else self.price_currency
 
 
     def value_of(self, currency):
@@ -280,8 +290,11 @@ class Market(object):
     # Protected methods
     def _raise_currency_exception(self, currency):
         """Raises an exception stating the currency isn't supported."""
-
         raise Exception("Unsupported currency: %s. Require %s or %s." % (
             currency, self.amount_currency, self.price_currency
         ))
-    
+   
+    def __str__(self):
+        return "<%s(%s/%s)>" % (
+            self.name, self.amount_currency, self.price_currency
+        ) 

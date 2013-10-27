@@ -7,7 +7,7 @@ CurrencyPair = namedtuple("CurrencyPair", ['from_currency', 'to_currency'])
 class MarketChain(object):
     def __init__(self, *args, pivot="USD"):
         self.locked = False
-        self.markets = args
+        self.markets = list(args)
         self.pivot_currency = pivot
         self.currency_pairs = []
 
@@ -17,46 +17,75 @@ class MarketChain(object):
         if not self.markets[-1].uses(self.pivot_currency):
             raise Exception("Market chain doesn't end in pivot currency!")
         
-        if len(self.markets) > 1:
-            self.init_currency_pairs()
+        self.init_currency_pairs()
 
 
     def init_currency_pairs(self):
-        self.currency_pairs = []
+        if self.markets[0].price_currency == self.pivot_currency:
+            self.currency_pairs = [CurrencyPair(
+                from_currency = self.pivot_currency,
+                to_currency = self.markets[0].amount_currency
+            )]
+        elif self.markets[0].amount_currency == self.pivot_currency:
+            self.currency_pairs = [CurrencyPair(
+                from_currency = self.pivot_currency,
+                to_currency = self.markets[0].price_currency
+            )]
+        else:
+            raise Exception("First Market in chain doesn't use pivot!")
 
         # Make sure we've been given a valid list of Markets.
         for i in range(0, len(self.markets)-1):
-            from_list = self.markets[i]
-            to_list = self.markets[i+1]
+            from_pair = self.currency_pairs[i]
+            to_market = self.markets[i+1]
+
+            if not to_market.uses(from_pair.to_currency):
+                raise Exception("Market discontinuity at self.markets[%i]" % i)
             
             # Remember the currency pairs we'll be trading to make it easier to build up
             # the TradeChain later.
-            # Figure out which currency we're moving to between lists.
-            if to_list.uses(from_list.amount_currency):
-                self.currency_pairs.append(CurrencyPair(
-                    to_currency = from_list.amount_currency,
-                    from_currency = from_list.price_currency
-                ))
-            elif to_list.uses(from_list.price_currency):
-                self.currency_pairs.append(CurrencyPair(
-                    to_currency = from_list.price_currency,
-                    from_currency = from_list.amount_currency
-                ))
-            else:
-                raise Exception("Market discontinuity detected at index "+i)
+            self.currency_pairs.append(CurrencyPair(
+                to_currency = to_market.counter_currency(
+                    from_pair.to_currency
+                ),
+                from_currency = from_pair.to_currency
+            ))
 
-        if self.markets[0].uses(self.markets[-1].amount_currency) \
-        and self.markets[-1].amount_currency == self.pivot_currency:
+
+    def can_append(self, market):
+        if len(self.currency_pairs) == 0:
+            return market.uses(self.pivot_currency)
+
+        return market.chainable_with(
+            self.markets[-1], exclude = self.pivot_currency
+        )
+
+
+    def append(self, market):
+        if not self.can_append(market):
+            return False
+
+        if len(self.currency_pairs) == 0:
             self.currency_pairs.append(CurrencyPair(
-                to_currency = self.markets[-1].amount_currency,
-                from_currency = self.markets[-1].price_currency
+                from_currency = self.pivot_currency,
+                to_currency = market.counter_currency(self.pivot_currency)
             ))
-        elif self.markets[0].uses(self.markets[-1].price_currency) \
-        and self.markets[-1].price_currency == self.pivot_currency:
-            self.currency_pairs.append(CurrencyPair(
-                to_currency = self.markets[-1].price_currency,
-                from_currency = self.markets[-1].amount_currency
-            ))
+            self.markets.append(market)
+            return True
+
+        from_pair = self.currency_pairs[-1]
+        self.currency_pairs.append(CurrencyPair(
+            from_currency = from_pair.to_currency,
+            to_currency = market.counter_currency(from_pair.to_currency)
+        ))
+        self.markets.append(market)
+        return True
+
+
+    def is_complete(self):
+        return len(self.currency_pairs) > 1 \
+        and self.currency_pairs[0].from_currency == self.pivot_currency \
+        and self.currency_pairs[-1].to_currency == self.pivot_currency
 
     
     def begin_transaction(self):

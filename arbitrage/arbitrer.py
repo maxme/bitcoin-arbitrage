@@ -7,6 +7,7 @@ import config
 import time
 import logging
 import json
+from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor, wait
 from public_markets.marketchain import MarketChain
 
@@ -63,31 +64,29 @@ class Arbitrer(object):
     def init_marketchains(self):
         # Generate all the valid market chains.
         self.marketchains = []
-        market_lists = [[market] for market in self.markets \
-            if market.uses(config.pivot_currency)
+        marketchains = [MarketChain(market, pivot = config.pivot_currency)\
+            for market in self.markets \
+            if market.price_currency == config.pivot_currency
         ]
 
-        for i in range(0, config.max_trade_path_length):
-            market_lists_loop = [market_list for market_list in market_lists]
+        for i in range(0, config.max_trade_path_length - 1):
+            num_marketchains = len(marketchains)
 
-            for j in range(0, len(market_lists_loop)):
-                market_list = market_lists.pop(0)
+            for j in range(0, num_marketchains):
+                marketchain = marketchains.pop(0)
 
-                if market_list[-1].uses(config.pivot_currency) \
-                and market_list[0].uses(config.pivot_currency) \
-                and market_list[-1] != market_list[0]:
-                    market_lists.append(market_list)
+                if marketchain.is_complete():
+                    marketchains.append(marketchain)
                 else:
                     for market in self.markets:
-                        if market_list[-1].chainable_with(market) \
-                        and market_list[-1] != market:
-                            market_lists.append(market_list + [market])
+                        if marketchain.can_append(market):
+                            new_marketchain = deepcopy(marketchain)
+                            new_marketchain.append(market)
+                            marketchains.append(new_marketchain)
 
-        for market_list in market_lists:
-            if market_list[-1].uses(config.pivot_currency):
-                self.marketchains.append(
-                    MarketChain(*market_list, pivot = config.pivot_currency)
-                )
+        for marketchain in marketchains:
+            if marketchain.is_complete():
+                self.marketchains.append(marketchain)
 
 
     def init_observers(self, _observers):
