@@ -6,9 +6,9 @@ import sys
 from .market import Market
 
 
-class BitstampMarket(Market):
+class Bitstamp(Market):
     def __init__(self, **kwargs):
-        super(BitstampMarket, self).__init__(**kwargs)
+        super(Bitstamp, self).__init__(**kwargs)
         self.trade_fee = 0.0050     # more complex than that : https://www.bitstamp.net/fee_schedule/
 
         if self.price_currency != "USD" or self.amount_currency != "BTC":
@@ -41,5 +41,5 @@ class BitstampMarket(Market):
 
 
 if __name__ == "__main__":
-    market = BitstampMarket()
+    market = Bitstamp()
     print(market.get_ticker())

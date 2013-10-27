@@ -8,7 +8,7 @@ import time
 import logging
 import json
 from concurrent.futures import ThreadPoolExecutor, wait
-
+from public_markets.marketchain import MarketChain
 
 class Arbitrer(object):
     """Grabs prices from the markets defined in the config file
@@ -41,7 +41,7 @@ class Arbitrer(object):
         >>> arb = Arbitrer(config = mock_config)
         >>> arb.init_markets(mock_self, {"Btce": [("BTC", "USD")]})
         >>> arb.markets[0].name
-        'BtceMarket'
+        'Btce'
 
         """
 
@@ -53,9 +53,41 @@ class Arbitrer(object):
             for pair in currency_pairs:
                 market = eval('public_markets.' + market_class_name.lower() +
                     '.' + market_name +
-                    'Market(amount_currency="%s", price_currency="%s")' % pair
+                    '(amount_currency="%s", price_currency="%s")' % pair
                 )
                 self.markets.append(market)
+
+        self.init_marketchains()
+
+
+    def init_marketchains(self):
+        # Generate all the valid market chains.
+        self.marketchains = []
+        market_lists = [[market] for market in self.markets \
+            if market.uses(config.pivot_currency)
+        ]
+
+        for i in range(0, config.max_trade_path_length):
+            market_lists_loop = [market_list for market_list in market_lists]
+
+            for j in range(0, len(market_lists_loop)):
+                market_list = market_lists.pop(0)
+
+                if market_list[-1].uses(config.pivot_currency) \
+                and market_list[0].uses(config.pivot_currency) \
+                and market_list[-1] != market_list[0]:
+                    market_lists.append(market_list)
+                else:
+                    for market in self.markets:
+                        if market_list[-1].chainable_with(market) \
+                        and market_list[-1] != market:
+                            market_lists.append(market_list + [market])
+
+        for market_list in market_lists:
+            if market_list[-1].uses(config.pivot_currency):
+                self.marketchains.append(
+                    MarketChain(*market_list, pivot = config.pivot_currency)
+                )
 
 
     def init_observers(self, _observers):
@@ -75,181 +107,6 @@ class Arbitrer(object):
             observer = eval('observers.' + observer_name.lower() + '.' +
                             observer_name + '()')
             self.observers.append(observer)
-
-
-    def get_profit_for(self, mi, mj, kask, kbid):
-        """Returns a tuple containing the profit, volume, selling price,
-        and buying price for arbitrage between two given orders in the
-        depths dictionary.
-
-        Positional args:
-        mi - The index of the trade in the `Arbitrer.depths` list for the
-            exchange passed in as `kask`.
-        mj - The index of the trade in the `Arbitrer.depths` list for the
-            exchange passed in as `kbid`.
-        kask - The name of the market to buy from.
-        kbid - The name of the market to sell to.
-
-        """
-        # TODO: Remove assumption that all prices are in USD.
-        if self.depths[kask]["asks"][mi]["price"] \
-                >= self.depths[kbid]["bids"][mj]["price"]:
-            return 0, 0, 0, 0
-
-        max_amount_buy = 0
-        for i in range(mi + 1):
-            max_amount_buy += self.depths[kask]["asks"][i]["amount"]
-        max_amount_sell = 0
-        for j in range(mj + 1):
-            max_amount_sell += self.depths[kbid]["bids"][j]["amount"]
-        max_amount = min(max_amount_buy, max_amount_sell, config.max_tx_volume)
-
-        buy_total = 0
-        w_buyprice = 0
-        for i in range(mi + 1):
-            price = self.depths[kask]["asks"][i]["price"]
-            amount = min(max_amount, buy_total + self.depths[
-                kask]["asks"][i]["amount"]) - buy_total
-            if amount <= 0:
-                break
-            buy_total += amount
-            if w_buyprice == 0:
-                w_buyprice = price
-            else:
-                # Calculate the average ask price for the profitable
-                # orders we found.
-                w_buyprice = (w_buyprice * (
-                    buy_total - amount) + price * amount) / buy_total
-
-        sell_total = 0
-        w_sellprice = 0
-        for j in range(mj + 1):
-            price = self.depths[kbid]["bids"][j]["price"]
-            amount = min(max_amount, sell_total + self.depths[
-                kbid]["bids"][j]["amount"]) - sell_total
-            if amount < 0:
-                break
-            sell_total += amount
-            if w_sellprice == 0 or sell_total == 0:
-                w_sellprice = price
-            else:
-                # Calculate the average bid price for the profitable
-                # orders we found.
-                w_sellprice = (w_sellprice * (
-                    sell_total - amount) + price * amount) / sell_total
-
-        profit = sell_total * w_sellprice - buy_total * w_buyprice
-        return profit, sell_total, w_buyprice, w_sellprice
-
-
-    def get_max_depth(self, kask, kbid):
-        """Returns a tuple containing the maximum number of profitable
-        arbitrage trades executable by only using the top ask and bid
-        orders on the `Arbitrer.depths` lists for the given exchanges.
-
-        Positional args:
-        kask - The name of the market to buy from.
-        kbid - The name of the market to sell to.
-
-        """
-        # TODO: Remove assumption that all prices are in USD.
-
-        i = 0
-        if len(self.depths[kbid]["bids"]) != 0 and \
-                        len(self.depths[kask]["asks"]) != 0:
-            while self.depths[kask]["asks"][i]["price"] \
-                    < self.depths[kbid]["bids"][0]["price"]:
-                if i >= len(self.depths[kask]["asks"]) - 1:
-                    break
-                i += 1
-        j = 0
-        if len(self.depths[kask]["asks"]) != 0 and \
-                        len(self.depths[kbid]["bids"]) != 0:
-            while self.depths[kask]["asks"][0]["price"] \
-                    < self.depths[kbid]["bids"][j]["price"]:
-                if j >= len(self.depths[kbid]["bids"]) - 1:
-                    break
-                j += 1
-        return i, j
-
-
-    def arbitrage_opportunity(self, kask, kbid):
-        """Finds all profitable trades and passes on trade profit information
-        to all observers.
-
-        Positional args:
-        kask - The name of the market to use for ask prices.
-        kbid - The name of the market to use for bid prices.
-
-        """
-
-        # TODO: Remove assumption that all prices are in USD.
-        profit, volume, buyprice, sellprice, weighted_buyprice, \
-        weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
-        if volume == 0 or buyprice == 0:
-            return
-        perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
-        for observer in self.observers:
-            observer.opportunity(
-                profit, volume, buyprice, kask, sellprice, kbid,
-                perc2, weighted_buyprice, weighted_sellprice)
-
-
-    def arbitrage_depth_opportunity(self, kask, kbid):
-        """Goes down the order book defined in `Arbitrer.depths` and returns
-        the profit realized, volume required, averaged buy and sell prices,
-        and the buy and sell prices on most profitable trade pair in the
-        exchange books of the markets passed in.
-
-        Positional args:
-        kask - The name of the market to grab ask prices from.
-        kbid - The name of the market to grab bid prices from.
-        
-        """
-
-        # TODO: Remove assumption that all prices are in USD.
-        maxi, maxj = self.get_max_depth(kask, kbid)
-        best_profit = 0
-        best_i, best_j = (0, 0)
-        best_w_buyprice, best_w_sellprice = (0, 0)
-        best_volume = 0
-        for i in range(maxi + 1):
-            for j in range(maxj + 1):
-                profit, volume, w_buyprice, w_sellprice = self.get_profit_for(
-                    i, j, kask, kbid)
-                if profit >= 0 and profit >= best_profit:
-                    best_profit = profit
-                    best_volume = volume
-                    best_i, best_j = (i, j)
-                    best_w_buyprice, best_w_sellprice = (
-                        w_buyprice, w_sellprice)
-        return best_profit, best_volume, \
-               self.depths[kask]["asks"][best_i]["price"], \
-               self.depths[kbid]["bids"][best_j]["price"], \
-               best_w_buyprice, best_w_sellprice
-
-
-    def __get_market_depth(self, market, depths):
-        """A callback used by `Arbitrer.update_depths` to asynchronously fetch
-        market depths.
-
-        """
-        depths[market.name] = market.get_depth()
-
-
-    def update_depths(self):
-        """Asynchronously grabs the order books from all markets in
-        `Arbitrer.markets` and returns a `depths` dictionary.
-
-        """
-
-        depths = {}
-        futures = []
-        for market in self.markets:
-            futures.append(self.threadpool.submit(self.__get_market_depth,
-                                                  market, depths))
-        wait(futures, timeout=20)
-        return depths
 
 
     def tickers(self):
@@ -284,10 +141,10 @@ class Arbitrer(object):
         files.sort()
         for f in files:
             depths = json.load(open(directory + '/' + f, 'r'))
-            self.depths = {}
+
             for market in self.market_names:
                 if market in depths:
-                    self.depths[market] = depths[market]
+                    market.depth = depths[market]
             self.tick()
 
 
@@ -296,24 +153,34 @@ class Arbitrer(object):
         present moment, and sends the opportunities on to the observers.
 
         """
-
         # Alert observers to the fact that we've now begun a tick.
         # This allows them to, for example, instantiate an empty list
-        # where they might keep 
+        # where they might keep profitable trades. 
         for observer in self.observers:
-            observer.begin_opportunity_finder(self.depths)
+            observer.begin_opportunity_finder(self.markets)
 
-        for kmarket1 in self.depths:
-            for kmarket2 in self.depths:
-                if kmarket1 == kmarket2:  # same market
-                    continue
-                market1 = self.depths[kmarket1]
-                market2 = self.depths[kmarket2]
-                if market1["asks"] and market2["bids"] \
-                    and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
-                    if market1["asks"][0]['price'] < market2["bids"][0]['price']:
-                        self.arbitrage_opportunity(kmarket1, kmarket2)
 
+        # Build up our list of profitable trade chains.
+        for chain in self.marketchains:
+            tradechains = []
+            chain.begin_transaction()
+            tradechain = chain.next()
+
+            while (config.perc_thresh
+            and tradechain.percentage > config.perc_thresh) \
+            or (config.profit_thresh
+            and tradechain.profit > config.profit_thresh):
+                tradechains.append(tradechain)
+                tradechain = chain.next()
+
+            if len(tradechains) > 0:
+                # Notify our observers of the opportunities in this chain.
+                for observer in self.observers:
+                    observer.opportunity(tradechains)
+
+            chain.end_transaction()
+
+        # Let our observers know we're done feeding them opportunities.
         for observer in self.observers:
             observer.end_opportunity_finder()
 
@@ -322,7 +189,6 @@ class Arbitrer(object):
         """Find arbitrage opportunities forever. (infinite loop)"""
         time_to_wait = sorted([m.update_rate for m in self.markets], reverse=True)[0]
         while True:
-            self.depths = self.update_depths()
             self.tickers()
             self.tick()
             time.sleep(max(config.refresh_rate, time_to_wait))

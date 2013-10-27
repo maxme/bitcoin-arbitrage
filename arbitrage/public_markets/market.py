@@ -5,6 +5,7 @@ import urllib.parse
 import config
 import logging
 from decimal import Decimal
+from public_markets.trade import Trade
 
 class Market(object):
     def __init__(self, price_currency="USD", amount_currency="BTC", update_rate=60):
@@ -75,6 +76,39 @@ class Market(object):
         or currency == self.price_currency)
 
 
+    def chainable_with(self, market):
+        """Returns true if the two markets can be adjacent in a trade chain."""
+        return self.uses(market.price_currency) \
+        or self.uses(market.amount_currency)
+
+
+    def value_of(self, currency):
+        """Returns the volume of the opposite currency that could be obtained
+        by selling a single unit of the given currency.
+
+        Args:
+        volume - The amount of the given currency to remove from the top.
+        currency - The currency denomination of the volume.
+
+        """
+        depth = self.get_depth()
+
+        if currency == self.amount_currency:
+            return depth["bids"][0]["price"]
+
+        elif currency == self.price_currency:
+            if depth["asks"][0]["price"] == 0:
+                return 0
+
+            return float(
+                (Decimal('1') / Decimal(str(depth["asks"][0]["price"]))
+                ).quantize(Decimal('1.00000000')).normalize()
+            )
+                
+        else:
+            self._raise_currency_exception(currency)
+
+
     def r_volume_to_next_price_as(self, currency):
         """Returns the amount of a given currency you would have to buy to fill
         the order currently on top of either the ask or bid list (depending on
@@ -131,6 +165,9 @@ class Market(object):
         currency - The currency denomination of the volume.
 
         """
+        if volume == 0:
+            return 0
+
         depth = self.get_depth()
 
         if currency == self.amount_currency:
@@ -156,6 +193,9 @@ class Market(object):
         currency - The currency denomination of the volume.
 
         """
+        if volume == 0:
+            return 0
+
         depth = self.get_depth()
 
         if currency == self.amount_currency:
@@ -170,7 +210,7 @@ class Market(object):
         return float(gross.quantize(Decimal('1.00000000')))
 
 
-    def execute_trade_volume(self, volume, currency):
+    def execute_trade(self, volume, currency):
         """Removes the given amount of the given currency from the top of the
         order list. Does not handle volumes that exceed the top order's volume
         at the moment, as such functionality is not yet necessary for our
@@ -187,9 +227,15 @@ class Market(object):
         gross = self.evaluate_trade_volume(volume, currency)
 
         if currency == self.amount_currency:
+            trade_type = "sell"
+            trade_price = self.depth['bids'][0]["price"]
+            gross_currency = self.price_currency
             self.depth['bids'][0]["amount"] -= volume
 
         elif currency == self.price_currency:
+            trade_type = "buy"
+            trade_price = self.depth['asks'][0]["price"]
+            gross_currency = self.amount_currency
             self.depth['asks'][0]["amount"] -= gross
 
         if self.depth['bids'][0]["amount"] <= 0:
@@ -198,7 +244,10 @@ class Market(object):
         if self.depth['asks'][0]["amount"] <= 0:
             self.depth['asks'].pop(0)
 
-        return gross
+        trade = Trade(self.name, trade_type, trade_price)
+
+        return trade.trade_from(volume, currency
+            ).trade_to(gross, gross_currency)
 
 
     def ask_update_depth(self):

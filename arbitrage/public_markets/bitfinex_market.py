@@ -6,9 +6,9 @@ import logging
 from .market import Market
 
 
-class BitfinexMarket(Market):
+class Bitfinex(Market):
     def __init__(self, **kwargs):
-        super(BitfinexMarket, self).__init__(**kwargs)
+        super(Bitfinex, self).__init__(**kwargs)
         self.update_rate = 20
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}
@@ -41,5 +41,5 @@ class BitfinexMarket(Market):
 
 
 if __name__ == "__main__":
-    market = BitfinexMarket()
+    market = Bitfinex()
     print(market.get_depth())

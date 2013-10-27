@@ -5,9 +5,9 @@ import json
 from .market import Market
 
 
-class CampBXMarket(Market):
+class CampBX(Market):
     def __init__(self, **kwargs):
-        super(CampBXMarket, self).__init__(**kwargs)
+        super(CampBX, self).__init__(**kwargs)
         self.trade_fee = 0.0055
 
     def update_depth(self):
@@ -29,5 +29,5 @@ class CampBXMarket(Market):
 
 
 if __name__ == "__main__":
-    market = CampBXMarket()
+    market = CampBX()
     print(market.get_ticker())

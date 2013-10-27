@@ -3,7 +3,7 @@ import sys
 sys.path.append('../')
 import unittest
 
-from arbitrage.arbitrermulti import ArbitrerMulti
+from arbitrage.arbitrer import Arbitrer
 
 depths1 = {
     'BitcoinCentralEUR':
@@ -52,29 +52,7 @@ depths3 = {
 
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
-        self.arbitrer = ArbitrerMulti()
-
-    def test_getprofit1(self):
-        self.arbitrer.depths = depths2
-        profit, vol, wb, ws = self.arbitrer.get_profit_for(
-            0, 0, 'BitcoinCentralEUR', 'MtGoxEUR')
-        assert (80 == int(profit * 100))
-        assert (vol == 2)
-
-    def test_getprofit2(self):
-        self.arbitrer.depths = depths2
-        profit, vol, wb, ws = self.arbitrer.get_profit_for(
-            2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
-        assert (159 == int(profit * 100))
-        assert (vol == 5)
-
-    def test_getprofit3(self):
-        self.arbitrer.depths = depths3
-        profit, vol, wb, ws = self.arbitrer.get_profit_for(
-            2, 1, 'BitcoinCentralEUR', 'MtGoxEUR')
-        assert (profit == 0)
-        assert (vol == 0)
-
+        self.arbitrer = Arbitrer()
 
 if __name__ == '__main__':
     unittest.main()

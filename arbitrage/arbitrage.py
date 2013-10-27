@@ -5,7 +5,7 @@ import logging
 import argparse
 import sys
 
-from arbitrerNG import ArbitrerNG
+from arbitrer import Arbitrer
 
 
 class ArbitrerCLI:
@@ -36,7 +36,7 @@ class ArbitrerCLI:
 
 
     def create_arbitrer(self, args):
-        self.arbitrer = ArbitrerNG()
+        self.arbitrer = Arbitrer()
         if args.observers:
             self.arbitrer.init_observers(args.observers.split(","))
         if args.markets:

@@ -1,16 +1,29 @@
 from collections import namedtuple
-from arbitrage.public_markets.trade import Trade
-from arbitrage.public_markets.tradechain import TradeChain
+from public_markets.tradechain import TradeChain
 
 # Allows us to keep track of exits and enterances in our chain of markets.
 CurrencyPair = namedtuple("CurrencyPair", ['from_currency', 'to_currency'])
 
 class MarketChain(object):
-    def __init__(self, *args):
+    def __init__(self, *args, pivot="USD"):
         self.locked = False
         self.markets = args
+        self.pivot_currency = pivot
         self.currency_pairs = []
+
+        if not self.markets[0].uses(self.pivot_currency):
+            raise Exception("Market chain doesn't begin with pivot currency!")
+
+        if not self.markets[-1].uses(self.pivot_currency):
+            raise Exception("Market chain doesn't end in pivot currency!")
         
+        if len(self.markets) > 1:
+            self.init_currency_pairs()
+
+
+    def init_currency_pairs(self):
+        self.currency_pairs = []
+
         # Make sure we've been given a valid list of Markets.
         for i in range(0, len(self.markets)-1):
             from_list = self.markets[i]
@@ -24,7 +37,7 @@ class MarketChain(object):
                     to_currency = from_list.amount_currency,
                     from_currency = from_list.price_currency
                 ))
-            elif to_list.used(from_list.price_currency):
+            elif to_list.uses(from_list.price_currency):
                 self.currency_pairs.append(CurrencyPair(
                     to_currency = from_list.price_currency,
                     from_currency = from_list.amount_currency
@@ -32,18 +45,18 @@ class MarketChain(object):
             else:
                 raise Exception("Market discontinuity detected at index "+i)
 
-        if self.markets[0].uses(self.markets[-1].amount_currency):
+        if self.markets[0].uses(self.markets[-1].amount_currency) \
+        and self.markets[-1].amount_currency == self.pivot_currency:
             self.currency_pairs.append(CurrencyPair(
                 to_currency = self.markets[-1].amount_currency,
                 from_currency = self.markets[-1].price_currency
             ))
-        elif self.markets[0].uses(self.markets[-1].price_currency):
+        elif self.markets[0].uses(self.markets[-1].price_currency) \
+        and self.markets[-1].price_currency == self.pivot_currency:
             self.currency_pairs.append(CurrencyPair(
                 to_currency = self.markets[-1].price_currency,
                 from_currency = self.markets[-1].amount_currency
             ))
-        else:
-            raise Exception("Market does not have a valid ending currency!")
 
     
     def begin_transaction(self):
@@ -75,17 +88,12 @@ class MarketChain(object):
 
         for i in range(0, len(self.markets)):
             pair = self.currency_pairs[i]
-            to_volume = self.markets[i].execute_trade_volume(
+            trade = self.markets[i].execute_trade(
                 from_volume, pair.from_currency
             )
-
-            trade = Trade(self.markets[i].name
-                ).trade_from(from_volume, pair.from_currency
-                ).trade_to(to_volume, pair.to_currency)
-
             tradechain.add_trade(trade)
 
-            from_volume = to_volume
+            from_volume = trade.to_volume
 
         # Unlock all the markets if we began this function locked.
         if not already_locked:

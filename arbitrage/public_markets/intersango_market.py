@@ -5,7 +5,7 @@ import json
 from .market import Market
 
 
-class IntersangoMarket(Market):
+class Intersango(Market):
     PAIR_IDS = {
         "BTC/GBP": "1",
         "BTC/EUR": "2",
@@ -14,7 +14,7 @@ class IntersangoMarket(Market):
     }
 
     def __init__(self, **kwargs):
-        super(IntersangoMarket, self).__init__(**kwargs)
+        super(Intersango, self).__init__(**kwargs)
         self.update_rate = 30
         self.pair_id = self._get_pair_id()
 
@@ -47,5 +47,5 @@ class IntersangoMarket(Market):
         return self.PAIR_IDS[pair]
 
 if __name__ == "__main__":
-    market = IntersangoEUR()
+    market = Intersango()
     print(json.dumps(market.get_ticker()))

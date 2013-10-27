@@ -65,7 +65,7 @@ class TestMarket(unittest.TestCase):
 
     def test_invalid_execution(self):
         try:
-            self.market.execute_trade_volume(2, "BTC")
+            self.market.execute_trade(2, "BTC")
             assert False
         except Exception:
             assert True
@@ -88,7 +88,7 @@ class TestMarket(unittest.TestCase):
         assert self.market.evaluate_trade_volume(65.60, "USD") == 2       
  
         # Make sure it returns the amount of BTC obtained from 65.60 USD.
-        assert self.market.execute_trade_volume(65.60, "USD") == 2
+        assert self.market.execute_trade(65.60, "USD").to_volume == 2
         
         # Should have half the original figure left in USD...
         assert self.market.volume_to_next_price_as("USD") == 65.6
@@ -97,10 +97,10 @@ class TestMarket(unittest.TestCase):
         assert self.market.volume_to_next_price_as("BTC") == 2
 
         # Make sure it returns the amount of USD obtained from 2 BTC.
-        assert self.market.execute_trade_volume(2, "BTC") == 63.6
+        assert self.market.execute_trade(2, "BTC").to_volume == 63.6
 
         # Clear out the top ask order.
-        assert self.market.execute_trade_volume(65.60, "USD") == 2
+        assert self.market.execute_trade(65.60, "USD").to_volume == 2
 
         # Should match the figures from the second order in the list now.
         assert self.market.volume_to_next_price_as("BTC") == 4 

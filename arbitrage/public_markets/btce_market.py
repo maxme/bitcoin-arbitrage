@@ -5,7 +5,7 @@ import json
 from .market import Market
 
 
-class BtceMarket(Market):
+class Btce(Market):
     def update_depth(self):
         url = 'https://btc-e.com/api/2/%s_%s/depth' % (
             self.amount_currency.lower(), self.price_currency.lower()
@@ -31,5 +31,5 @@ class BtceMarket(Market):
         return {'asks': asks, 'bids': bids}
 
 if __name__ == "__main__":
-    market = BtceMarket()
+    market = Btce()
     print(market.get_ticker())

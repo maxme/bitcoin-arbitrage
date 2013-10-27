@@ -5,7 +5,7 @@ import json
 from .market import Market
 
 
-class BitcoinCentralMarket(Market):
+class BitcoinCentral(Market):
     def update_depth(self):
         res = urllib.request.urlopen(
             'https://bitcoin-central.net/api/v1/depth?currency='
@@ -28,5 +28,5 @@ class BitcoinCentralMarket(Market):
         return {'asks': asks, 'bids': bids}
 
 if __name__ == "__main__":
-    market = BitcoinCentralMarket()
+    market = BitcoinCentral()
     print(market.get_ticker())

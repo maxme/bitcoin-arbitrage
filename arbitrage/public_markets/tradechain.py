@@ -26,7 +26,32 @@ class TradeChain(object):
         that the chain of trades starts and ends in the same currency.
 
         """
+        if self.profit == 0:
+            return 0
 
-        return float((Decimal(str(self.profit)) / Decimal(
+        return float(((Decimal(str(self.profit)) / Decimal(
             str(self.trades[0].from_volume)
-        )).quantize(Decimal('1.00'), rounding=ROUND_HALF_DOWN))
+            )) * Decimal('100')).quantize(
+                Decimal('1.00'), rounding=ROUND_HALF_DOWN)
+        )
+    
+    @property
+    def pivot_currency(self):
+        if len(self.trades) == 0:
+            return None
+
+        return self.trades[0].from_currency
+
+
+    def __str__(self):
+        repr = "profit: %f %s with trade path: " % (
+            self.profit, self.pivot_currency
+        )
+
+        path = ""
+        for trade in self.trades:
+            path += "%s -> " % str(trade)
+
+        repr += "%s profit ~%.2f%%" % (path, self.percentage)
+
+        return repr

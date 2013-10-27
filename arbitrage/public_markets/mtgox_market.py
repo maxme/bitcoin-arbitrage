@@ -13,9 +13,9 @@ from .market import Market
 #FIXME passer sur du Decimal partout !!
 
 
-class MtGoxMarket(Market):
+class MtGox(Market):
     def __init__(self, **kwargs):
-        super(MtGoxMarket, self).__init__(**kwargs)
+        super(MtGox, self).__init__(**kwargs)
         self.trade_fee = 0.0060     # more complex than that https://www.mtgox.com/fee-schedule
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}
@@ -51,5 +51,5 @@ class MtGoxMarket(Market):
 
 
 if __name__ == "__main__":
-    market = MtGoxMarket()
+    market = MtGox()
     print(market.get_depth())

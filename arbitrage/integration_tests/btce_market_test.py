@@ -3,11 +3,11 @@ import sys
 sys.path.append('../')
 import unittest
 
-from arbitrage.public_markets.btce_market import BtceMarket
+from arbitrage.public_markets.btce_market import Btce
 
-class TestBtcMarket(unittest.TestCase):
+class TestBtce(unittest.TestCase):
     def setUp(self):
-        self.market = BtceMarket()
+        self.market = Btce()
 
     def test_getdepth(self):
         self.market.get_depth()

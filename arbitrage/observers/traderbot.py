@@ -3,7 +3,6 @@ import config
 import time
 from .observer import Observer
 from .emailer import send_email
-from fiatconverter import FiatConverter
 from private_markets import mtgoxeur
 from private_markets import mtgoxusd
 from private_markets import bitstampusd
@@ -16,7 +15,6 @@ class TraderBot(Observer):
             "MtGoxUSD": mtgoxusd.PrivateMtGoxUSD(),
             "BitstampUSD": bitstampusd.PrivateBitstampUSD(),
         }
-        self.fc = FiatConverter()
         self.trade_wait = 120  # in seconds
         self.last_trade = 0
         self.potential_trades = []
