@@ -6,8 +6,8 @@ class TradeChain(object):
     def __init__(self):
         self.trades = []
 
-    def add_trade(self, from_trade, to_trade):
-        self.trades.append({"from": from_trade, "to": to_trade})
+    def add_trade(self, trade):
+        self.trades.append(trade)
 
     @property
     def profit(self):
@@ -16,8 +16,8 @@ class TradeChain(object):
 
         """
 
-        return float(Decimal(str(list(self.trades[-1]["to"].values())[0]))
-            - Decimal(str(list(self.trades[0]["from"].values())[0]))
+        return float(Decimal(str(self.trades[-1].to_volume))
+            - Decimal(str(self.trades[0].from_volume))
         )
 
     @property
@@ -28,5 +28,5 @@ class TradeChain(object):
         """
 
         return float((Decimal(str(self.profit)) / Decimal(
-            str(list(self.trades[0]["from"].values())[0])
+            str(self.trades[0].from_volume)
         )).quantize(Decimal('1.00'), rounding=ROUND_HALF_DOWN))

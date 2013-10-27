@@ -1,4 +1,5 @@
 from collections import namedtuple
+from arbitrage.public_markets.trade import Trade
 from arbitrage.public_markets.tradechain import TradeChain
 
 # Allows us to keep track of exits and enterances in our chain of markets.
@@ -78,10 +79,11 @@ class MarketChain(object):
                 from_volume, pair.from_currency
             )
 
-            tradechain.add_trade(
-                {pair.from_currency: from_volume},
-                {pair.to_currency: to_volume}
-            )
+            trade = Trade(self.markets[i].name
+                ).trade_from(from_volume, pair.from_currency
+                ).trade_to(to_volume, pair.to_currency)
+
+            tradechain.add_trade(trade)
 
             from_volume = to_volume
 
