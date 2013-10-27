@@ -4,7 +4,6 @@ import urllib.error
 import urllib.parse
 import config
 import logging
-from fiatconverter import FiatConverter
 from decimal import Decimal
 
 class Market(object):
@@ -15,8 +14,6 @@ class Market(object):
         self.update_rate = update_rate
         self.trade_fee = 0
         self.locked = False
-        self.fc = FiatConverter()
-        self.fc.update()
 
     @property
     def name(self):
