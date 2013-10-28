@@ -9,6 +9,15 @@ class TradeChain(object):
     def add_trade(self, trade):
         self.trades.append(trade)
 
+    def scale(self, scaling_factor):
+        for trade in self.trades:
+            trade.from_volume = float(
+                Decimal(str(trade.from_volume)) * Decimal(str(scaling_factor))
+            )
+            trade.to_volume = float(
+                Decimal(str(trade.to_volume)) * Decimal(str(scaling_factor))
+            )
+
     @property
     def profit(self):
         """Returns the profit made with the chain of trades. Assumes that the

@@ -1,23 +1,26 @@
 import logging
 import config
 import time
+from decimal import Decimal
 from .observer import Observer
 from .emailer import send_email
-from private_markets import mtgoxeur
-from private_markets import mtgoxusd
-from private_markets import bitstampusd
+from private_markets import mtgox
+from private_markets import bitstamp
 
 
 class TraderBot(Observer):
-    def __init__(self):
-        self.clients = {
-            "MtGoxEUR": mtgoxeur.PrivateMtGoxEUR(),
-            "MtGoxUSD": mtgoxusd.PrivateMtGoxUSD(),
-            "BitstampUSD": bitstampusd.PrivateBitstampUSD(),
-        }
+    def __init__(self, clients = None):
         self.trade_wait = 120  # in seconds
         self.last_trade = 0
         self.potential_trades = []
+
+        if clients:
+            self.clients = clients
+        else:
+            self.clients = {
+                "MtGox": mtgox.PrivateMtGox(),
+                "Bitstamp": bitstamp.PrivateBitstamp(),
+            }
 
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
@@ -25,14 +28,9 @@ class TraderBot(Observer):
     def end_opportunity_finder(self):
         if not self.potential_trades:
             return
-        self.potential_trades.sort(key=lambda x: x[0])
+        self.potential_trades.sort(key=lambda trade: trade.profit)
         # Execute only the best (more profitable)
-        self.execute_trade(*self.potential_trades[0][1:])
-
-    def get_min_tradeable_volume(self, buyprice, usd_bal, btc_bal):
-        min1 = float(usd_bal) / ((1 + config.balance_margin) * buyprice)
-        min2 = float(btc_bal) / (1 + config.balance_margin)
-        return min(min1, min2)
+        self.execute(self.potential_trades[0])
 
     def update_balance(self):
         for kclient in self.clients:
@@ -46,42 +44,62 @@ class TraderBot(Observer):
             return
 
         self.update_balance()
+        
+        scaling_factors = [1]
 
         for trade in tradechain.trades:
-            if trade.market_name not in self.clients:
+            market_name = trade.market_name
+            if market_name not in self.clients:
                 logging.warn("[TraderBot] Can't automate this trade, client "+
-                            "not available: %s" % trade.market_name)
+                            "not available: %s" % market_name)
                 return
-        max_volume = self.get_min_tradeable_volume(buyprice,
-                                                   self.clients[kask].usd_balance,
-                                                   self.clients[kbid].btc_balance)
+
+            balance = self.clients[market_name].balance(trade.from_currency)
+
+            if balance <= 0:
+                logging.warn("[TraderBot] Can't automate this trade. Out of "+
+                    "%s on %s" % (market_name, trade.from_currency)
+                )
+                return
+
+            scaling_factors.append(
+                Decimal(str(balance)) / Decimal(str(trade.from_volume))
+            )
+
+        tradechain.scale(min(scaling_factors))
         volume = min(config.max_tx_volume, tradechain.trade[0].from_volume)
 
-        # Update client balance
-        volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction"+
-                         " not reached %f/%f" % (volume, config.min_tx_volume))
-            logging.warn("Balance on %s: %f USD - Balance on %s: %f BTC"
-                         % (kask, self.clients[kask].usd_balance, kbid,
-                            self.clients[kbid].btc_balance))
+            logging.warn("Can't automate this trade, minimum volume "+
+                        " transaction not reached %f/%f" % (
+                        volume, config.min_tx_volume)
+            )
+            for trade in tradechain.trades;
+                logging.warn("Balance on %s: %f %s" % (trade.market_name,
+                    self.clients[trade.market_name].balance(
+                        trade.from_currency
+                    ), trade.from_currency)
+                )
             return
+
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
             logging.warn("[TraderBot] Can't automate this trade, last trade " +
                          "occured %.2f seconds ago" %
                          (current_time - self.last_trade))
             return
-        self.potential_trades.append([profit, volume, kask, kbid,
-                                      weighted_buyprice, weighted_sellprice,
-                                      buyprice, sellprice])
+        self.potential_trades.append(tradechain)
 
     def watch_balances(self):
         pass
 
-    def execute_trade(self, volume, kask, kbid, weighted_buyprice,
-                      weighted_sellprice, buyprice, sellprice):
+    def execute(tradechain):
         self.last_trade = time.time()
-        logging.info("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
-        self.clients[kask].buy(volume, buyprice)
-        self.clients[kbid].sell(volume, sellprice)
+
+        for trade in tradechain.trades:
+            logging.info(str(trade))
+
+        if trade.type == "buy":
+            self.clients[trade.market_name].buy(trade.to_volume, trade.price)
+        elif trade.type == "sell":
+            self.clients[trade.market_name].sell(trade.from_volume, trade.price)

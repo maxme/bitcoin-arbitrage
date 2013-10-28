@@ -18,13 +18,13 @@ class Trade(object):
 
     def __str__(self):
         if self.type == "buy":
-            return "buy %f %s at %.4f %s on %s with %f %s" % (
+            return "Buy %f %s at %.4f %s on %s with %f %s" % (
                 self.to_volume, self.to_currency, self.price,
                 self.from_currency, self.market_name,
                 self.from_volume, self.from_currency
             )
         else:
-            return "sell %f %s at %.4f %s on %s for %f %s" % (
+            return "Sell %f %s at %.4f %s on %s for %f %s" % (
                 self.from_volume, self.from_currency, self.price,
                 self.to_currency, self.market_name,
                 self.to_volume, self.to_currency
