@@ -16,6 +16,27 @@ class Trade(object):
         self.to_currency = currency
         return self
 
+    @property
+    def amount(self):
+        if self.type == "buy":
+            return self.to_volume
+        else:
+            return self.from_volume
+
+    @property
+    def amount_currency(self):
+        if self.type == "buy":
+            return self.to_currency
+        else:
+            return self.from_currency 
+
+    @property
+    def price_currency(self):
+        if self.type == "buy":
+            return self.from_currency
+        else:
+            return self.to_currency
+ 
     def __str__(self):
         if self.type == "buy":
             return "Buy %f %s at %.4f %s on %s with %f %s" % (

@@ -28,15 +28,18 @@ class TraderBot(Observer):
     def end_opportunity_finder(self):
         if not self.potential_trades:
             return
-        self.potential_trades.sort(key=lambda trade: trade.profit)
+        self.potential_trades = sorted(
+            self.potential_trades, key=lambda trade: trade.profit
+        )
         # Execute only the best (more profitable)
-        self.execute(self.potential_trades[0])
+        self.execute(self.potential_trades[-1])
 
     def update_balance(self):
         for kclient in self.clients:
             self.clients[kclient].get_info()
 
-    def opportunity(self, tradechain):
+    def opportunity(self, tradechains):
+        tradechain = sorted(tradechains, key=lambda trade: trade.profit)[-1]
         if tradechain.profit < config.profit_thresh \
         or tradechain.percentage < config.perc_thresh:
             logging.debug("[TraderBot] Profit or profit percentage lower than"+
@@ -58,7 +61,7 @@ class TraderBot(Observer):
 
             if balance <= 0:
                 logging.warn("[TraderBot] Can't automate this trade. Out of "+
-                    "%s on %s" % (market_name, trade.from_currency)
+                    "%s on %s" % (trade.from_currency, market_name)
                 )
                 return
 
@@ -67,14 +70,14 @@ class TraderBot(Observer):
             )
 
         tradechain.scale(min(scaling_factors))
-        volume = min(config.max_tx_volume, tradechain.trade[0].from_volume)
+        volume = min(config.max_tx_volume, tradechain.trades[0].from_volume)
 
         if volume < config.min_tx_volume:
             logging.warn("Can't automate this trade, minimum volume "+
                         " transaction not reached %f/%f" % (
                         volume, config.min_tx_volume)
             )
-            for trade in tradechain.trades;
+            for trade in tradechain.trades:
                 logging.warn("Balance on %s: %f %s" % (trade.market_name,
                     self.clients[trade.market_name].balance(
                         trade.from_currency
@@ -93,13 +96,9 @@ class TraderBot(Observer):
     def watch_balances(self):
         pass
 
-    def execute(tradechain):
+    def execute(self, tradechain):
         self.last_trade = time.time()
 
         for trade in tradechain.trades:
-            logging.info(str(trade))
-
-        if trade.type == "buy":
-            self.clients[trade.market_name].buy(trade.to_volume, trade.price)
-        elif trade.type == "sell":
-            self.clients[trade.market_name].sell(trade.from_volume, trade.price)
+            logging.info("[TradeBot] Executing \"%s\"" % str(trade))
+            self.clients[trade.market_name].execute(trade)
