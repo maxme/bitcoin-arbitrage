@@ -22,7 +22,7 @@ class Trade(object):
             return self.to_volume
         else:
             return self.from_volume
-
+ 
     @property
     def amount_currency(self):
         if self.type == "buy":
