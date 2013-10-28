@@ -15,6 +15,9 @@ class ArbitrerCLI:
     def exec_command(self, args):
 
         if "watch" in args.command:
+            logging.info("Looking for profits along %s possible paths." % (
+                len(self.arbitrer.marketchains)
+            ))
             self.arbitrer.loop()
 
         if "replay-history" in args.command:
