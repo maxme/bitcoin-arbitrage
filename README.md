@@ -1,5 +1,6 @@
 Fork from the work of Maxime Biais : https://github.com/maxme/bitcoin-arbitrage
-Work in progress for change / improvement
+
+This is a work in progress.
 
 # bitcoin-arbitrage - opportunity detector and automated trading
 
@@ -23,7 +24,9 @@ Currently supported exchanges to automate trade:
  - Bitstamp (USD)
  - Bitcoin-Central (EUR) - (API changed)
 
-Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+Contributer donation addresses:
+- Maxime Biais (maxme) - **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+- Ryan Casey (ryepdx) - **19MMTc2TZovaJZjwtmVgmoUuWk8XDYPSgi**
 
 # WARNING
 
