@@ -82,10 +82,10 @@ class TestMarket(unittest.TestCase):
         assert self.market.volume_to_next_price_as("USD") == 131.2
 
         # Make sure it returns the amount of USD that 0.1 BTC would obtain.
-        assert self.market.evaluate_trade_volume(0.1, "BTC") == 3.18   
+        assert self.market.value_of("BTC", volume = 0.1) == 3.18   
  
         # Make sure it returns the amount of BTC that 65.60 USD would obtain.
-        assert self.market.evaluate_trade_volume(65.60, "USD") == 2       
+        assert self.market.value_of("USD", volume = 65.60) == 2       
  
         # Make sure it returns the amount of BTC obtained from 65.60 USD.
         assert self.market.execute_trade(65.60, "USD").to_volume == 2

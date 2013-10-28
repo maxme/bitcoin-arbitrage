@@ -92,31 +92,16 @@ class Market(object):
         else self.price_currency
 
 
-    def value_of(self, currency):
-        """Returns the volume of the opposite currency that could be obtained
-        by selling a single unit of the given currency.
+    def add_fee(self, volume):
+        return float(Decimal(str(volume)) - \
+            (Decimal(str(self.trade_fee)) * Decimal(str(volume)))
+        )
 
-        Args:
-        volume - The amount of the given currency to remove from the top.
-        currency - The currency denomination of the volume.
 
-        """
-        depth = self.get_depth()
-
-        if currency == self.amount_currency:
-            return depth["bids"][0]["price"]
-
-        elif currency == self.price_currency:
-            if depth["asks"][0]["price"] == 0:
-                return 0
-
-            return float(
-                (Decimal('1') / Decimal(str(depth["asks"][0]["price"]))
-                ).quantize(Decimal('1.00000000')).normalize()
-            )
-                
-        else:
-            self._raise_currency_exception(currency)
+    def remove_fee(self, volume):
+        return float((Decimal(1) - Decimal(str(self.trade_fee))) \
+            * Decimal(str(volume))
+        )
 
 
     def r_volume_to_next_price_as(self, currency):
@@ -131,11 +116,12 @@ class Market(object):
         depth = self.get_depth()
 
         if currency == self.amount_currency:
-            return depth['asks'][0]["amount"]
+            return self.add_fee(depth['asks'][0]["amount"])
         elif currency == self.price_currency:
-            return float(Decimal(str(depth['bids'][0]["price"])) * Decimal(
+            return self.add_fee(
+                float(Decimal(str(depth['bids'][0]["price"])) * Decimal(
                 str(depth['bids'][0]["amount"])
-            ))
+            )))
         else:
             self._raise_currency_exception(currency)
 
@@ -152,18 +138,19 @@ class Market(object):
         depth = self.get_depth()
 
         if currency == self.amount_currency:
-            return depth['bids'][0]["amount"]
+            return self.add_fee(depth['bids'][0]["amount"])
         elif currency == self.price_currency:
-            return float(Decimal(str(depth['asks'][0]["price"])) * Decimal(
+            return self.add_fee(
+                float(Decimal(str(depth['asks'][0]["price"])) * Decimal(
                 str(depth['asks'][0]["amount"])
-            ))
+            )))
         else:
             self._raise_currency_exception(currency)
 
 
-    def r_evaluate_trade_volume(self, volume, currency):
-        """Returns the amount of currency that would be given to the other
-        party if `volume` of `currency` were sold at the currency market price.
+    def r_value_of(self, currency, volume = 1):
+        """Returns the amount of currency necessary to return the given volume
+        of the given currency.
         Useful for working backwards to the amount of money that needs to go
         into the system after working out the maximum trade volume across
         market order books.
@@ -179,6 +166,7 @@ class Market(object):
             return 0
 
         depth = self.get_depth()
+        volume = self.remove_fee(volume)
 
         if currency == self.amount_currency:
             gross = Decimal(str(volume)) * Decimal(str(depth["asks"][0]["price"]))
@@ -192,7 +180,7 @@ class Market(object):
         return float(gross.quantize(Decimal('1.00000000')))
 
 
-    def evaluate_trade_volume(self, volume, currency):
+    def value_of(self, currency, volume=1):
         """Returns the amount that would be yielded if the trade volume,
         denominated in `currency`, were executed.
         Does not handle volumes that exceed the top order's volume at the
@@ -207,6 +195,7 @@ class Market(object):
             return 0
 
         depth = self.get_depth()
+        volume = self.add_fee(volume)
 
         if currency == self.amount_currency:
             gross = Decimal(str(volume)) * Decimal(str(depth["bids"][0]["price"]))
@@ -234,7 +223,7 @@ class Market(object):
         if not self.locked:
             raise Exception("Cannot mutate orderbook outside a transaction.")
 
-        gross = self.evaluate_trade_volume(volume, currency)
+        gross = self.value_of(currency, volume = volume)
 
         if currency == self.amount_currency:
             trade_type = "sell"
@@ -254,6 +243,9 @@ class Market(object):
         if self.depth['asks'][0]["amount"] <= 0:
             self.depth['asks'].pop(0)
 
+        gross = float(Decimal(str(gross)) - Decimal(str(gross)
+            ) * Decimal(str(self.trade_fee))
+        )
         trade = Trade(self.name, trade_type, trade_price)
 
         return trade.trade_from(volume, currency

@@ -28,4 +28,4 @@ class TestTradeChain(unittest.TestCase):
         )
 
         assert float(self.chain.profit) == 0.72
-        assert float(self.chain.percentage) == 0.22
+        assert float(self.chain.percentage) == 21.95

@@ -54,7 +54,7 @@ class TestMarketChain(unittest.TestCase):
     def test_profit_functions(self):
         tradechain = self.chain.next()
         assert tradechain.profit == 0.72
-        assert tradechain.percentage == 0.22
+        assert tradechain.percentage == 21.95
         
         # Make sure we're unlocked.
         assert not self.chain.locked
@@ -63,14 +63,14 @@ class TestMarketChain(unittest.TestCase):
     
         tradechain = self.chain.next()
         assert tradechain.profit == 0.34
-        assert tradechain.percentage == 0.21
+        assert tradechain.percentage == 20.73
         
         # Make sure we're still locked.
         assert self.chain.locked
 
         tradechain = self.chain.next()
         assert tradechain.profit == -0.804
-        assert tradechain.percentage == -0.45
+        assert tradechain.percentage == -44.57
 
         self.chain.end_transaction()
 

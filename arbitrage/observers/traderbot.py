@@ -38,27 +38,26 @@ class TraderBot(Observer):
         for kclient in self.clients:
             self.clients[kclient].get_info()
 
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
-                    weighted_buyprice, weighted_sellprice):
-        if profit < config.profit_thresh or perc < config.perc_thresh:
+    def opportunity(self, tradechain):
+        if tradechain.profit < config.profit_thresh \
+        or tradechain.percentage < config.perc_thresh:
             logging.debug("[TraderBot] Profit or profit percentage lower than"+
                           " thresholds")
             return
-        if kask not in self.clients:
-            logging.warn("[TraderBot] Can't automate this trade, client not "+
-                         "available: %s" % kask)
-            return
-        if kbid not in self.clients:
-            logging.warn("[TraderBot] Can't automate this trade, " +
-                         "client not available: %s" % kbid)
-            return
-        volume = min(config.max_tx_volume, volume)
 
-        # Update client balance
         self.update_balance()
+
+        for trade in tradechain.trades:
+            if trade.market_name not in self.clients:
+                logging.warn("[TraderBot] Can't automate this trade, client "+
+                            "not available: %s" % trade.market_name)
+                return
         max_volume = self.get_min_tradeable_volume(buyprice,
                                                    self.clients[kask].usd_balance,
                                                    self.clients[kbid].btc_balance)
+        volume = min(config.max_tx_volume, tradechain.trade[0].from_volume)
+
+        # Update client balance
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
             logging.warn("Can't automate this trade, minimum volume transaction"+

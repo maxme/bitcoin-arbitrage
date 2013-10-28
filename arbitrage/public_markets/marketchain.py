@@ -153,21 +153,23 @@ class MarketChain(object):
                 # Translate max_volume, which is currently denominated in the
                 # currency we're moving from, to the currency we're moving to.
                 # This allows for an accurate comparison. 
-                max_volume = from_list.r_evaluate_trade_volume(
-                    max_volume, pair.from_currency
+                max_volume = from_list.value_of(
+                    pair.from_currency, volume = max_volume
                 )
                 max_volume = min(volume1, volume2, max_volume)
 
         max_volume = min(
             self.markets[-1].r_volume_to_next_price_as(self.currency_pairs[-1].to_currency),
-            self.markets[-1].evaluate_trade_volume(max_volume, self.currency_pairs[-1].from_currency)
+            self.markets[-1].value_of(
+                self.currency_pairs[-1].from_currency, volume = max_volume
+            )
         )
 
         # Okay, now figure out how much we're supposed to put into the system
         # to get that amount out.
         for i in range(0, len(self.markets)):
-            max_volume = self.markets[-1 * i].r_evaluate_trade_volume(
-                max_volume, self.currency_pairs[-1 * i].to_currency
+            max_volume = self.markets[-1 * i].r_value_of(
+                self.currency_pairs[-1 * i].to_currency, volume = max_volume
             )
         return max_volume
 
