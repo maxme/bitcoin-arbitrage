@@ -18,10 +18,12 @@ markets = {
         ("BTC", "USD")
     ]
 }
+pivot_currency = "USD"
+max_trade_path_length = 3
 
 # observers if any
 # ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
-observers = ["Logger"]
+observers = ["Logger", "TraderBotSim"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
