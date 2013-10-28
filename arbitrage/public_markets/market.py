@@ -76,13 +76,13 @@ class Market(object):
         or currency == self.price_currency)
 
 
-    def chainable_with(self, market, exclude = None):
+    def chainable_with(self, market, exclude = []):
         """Returns true if the two markets can be adjacent in a trade chain."""
         return market != self and (
             (self.uses(market.price_currency
-                ) and market.price_currency != exclude
+                ) and market.price_currency not in exclude
             ) or (self.uses(market.amount_currency
-                ) and market.amount_currency != exclude
+                ) and market.amount_currency not in exclude
             )
         )
 

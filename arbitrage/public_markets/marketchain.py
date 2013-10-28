@@ -57,8 +57,10 @@ class MarketChain(object):
             return market.uses(self.pivot_currency)
 
         return market.chainable_with(
-            self.markets[-1], exclude = self.pivot_currency
-        )
+            self.markets[-1], exclude = [
+                self.currency_pairs[-1].from_currency,
+                self.pivot_currency
+            ])
 
 
     def append(self, market):

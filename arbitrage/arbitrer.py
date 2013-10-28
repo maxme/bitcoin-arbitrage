@@ -66,7 +66,7 @@ class Arbitrer(object):
         self.marketchains = []
         marketchains = [MarketChain(market, pivot = config.pivot_currency)\
             for market in self.markets \
-            if market.price_currency == config.pivot_currency
+            if market.uses(config.pivot_currency)
         ]
 
         for i in range(0, config.max_trade_path_length - 1):
