@@ -47,3 +47,6 @@ tmp/
 
 # run
 *.log
+
+# BTC-e nonce files
+*.nonce
