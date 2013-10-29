@@ -64,6 +64,7 @@ class ArbitrerCLI:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
                             level=level)
 
+        logging.info("Starting arbitrage. Ctrl-C at any time to exit.")
         self.create_arbitrer(args)
         self.exec_command(args)
 
@@ -74,4 +75,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        logging.info("Stopping arbitrage and exiting.")
