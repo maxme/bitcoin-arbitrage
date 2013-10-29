@@ -4,11 +4,11 @@
 import public_markets
 import observers
 import config
+import config_dynamic
 import time
 import logging
 import json
 from copy import deepcopy
-from concurrent.futures import ThreadPoolExecutor, wait
 from public_markets.marketchain import MarketChain
 
 class Arbitrer(object):
@@ -18,12 +18,13 @@ class Arbitrer(object):
     """
 
     def __init__(self, config = config):
-        self.markets = []
-        self.observers = []
-        self.depths = {}
+        self.reload(config)        
+        config_dynamic.updated.connect(self.reload)
+        
+
+    def reload(self, config):
         self.init_markets(config.markets)
         self.init_observers(config.observers)
-        self.threadpool = ThreadPoolExecutor(max_workers=10)
 
 
     def init_markets(self, markets):
@@ -46,6 +47,7 @@ class Arbitrer(object):
 
         """
 
+        self.markets = []
         self.market_names = markets
         for market_name, currency_pairs in markets.items():
             market_class_name = market_name.lower() + "_market"
@@ -54,7 +56,7 @@ class Arbitrer(object):
             for pair in currency_pairs:
                 market = eval('public_markets.' + market_class_name.lower() +
                     '.' + market_name +
-                    '(amount_currency="%s", price_currency="%s")' % pair
+                    '(amount_currency="%s", price_currency="%s")' % tuple(pair)
                 )
                 self.markets.append(market)
 
@@ -100,6 +102,7 @@ class Arbitrer(object):
 
         """
 
+        self.observers = []
         self.observer_names = _observers
         for observer_name in _observers:
             exec('import observers.' + observer_name.lower())

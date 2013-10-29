@@ -4,6 +4,7 @@
 import logging
 import argparse
 import sys
+import config_dynamic
 
 from arbitrer import Arbitrer
 
@@ -65,6 +66,8 @@ class ArbitrerCLI:
                             level=level)
 
         logging.info("Starting arbitrage. Ctrl-C at any time to exit.")
+        config_dynamic.init()
+
         self.create_arbitrer(args)
         self.exec_command(args)
 
@@ -74,8 +77,13 @@ def main():
     cli.main()
 
 
+def log_config_json_loaded(config):
+    logging.info("Loaded settings from config.json")
+
+
 if __name__ == "__main__":
     try:
+        config_dynamic.loaded.connect(log_config_json_loaded)
         main()
     except KeyboardInterrupt:
         logging.info("Stopping arbitrage and exiting.")
