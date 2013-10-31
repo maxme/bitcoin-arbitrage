@@ -51,6 +51,14 @@ class TradeChain(object):
 
         return self.trades[0].from_currency
 
+    @property
+    def __dict__(self):
+        return {
+            "pivot_currency": self.pivot_currency,
+            "profit": self.profit,
+            "percentage": self.percentage,
+            "trades": [ t.__dict__ for t in self.trades]
+        }
 
     def __str__(self):
         repr = "profit: %f %s with trade path: " % (
