@@ -50,3 +50,18 @@ class Trade(object):
                 self.to_currency, self.market_name,
                 self.to_volume, self.to_currency
             )
+
+    @property
+    def __dict__(self):
+        return {
+            "market_name": self.market_name,
+            "type": self.type,
+            "price": self.price,
+            "price_currency": self.price_currency,
+            "amount": self.amount,
+            "amount_currency": self.amount_currency,
+            "from_currency": self.from_currency,
+            "from_volume": self.from_volume,
+            "to_currency": self.to_currency,
+            "to_volume": self.to_volume
+        }
