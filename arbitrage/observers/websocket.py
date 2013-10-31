@@ -6,28 +6,51 @@ import tornado.ioloop
 import tornado.web
 from tornado import websocket
 from .observer import Observer
+from .traderbot import order_placed
 
 GLOBALS={
-    'sockets': []
+    'opportunity_sockets': [],
+    'traderbot_sockets': []
 }
 
-class ClientSocket(websocket.WebSocketHandler):
+
+class OpportunitySocket(websocket.WebSocketHandler):
     def open(self):
-        GLOBALS['sockets'].append(self)
+        GLOBALS["opportunity_sockets"].append(self)
         logging.info("[WebSocket] Client connected.") 
 
     def on_close(self):
-        GLOBALS['sockets'].remove(self)
-        logging.info("[WebSocket] Client disconnected.") 
+        GLOBALS["opportunity_sockets"].remove(self)
+        logging.info("[WebSocket] '%s' client disconnected." 
+            % type.capitalize()
+        ) 
+
+
+class TraderBotSocket(websocket.WebSocketHandler):
+    def open(self):
+        GLOBALS["traderbot_sockets"].append(self)
+        logging.info("[WebSocket] TraderBot client connected.") 
+
+    def on_close(self):
+        GLOBALS["traderbot_sockets"].remove(self)
+        logging.info("[WebSocket] TraderBot client disconnected.") 
+
 
 class WebSocket(Observer):
     def opportunity(self, tradechains):
         best_chain = sorted(tradechains, key=lambda x: x.profit)[-1]
-        for socket in GLOBALS['sockets']:
+        for socket in GLOBALS['opportunity_sockets']:
             socket.write_message(json.dumps(best_chain.__dict__))
 
+
+def write_traderbot_trades(trade):
+    for socket in GLOBALS['traderbot_sockets']:
+        socket.write_message(json.dumps(trade.__dict__))
+
+
 application = tornado.web.Application([
-    (r"/", ClientSocket)
+    (r"/", OpportunitySocket),
+    (r"/traderbot", TraderBotSocket)
 ])
 
 port = config.ws_port if hasattr(config, "ws_port") else 8888
@@ -36,3 +59,4 @@ application.listen(port)
 thread = threading.Thread(target = tornado.ioloop.IOLoop.instance().start)
 thread.daemon = True
 thread.start()
+order_placed.connect(write_traderbot_trades)

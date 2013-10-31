@@ -1,3 +1,4 @@
+import blinker
 import logging
 import config
 import time
@@ -7,6 +8,7 @@ from .emailer import send_email
 from private_markets import mtgox
 from private_markets import bitstamp
 
+order_placed = blinker.signal("order_placed")
 
 class TraderBot(Observer):
     def __init__(self, clients = None):
@@ -102,3 +104,4 @@ class TraderBot(Observer):
         for trade in tradechain.trades:
             logging.info("[TradeBot] Executing \"%s\"" % str(trade))
             self.clients[trade.market_name].execute(trade)
+            order_placed.send(trade)
