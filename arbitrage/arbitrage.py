@@ -80,10 +80,13 @@ def main():
 def log_config_json_loaded(config):
     logging.info("Loaded settings from config.json")
 
+def log_config_json_error(e):
+    logging.warn("Could not load config.json")
 
 if __name__ == "__main__":
     try:
         config_dynamic.loaded.connect(log_config_json_loaded)
+        config_dynamic.error.connect(log_config_json_error)
         main()
     except KeyboardInterrupt:
         logging.info("Stopping arbitrage and exiting.")
