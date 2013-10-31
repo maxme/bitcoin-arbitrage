@@ -5,6 +5,7 @@ from watchdog.events import FileSystemEventHandler
 
 loaded = signal('config_loaded')
 updated = signal('config_updated')
+error = signal('config_error')
 
 class ConfigEventHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -15,12 +16,15 @@ class ConfigEventHandler(FileSystemEventHandler):
 
 
 def update_config_from_json():
-    config_json = open("config.json", "r")
+    try:
+        config_json = open("config.json", "r")
 
-    for key, value in json.load(config_json).items():
-        setattr(config, key, value)
+        for key, value in json.load(config_json).items():
+            setattr(config, key, value)
 
-    loaded.send(config)
+        loaded.send(config)
+    except ValueError as e:
+        error.send(e)
 
 def init():
     # Import config variables from JSON, if a config.json file exists.
