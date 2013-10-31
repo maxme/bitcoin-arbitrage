@@ -1,4 +1,5 @@
 import config
+import json
 import logging
 import threading
 import tornado.ioloop
@@ -23,7 +24,7 @@ class WebSocket(Observer):
     def opportunity(self, tradechains):
         best_chain = sorted(tradechains, key=lambda x: x.profit)[-1]
         for socket in GLOBALS['sockets']:
-            socket.write_message(str(best_chain))
+            socket.write_message(json.dumps(best_chain.__dict__))
 
 application = tornado.web.Application([
     (r"/", ClientSocket)
