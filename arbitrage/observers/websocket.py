@@ -21,9 +21,7 @@ class OpportunitySocket(websocket.WebSocketHandler):
 
     def on_close(self):
         GLOBALS["opportunity_sockets"].remove(self)
-        logging.info("[WebSocket] '%s' client disconnected." 
-            % type.capitalize()
-        ) 
+        logging.info("[WebSocket] Client disconnected.") 
 
 
 class TraderBotSocket(websocket.WebSocketHandler):
