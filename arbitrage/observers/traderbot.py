@@ -2,11 +2,11 @@ import blinker
 import logging
 import config
 import time
+import importlib
+import private_markets
 from decimal import Decimal
 from .observer import Observer
 from .emailer import send_email
-from private_markets import mtgox
-from private_markets import bitstamp
 
 order_placed = blinker.signal("order_placed")
 
@@ -15,14 +15,19 @@ class TraderBot(Observer):
         self.trade_wait = 120  # in seconds
         self.last_trade = 0
         self.potential_trades = []
+        self.clients = {}
 
         if clients:
             self.clients = clients
-        else:
-            self.clients = {
-                "MtGox": mtgox.PrivateMtGox(),
-                "Bitstamp": bitstamp.PrivateBitstamp(),
-            }
+        elif hasattr(config, "traderbot_markets"):
+            for market in config.traderbot_markets:
+                client_module = importlib.import_module(
+                    "private_markets." + market.lower()
+                ) 
+                self.clients[market] = getattr(
+                    client_module,
+                    "Private" + market
+                )()
 
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
