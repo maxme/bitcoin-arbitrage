@@ -38,6 +38,9 @@ depth_profit = \
               {'amount': 6, 'price': 31.4},
               {'amount': 2, 'price': 30.1}]}
 
+depth_div_by_zero = \
+    {'asks': [{'amount': 1, 'price': 0}],
+     'bids': [{'amount': 1, 'price': 0}]}
 
 class TestMarket(unittest.TestCase):
     def setUp(self):
@@ -70,6 +73,11 @@ class TestMarket(unittest.TestCase):
         except Exception:
             assert True
 
+    def test_divide_by_zero_bug(self):
+        self.market.set_mock_depth(depth_div_by_zero)
+        self.market.get_depth()
+        assert self.market.value_of("USD") == 0
+        assert self.market.r_value_of("BTC") == 0
 
     def test_volume_functions(self):
         self.market.set_mock_depth(depth_profit)

@@ -166,6 +166,10 @@ class Market(object):
             return 0
 
         depth = self.get_depth()
+
+        if depth["bids"][0]["price"] == 0:
+            return 0
+
         volume = self.remove_fee(volume)
 
         if currency == self.amount_currency:
@@ -195,6 +199,10 @@ class Market(object):
             return 0
 
         depth = self.get_depth()
+
+        if depth["asks"][0]["price"] == 0:
+            return 0
+
         volume = self.add_fee(volume)
 
         if currency == self.amount_currency:
