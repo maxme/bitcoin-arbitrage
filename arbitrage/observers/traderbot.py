@@ -9,6 +9,7 @@ from .observer import Observer
 from .emailer import send_email
 
 order_placed = blinker.signal("order_placed")
+tradechain_executed = blinker.signal("tradechain_executed")
 
 class TraderBot(Observer):
     def __init__(self, clients = None):
@@ -110,3 +111,5 @@ class TraderBot(Observer):
             logging.info("[TradeBot] Executing \"%s\"" % str(trade))
             self.clients[trade.market_name].execute(trade)
             order_placed.send(trade)
+
+        tradechain_executed.send(tradechain)

@@ -6,7 +6,7 @@ import tornado.ioloop
 import tornado.web
 from tornado import websocket
 from .observer import Observer
-from .traderbot import order_placed
+from .traderbot import order_placed, tradechain_executed
 
 GLOBALS={
     'opportunity_sockets': [],
@@ -41,9 +41,14 @@ class WebSocket(Observer):
             socket.write_message(json.dumps(best_chain.__dict__))
 
 
-def write_traderbot_trades(trade):
+def write_traderbot_trade(trade):
     for socket in GLOBALS['traderbot_sockets']:
-        socket.write_message(json.dumps(trade.__dict__))
+        socket.write_message(json.dumps({"trade": trade.__dict__}))
+
+
+def write_traderbot_tradechain(tradechain):
+    for socket in GLOBALS['traderbot_sockets']:
+        socket.write_message(json.dumps({"tradechain": tradechain.__dict__}))
 
 
 application = tornado.web.Application([
@@ -57,4 +62,5 @@ application.listen(port)
 thread = threading.Thread(target = tornado.ioloop.IOLoop.instance().start)
 thread.daemon = True
 thread.start()
-order_placed.connect(write_traderbot_trades)
+order_placed.connect(write_traderbot_trade)
+tradechain_executed.connect(write_traderbot_tradechain)
