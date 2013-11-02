@@ -60,8 +60,4 @@ class Trade(object):
             "price_currency": self.price_currency,
             "amount": self.amount,
             "amount_currency": self.amount_currency,
-            "from_currency": self.from_currency,
-            "from_volume": self.from_volume,
-            "to_currency": self.to_currency,
-            "to_volume": self.to_volume
         }
