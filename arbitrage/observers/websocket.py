@@ -10,7 +10,8 @@ from .traderbot import order_placed, tradechain_executed
 
 GLOBALS={
     'opportunity_sockets': [],
-    'traderbot_sockets': []
+    'traderbot_sockets': [],
+    'log_sockets': []
 }
 
 
@@ -34,6 +35,22 @@ class TraderBotSocket(websocket.WebSocketHandler):
         logging.info("[WebSocket] TraderBot client disconnected.") 
 
 
+class LogSocket(websocket.WebSocketHandler):
+    def open(self):
+        GLOBALS["log_sockets"].append(self)
+        logging.info("[WebSocket] Log client connected.") 
+
+    def on_close(self):
+        GLOBALS["log_sockets"].remove(self)
+        logging.info("[WebSocket] Log client disconnected.") 
+
+
+class LogSocketHandler(logging.Handler):
+    def emit(self, record):
+        for socket in GLOBALS['log_sockets']:
+            socket.write_message(self.format(record))
+
+
 class WebSocket(Observer):
     def opportunity(self, tradechains):
         best_chain = sorted(tradechains, key=lambda x: x.profit)[-1]
@@ -53,11 +70,13 @@ def write_traderbot_tradechain(tradechain):
 
 application = tornado.web.Application([
     (r"/", OpportunitySocket),
-    (r"/traderbot", TraderBotSocket)
+    (r"/traderbot", TraderBotSocket),
+    (r"/log", LogSocket)
 ])
 
 port = config.ws_port if hasattr(config, "ws_port") else 8888
-logging.info("[WebSocket] Serving trade updates on port %i" % port) 
+logging.info("[WebSocket] Serving trade updates on port %i" % port)
+logging.getLogger().addHandler(LogSocketHandler())
 application.listen(port)
 thread = threading.Thread(target = tornado.ioloop.IOLoop.instance().start)
 thread.daemon = True
