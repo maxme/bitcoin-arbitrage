@@ -11,7 +11,8 @@ from .traderbot import order_placed, tradechain_executed
 GLOBALS={
     'opportunity_sockets': [],
     'traderbot_sockets': [],
-    'log_sockets': []
+    'log_sockets': [],
+    'socket_singleton': None
 }
 
 
@@ -51,7 +52,7 @@ class LogSocketHandler(logging.Handler):
             socket.write_message(self.format(record))
 
 
-class WebSocket(Observer):
+class _WebSocket(Observer):
     def __init__(self):
         self.application = tornado.web.Application([
             (r"/", OpportunitySocket),
@@ -72,6 +73,15 @@ class WebSocket(Observer):
         for socket in GLOBALS['opportunity_sockets']:
             socket.write_message(json.dumps(best_chain.__dict__))
 
+    def shutdown(self):
+        tornado.ioloop.IOLoop.instance().stop()
+        GLOBALS["socket_singleton"] = None
+
+
+def WebSocket():
+    if not GLOBALS["socket_singleton"]:
+        GLOBALS["socket_singleton"] = _WebSocket()
+    return GLOBALS["socket_singleton"]
 
 # Signals
 
