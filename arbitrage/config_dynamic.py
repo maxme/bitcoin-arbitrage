@@ -10,7 +10,7 @@ error = signal('config_error')
 class ConfigEventHandler(FileSystemEventHandler):
     def on_modified(self, event):
         if not event.is_directory \
-        and event.src_path.endswith("config.json"):
+        and event.src_path.decode("utf-8").endswith("config.json"):
             update_config_from_json()
             updated.send(config)
 
