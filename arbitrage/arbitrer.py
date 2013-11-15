@@ -10,6 +10,11 @@ import logging
 import json
 from copy import deepcopy
 from public_markets.marketchain import MarketChain
+from public_markets import bitcoincentral_market, bitfinex_market, \
+    bitstamp_market, btce_market, campbx_market, intersango_market, \
+    kraken_market, mtgox_market
+from observers import emailer, historydumper, logger, traderbot, \
+    traderbotsim, websocket
 
 class Arbitrer(object):
     """Grabs prices from the markets defined in the config file
@@ -51,10 +56,10 @@ class Arbitrer(object):
         self.market_names = markets
         for market_name, currency_pairs in markets.items():
             market_class_name = market_name.lower() + "_market"
-            exec('import public_markets.' + market_class_name)
+            exec('from public_markets import ' + market_class_name)
             
             for pair in currency_pairs:
-                market = eval('public_markets.' + market_class_name.lower() +
+                market = eval(market_class_name.lower() +
                     '.' + market_name +
                     '(amount_currency="%s", price_currency="%s")' % tuple(pair)
                 )
