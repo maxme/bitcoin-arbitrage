@@ -20,8 +20,6 @@ class PrivateBitcoinCentral(Market):
     withdraw_url = "https://bitcoin-central.net/api/v1/transfers/send_bitcoins/"
 
     def __init__(self):
-        # FIXME: update this file when bitcoin central re-opens
-        raise Exception("BitcoinCentral is closed")
         super().__init__()
         self.username = config.bitcoincentral_username
         self.password = config.bitcoincentral_password
@@ -58,21 +56,11 @@ class PrivateBitcoinCentral(Market):
             return json.loads(jsonstr)
         return None
 
-    def trade(self, amount, ttype, price=None):
-        # params = [("amount", amount), ("currency", self.currency), ("type",
-        # ttype)]
-        params = {"amount": amount, "currency": self.currency, "type": ttype}
-        if price:
-            params["price"] = price
-        response = self._send_request(self.trade_url, params)
-        return response
-
-    def buy(self, amount, price=None):
-        response = self.trade(amount, "buy", price)
-
-    def sell(self, amount, price=None):
-        response = self.trade(amount, "sell", price)
-        print(response)
+    def execute(self, trade):
+        return self._send_request(self.trade_url, {
+            "amount": trade.amount, "currency": trade.price_currency,
+            "type": trade.type, "price": trade.price
+        })
 
     def withdraw(self, amount, address):
         params = {"amount": amount, "address": address}

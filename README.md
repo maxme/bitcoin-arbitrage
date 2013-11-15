@@ -1,3 +1,7 @@
+Fork from the work of Maxime Biais : https://github.com/maxme/bitcoin-arbitrage
+
+This is a work in progress.
+
 # bitcoin-arbitrage - opportunity detector and automated trading
 
 It gets order books from supported exchanges and calculate arbitrage
@@ -20,7 +24,9 @@ Currently supported exchanges to automate trade:
  - Bitstamp (USD)
  - Bitcoin-Central (EUR) - (API changed)
 
-Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+Contributer donation addresses:
+- Maxime Biais (maxme) - **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+- Ryan Casey (ryepdx) - **19MMTc2TZovaJZjwtmVgmoUuWk8XDYPSgi**
 
 # WARNING
 
@@ -65,7 +71,7 @@ To check your balance on an exchange (also a good way to check your accounts con
 
 Run tests
 
-    $ nosetests arbitrage/
+    $ python3 arbitrage/run_tests.py
 
 # TODO
 

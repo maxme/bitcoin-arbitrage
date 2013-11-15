@@ -1,8 +1,5 @@
-import json
-import sys
-# Enable websocket protocol debugging
-import websocket
-websocket._debug = True
+import websocket    # https://github.com/liris/websocket-client/tree/py3
+import threading
 
 
 def on_message(ws, message):
@@ -17,21 +14,22 @@ def on_close(ws):
     print("### closed ###")
 
 
+def run(*args):
+    command = '{"op": "mtgox.subscribe", "type": "depth"}'
+    ws.send(command.encode('utf-8'))
+
+
 def on_open(ws):
-    def run(*args):
-        for i in range(30000):
-            time.sleep(1)
-            ws.send("Hello %d" % i)
-        time.sleep(1)
-        ws.close()
-        print("thread terminating...")
-    thread.start_new_thread(run, ())
+    threading.Thread(target=run).start()
+
 
 if __name__ == "__main__":
-
-    ws = websocket.WebSocketApp("wss://websocket.mtgox.com/mtgox",
-                                on_message,
-                                on_error)
-    ws.on_open = on_open
-
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("ws://websocket.mtgox.com/mtgox",
+                                on_open=on_open,
+                                on_message=on_message,
+                                on_error=on_error,
+                                on_close=on_close)
     ws.run_forever()
+
+

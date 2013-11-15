@@ -4,15 +4,21 @@ import urllib.parse
 import json
 from .market import Market
 
+class Kraken(Market):
+    CODES = {
+        "USD": "XXBTZUSD",
+        "EUR": "XXBTZEUR"
+    }
 
-class BtceUSD(Market):
-    def __init__(self):
-        super(BtceUSD, self).__init__("USD")
-        self.update_rate = 60
+    def __init__(self, **kwargs):
+        super(Kraken, self).__init__(**kwargs)
+        self.code = self.CODES[self.price_currency]
+        self.update_rate = 30
 
     def update_depth(self):
-        url = 'https://btc-e.com/api/2/btc_usd/depth'
-        req = urllib.request.Request(url, None, headers={
+        url = 'https://api.kraken.com/0/public/Depth'
+        req = urllib.request.Request(url, b"pair=" + bytes(self.code, "ascii"),
+                                     headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",
             "User-Agent": "curl/7.24.0 (x86_64-apple-darwin12.0)"})
@@ -28,10 +34,6 @@ class BtceUSD(Market):
         return r
 
     def format_depth(self, depth):
-        bids = self.sort_and_format(depth['bids'], True)
-        asks = self.sort_and_format(depth['asks'], False)
+        bids = self.sort_and_format(depth['result'][self.code]['bids'], True)
+        asks = self.sort_and_format(depth['result'][self.code]['asks'], False)
         return {'asks': asks, 'bids': bids}
-
-if __name__ == "__main__":
-    market = BtceUSD()
-    print(market.get_ticker())
