@@ -6,6 +6,11 @@ import argparse
 import sys
 import config_dynamic
 
+if hasattr(sys, 'frozen'):
+    # Logging needs to be set up here if running as a compiled executable.
+    logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
+		    level=logging.INFO)
+
 from arbitrer import Arbitrer
 
 
@@ -48,22 +53,32 @@ class ArbitrerCLI:
 
 
     def main(self):
+        compiled = hasattr(sys, 'frozen')
         parser = argparse.ArgumentParser()
-        parser.add_argument("-v", "--verbose", help="more verbose",
-                            action="store_true")
         parser.add_argument("-o", "--observers", type=str,
                             help="observers, example: -oLogger,Emailer")
         parser.add_argument("-m", "--markets", type=str,
                             help="markets, example: -mMtGox,Bitstamp")
         parser.add_argument("command", nargs='*', default="watch",
                             help='verb: "watch|replay-history|get-balance"')
-        args = parser.parse_args()
 
-        level = logging.INFO
-        if args.verbose:
-            level = logging.DEBUG
-        logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
-                            level=level)
+        # cx_freeze seems to have problems with setting logging down here.
+        if not compiled:
+                parser.add_argument("-v", "--verbose", help="more verbose",
+                                    action="store_true")
+
+        args = parser.parse_args()
+        
+        if not compiled:
+                level = logging.INFO
+
+                if args.verbose:
+                        level = logging.DEBUG
+
+                logging.basicConfig(
+                        format='%(asctime)s [%(levelname)s] %(message)s',
+                        level=level
+                )
 
         logging.info("Starting arbitrage. Ctrl-C at any time to exit.")
         config_dynamic.init()
