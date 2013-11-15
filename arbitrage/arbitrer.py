@@ -23,11 +23,17 @@ class Arbitrer(object):
     """
 
     def __init__(self, config = config):
+        self.observers = {}
+        self.markets = []
         self.reload(config)        
         config_dynamic.updated.connect(self.reload)
         
 
     def reload(self, config):
+        for observer_name, observer in self.observers.items():
+            if observer_name not in config.observers:
+                observer.shutdown()
+
         self.init_markets(config.markets)
         self.init_observers(config.observers)
 
@@ -107,13 +113,13 @@ class Arbitrer(object):
 
         """
 
-        self.observers = []
+        self.observers = {}
         self.observer_names = _observers
         for observer_name in _observers:
             exec('import observers.' + observer_name.lower())
             observer = eval('observers.' + observer_name.lower() + '.' +
                             observer_name + '()')
-            self.observers.append(observer)
+            self.observers[observer_name] = observer
 
 
     def tickers(self):
@@ -163,7 +169,7 @@ class Arbitrer(object):
         # Alert observers to the fact that we've now begun a tick.
         # This allows them to, for example, instantiate an empty list
         # where they might keep profitable trades. 
-        for observer in self.observers:
+        for observer in self.observers.values():
             observer.begin_opportunity_finder(self.markets)
 
 
@@ -182,13 +188,13 @@ class Arbitrer(object):
 
             if len(tradechains) > 0:
                 # Notify our observers of the opportunities in this chain.
-                for observer in self.observers:
+                for observer in self.observers.values():
                     observer.opportunity(tradechains)
 
             chain.end_transaction()
 
         # Let our observers know we're done feeding them opportunities.
-        for observer in self.observers:
+        for observer in self.observers.values():
             observer.end_opportunity_finder()
 
 
