@@ -25,8 +25,15 @@ bitcoincentral_address = "FIXME"  # to deposit btc from markets / wallets
 bitstamp_username = "FIXME"
 bitstamp_password = "FIXME"
 
+ripple_useraddress = "FIXME"  # r1234abcd...
+# WARNING! Whoever has this secret has full control over the account forever!
+# It can NOT be revoked or changed!
+ripple_usersecret = "FIXME"  # s1234abcd...
+# used to sign transactions by providing the secret. Make sure it is safe!
+ripple_private_rippled = 'http://127.0.0.1:5005'  # RPC port
+
 # Ripple general config
-ripple_rippled = 'http://s1.ripple.com:51234'
+ripple_rippled = 'http://s1.ripple.com:51234'  # used to get market data
 ripple_BTC_issuer = 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'  # Bitstamp
 ripple_USD_issuer = 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'  # Bitstamp
 ripple_EUR_issuer = 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'  # Bitstamp
