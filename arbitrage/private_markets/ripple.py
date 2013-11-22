@@ -83,7 +83,7 @@ class PrivateRipple(Market):
             '"params" : [ { "account" : "' + self.address + '" } ] }')
         infodata = infodata.encode('ascii')
         inforeq = urllib.request.Request(
-            public_rippled_url,  # account data is public in Ripple
+            self.public_rippled_url,  # account data is public in Ripple
             infodata,
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -97,10 +97,16 @@ class PrivateRipple(Market):
             if trustline['account'] == config.ripple_BTC_issuer:
                 if trustline['currency'] == "BTC":
                     self.btc_balance = float(trustline['balance'])
+                else:
+                    self.btc_balance = 0.
             if trustline['account'] == config.ripple_USD_issuer:
                 if trustline['currency'] == "USD":
                     self.usd_balance = float(trustline['balance'])
+                else:
+                    self.usd_balance = 0.
             if trustline['account'] == config.ripple_EUR_issuer:
                 if trustline['currency'] == "EUR":
                     self.eur_balance = float(trustline['balance'])
+                else:
+                    self.eur_balance = 0.
         return 1

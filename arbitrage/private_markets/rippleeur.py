@@ -1,4 +1,5 @@
 from .ripple import PrivateRipple
+import config
 
 
 class PrivateRippleEUR(PrivateRipple):
