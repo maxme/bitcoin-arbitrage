@@ -9,6 +9,7 @@ from private_markets import mtgoxusd
 from private_markets import rippleeur
 from private_markets import rippleusd
 from private_markets import bitstampusd
+from private_markets import bitfinexusd
 
 
 class TraderBot(Observer):
@@ -19,6 +20,7 @@ class TraderBot(Observer):
             "RippleEUR": rippleeur.PrivateRippleEUR(),
             "RippleUSD": rippleusd.PrivateRippleUSD(),
             "BitstampUSD": bitstampusd.PrivateBitstampUSD(),
+            "BitfinexUSD": bitfinexusd.PrivateBitfinexUSD(),
         }
         self.fc = FiatConverter()
         self.trade_wait = 120  # in seconds

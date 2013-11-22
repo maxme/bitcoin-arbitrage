@@ -1,8 +1,6 @@
 import logging
 import config
 from .observer import Observer
-from private_markets import mtgox
-from private_markets import bitcoincentral
 from .traderbot import TraderBot
 import json
 
@@ -61,12 +59,14 @@ class TraderBotSim(TraderBot):
         self.intersango = MockMarket("intersango", 0.0065)
         self.bitcoin24 = MockMarket("bitcoin24", 0)
         self.bitstamp = MockMarket("bitstamp", 0.005)  # 0.5% fee
+        self.bitfinex = MockMarket("bitfinex", 0.0012)  # 0.12% fee
         self.clients = {
             "MtGoxEUR": self.mtgox,
             "MtGoxUSD": self.mtgox,
             "RippleEUR": self.ripple,
             "RippleUSD": self.ripple,
             "BitstampUSD": self.bitstamp,
+            "BitfinexUSD": self.bitfinex,
         }
         self.profit_thresh = 1  # in EUR
         self.perc_thresh = 0.6  # in %
@@ -86,4 +86,4 @@ class TraderBotSim(TraderBot):
 
 if __name__ == "__main__":
     t = TraderBotSim()
-    print(t.total_balance(33))
+    print(t.total_balance(770))
