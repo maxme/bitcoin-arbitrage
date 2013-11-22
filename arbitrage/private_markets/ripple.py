@@ -41,6 +41,7 @@ class PrivateRipple(Market):
         # TODO: return None on error
         # TODO: make sure that the transaction actually took place
         answer = json.loads(buyres.read().decode('utf8'))
+        print(answer)
         return "success"
 
     def _sell(self, amount, price):
@@ -66,6 +67,7 @@ class PrivateRipple(Market):
         # TODO: return None on error
         # TODO: make sure that the transaction actually took place
         answer = json.loads(sellres.read().decode('utf8'))
+        print(answer)
         return "success"
 
     def withdraw(self, amount, address):
