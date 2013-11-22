@@ -25,6 +25,9 @@ bitcoincentral_address = "FIXME"  # to deposit btc from markets / wallets
 bitstamp_username = "FIXME"
 bitstamp_password = "FIXME"
 
+bitfinex_apikey = "FIXME"
+bitfinex_apisecret = "FIXME"
+
 ripple_useraddress = "FIXME"  # r1234abcd...
 # WARNING! Whoever has this secret has full control over the account forever!
 # It can NOT be revoked or changed!
