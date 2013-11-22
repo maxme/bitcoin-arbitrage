@@ -6,6 +6,8 @@ from .emailer import send_email
 from fiatconverter import FiatConverter
 from private_markets import mtgoxeur
 from private_markets import mtgoxusd
+from private_markets import rippleeur
+from private_markets import rippleusd
 from private_markets import bitstampusd
 
 
@@ -14,6 +16,8 @@ class TraderBot(Observer):
         self.clients = {
             "MtGoxEUR": mtgoxeur.PrivateMtGoxEUR(),
             "MtGoxUSD": mtgoxusd.PrivateMtGoxUSD(),
+            "RippleEUR": rippleeur.PrivateRippleEUR(),
+            "RippleUSD": rippleusd.PrivateRippleUSD(),
             "BitstampUSD": bitstampusd.PrivateBitstampUSD(),
         }
         self.fc = FiatConverter()

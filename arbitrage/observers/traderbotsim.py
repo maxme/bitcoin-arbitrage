@@ -56,6 +56,7 @@ class MockMarket(object):
 class TraderBotSim(TraderBot):
     def __init__(self):
         self.mtgox = MockMarket("mtgox", 0.006)  # 0.6% fee
+        self.ripple = MockMarket("ripple", 0.002)  # 0.2% fee
         self.btcentral = MockMarket("bitcoin-central", 0.00489)
         self.intersango = MockMarket("intersango", 0.0065)
         self.bitcoin24 = MockMarket("bitcoin24", 0)
@@ -63,6 +64,8 @@ class TraderBotSim(TraderBot):
         self.clients = {
             "MtGoxEUR": self.mtgox,
             "MtGoxUSD": self.mtgox,
+            "RippleEUR": self.ripple,
+            "RippleUSD": self.ripple,
             "BitstampUSD": self.bitstamp,
         }
         self.profit_thresh = 1  # in EUR
