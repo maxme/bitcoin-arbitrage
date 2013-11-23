@@ -24,6 +24,7 @@ Currently supported exchanges to automate trade:
  - Bitfinex (USD) - untested, please remove this once verified
 
 Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+
 Ripple + Bitfinex private API: **1LeUQ5Zyn1gZEt2MNqBdhg7JqvqhNRXrAb**
 
 # WARNING
