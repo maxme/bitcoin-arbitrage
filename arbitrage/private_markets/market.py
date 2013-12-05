@@ -12,12 +12,14 @@ class Market:
         self.btc_balance = 0.
         self.eur_balance = 0.
         self.usd_balance = 0.
+        self.gbp_balance = 0.
         self.fc = FiatConverter()
 
     def __str__(self):
-        return "%s: %s" % (self.name, str({"btc_balance": self.btc_balance,
-                                           "eur_balance": self.eur_balance,
-                                           "usd_balance": self.usd_balance}))
+      return "%s: %s" % (self.name, str({"BTC ": self.btc_balance,
+                                           "€": self.eur_balance,
+                                           "£": self.gbp_balance,
+                                           "$": self.usd_balance}))
 
     def buy(self, amount, price):
         """Orders are always priced in USD"""
