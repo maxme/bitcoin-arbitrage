@@ -14,13 +14,18 @@ Currently supported exchanges to get data:
  - Bitfinex (USD)
  - Kraken (USD, EUR)
  - Bitcoin-Central (EUR)
+ - Ripple (USD, EUR)
 
 Currently supported exchanges to automate trade:
  - MtGox (EUR, USD)
- - Bitstamp (USD)
+ - Bitstamp (USD) - (API changed, not functional atm.)
  - Bitcoin-Central (EUR) - (API changed)
+ - Ripple (EUR, USD) - you need your own private rippled for signing transactions! Also untested.
+ - Bitfinex (USD) - untested, please remove this once verified
 
 Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+
+Ripple + Bitfinex private API: **1LeUQ5Zyn1gZEt2MNqBdhg7JqvqhNRXrAb**
 
 # WARNING
 
@@ -73,13 +78,12 @@ Run tests
  * Write documentation
  * Add other exchanges:
    * icbit
-   * BitFinex
  * Update order books with a WebSocket client for supported exchanges
-   (MtGox, Bitcoin-Central)
+   (MtGox, Bitcoin-Central, Ripple, Bitstamp?)
  * Better history handling for observer "HistoryDumper" (Redis ?)
+ * handle fees properly
  * Move EUR / USD from a market to an other:
    * Coupons
-   * Ripple ?
    * Negative Operations
    * use Litecoin or other cryptocurrencies trades
 
