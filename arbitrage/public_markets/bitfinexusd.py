@@ -15,7 +15,7 @@ class BitfinexUSD(Market):
 
     def update_depth(self):
         res = urllib.request.urlopen(
-            'https://bitfinex.com/api/v1/book/btcusd')
+            'https://api.bitfinex.com/v1/book/btcusd')
         jsonstr = res.read().decode('utf8')
         try:
             depth = json.loads(jsonstr)
