@@ -18,4 +18,5 @@ setup(name='bitcoin-arbitrage',
       arbitrage=['bin/bitcoin-arbitrage'],
       test_suite='nose.collector',
       tests_require=['nose', 'websocket'],
+      install_requires=['blinker','watchdog'],
 )
