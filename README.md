@@ -38,7 +38,10 @@ Contributer donation addresses:
     cp arbitrage/config.py-example arbitrage/config.py
 
 Then edit config.py file to setup your preferences: watched markets
-and observers
+and observers. You can also create a config.json file to override
+the variables defined in config.py. If you have blinker and watchdog
+installed, the arbitrage bot will automatically update its settings
+any time a change is made to config.json.
 
 You need Python3 to run this program. To install on Debian, Ubuntu, or
 variants of them, use:
@@ -47,7 +50,26 @@ variants of them, use:
 
 To use the observer XMPPMessager you will need to install sleekxmpp:
 
-    $ pip3 install sleekxmpp
+    $ sudo pip3 install sleekxmpp
+
+To use the observer WebSocket, you will need to install tornado and blinker:
+
+    $ sudo pip3 install blinker tornado
+
+Watchdog must be installed and the WebSocket observer must be turned on in
+order to use bitcoin-arbitrage-ui. Bitcoin-arbitrage-ui is a browser-based
+GUI for this arbitrage bot, and can be downloaded from
+https://github.com/ryepdx/bitcoin-arbitrage-ui
+
+You may have trouble with the copy of watchdog currently in PyPI.
+If that's the case, try installing it directly from source:
+
+    $ wget https://github.com/gorakhargosh/watchdog/archive/master.zip
+    $ unzip master.zip
+    $ cd watchdog-master
+    $ sudo python3 setup.py install
+    $ cd ..
+    $ sudo rm -fr watchdog-master master.zip
 
 # Run
 
