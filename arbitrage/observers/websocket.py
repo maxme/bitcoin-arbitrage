@@ -2,17 +2,24 @@ import config
 import json
 import logging
 import threading
-import tornado.ioloop
-import tornado.web
-from tornado import websocket
 from .observer import Observer
 from .traderbot import order_placed, tradechain_executed
+
+try:
+    import tornado.ioloop
+    import tornado.web
+    from tornado import websocket
+
+except ImportError:
+    tornado = False
+    logging.warn("Could not load 'tornado'. WebSocket observer disabled!")
 
 GLOBALS={
     'opportunity_sockets': [],
     'traderbot_sockets': [],
     'log_sockets': [],
-    'socket_singleton': None
+    'socket_singleton': None,
+    'tornado_loaded': tornado != False
 }
 
 
@@ -78,9 +85,25 @@ class _WebSocket(Observer):
         GLOBALS["socket_singleton"] = None
 
 
+class _MockWebSocket(object):
+    """ Simplifies disabling the WebSocket observer. """
+
+    def opportunity(*args, **kwargs):
+        pass
+
+    def shutdown(*args, **kwargs):
+        GLOBALS["socket_singleton"] = None
+
+
 def WebSocket():
+    ws_class = _WebSocket
+
+    if not GLOBALS["tornado_loaded"]:
+        ws_class = _MockWebSocket
+
     if not GLOBALS["socket_singleton"]:
-        GLOBALS["socket_singleton"] = _WebSocket()
+        GLOBALS["socket_singleton"] = ws_class()
+
     return GLOBALS["socket_singleton"]
 
 # Signals

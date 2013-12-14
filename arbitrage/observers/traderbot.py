@@ -1,4 +1,3 @@
-import blinker
 import logging
 import config
 import time
@@ -7,6 +6,15 @@ import private_markets
 from decimal import Decimal
 from .observer import Observer
 from .emailer import send_email
+
+try:
+    import blinker
+
+except ImportError:
+    logging.warn("[TraderBot] Could not load 'blinker' library. "\
+        + "Inter-observer signals disabled!"
+    )
+    import mock_blinker as blinker
 
 order_placed = blinker.signal("order_placed")
 tradechain_executed = blinker.signal("tradechain_executed")
