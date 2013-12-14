@@ -109,7 +109,6 @@ Run tests
    * Coupons
    * Ripple ?
    * Negative Operations
-   * use Litecoin or other cryptocurrencies trades
 
 # LICENSE
 
