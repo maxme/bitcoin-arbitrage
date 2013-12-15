@@ -12,6 +12,8 @@ try:
 
 except ImportError:
     tornado = False
+    class websocket:
+        WebSocketHandler = object
     logging.warn("Could not load 'tornado'. WebSocket observer disabled!")
 
 GLOBALS={
