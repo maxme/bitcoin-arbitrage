@@ -68,7 +68,8 @@ def init():
             logging.warn("Dynamic config.json reloading disabled!")
             
         update_config_from_json()
-    except IOError:
-        pass # No config.json? No problem.
+    except (OSError, IOError):
+        logging.info("Could not load config.json.")
+        pass # Can't load config.json? No problem.
 
 
