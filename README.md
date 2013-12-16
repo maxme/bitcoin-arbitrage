@@ -37,7 +37,7 @@ and observers
 You need Python3 to run this program. To install on Debian, Ubuntu, or
 variants of them, use:
 
-    $ sudo apt-get install python3 python3-pip
+    $ sudo apt-get install python3 python3-pip python-nose
 
 To use the observer XMPPMessager you will need to install sleekxmpp:
 
