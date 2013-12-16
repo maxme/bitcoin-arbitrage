@@ -128,7 +128,7 @@ class Arbitrer(object):
         for market in self.markets:
             ticker=market.get_ticker()
             logging.debug(
-                "ticker: %-10s ask: %8.2f %3s (%5.2f) - bid: %8.2f %3s %5.2f" %
+                "ticker: %-10s ask: %8.2f %3s (%5.2f) - bid: %8.2f %3s (%5.2f)" %
                 (market.name[:10],
                  ticker["ask"]["price"],market.price_currency,ticker["ask"]["amount"],
                  ticker["bid"]["price"],market.price_currency,ticker["bid"]["amount"]))
