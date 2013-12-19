@@ -8,7 +8,6 @@ import config_dynamic
 import time
 import logging
 import json
-from copy import deepcopy
 from public_markets.marketchain import MarketChain
 from public_markets import bitcoincentral_market, bitfinex_market, \
     bitstamp_market, btce_market, campbx_market, intersango_market, \
@@ -93,7 +92,7 @@ class Arbitrer(object):
                 else:
                     for market in self.markets:
                         if marketchain.can_append(market):
-                            new_marketchain = deepcopy(marketchain)
+                            new_marketchain = marketchain.copy()
                             new_marketchain.append(market)
                             marketchains.append(new_marketchain)
 

@@ -19,6 +19,13 @@ class MarketChain(object):
         
         self.init_currency_pairs()
 
+    def __str__(self):
+        return "-->".join(["%s" % market for market in self.markets])
+
+    def copy(self):
+        new_marketchain = self
+        new_marketchain.markets = self.markets[:]
+        return new_marketchain
 
     def init_currency_pairs(self):
         if self.markets[0].price_currency == self.pivot_currency:
