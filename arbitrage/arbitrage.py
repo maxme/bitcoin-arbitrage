@@ -8,7 +8,12 @@ from arbitrer import Arbitrer
 
 class ArbitrerCLI:
     def __init__(self):
-        pass
+        self.inject_verbose_info()
+
+    def inject_verbose_info(self):
+        logging.VERBOSE = 15
+        logging.verbose = lambda x: logging.log(logging.VERBOSE, x)
+        logging.addLevelName(logging.VERBOSE, "VERBOSE")
 
     def exec_command(self, args):
         if "watch" in args.command:
@@ -38,7 +43,9 @@ class ArbitrerCLI:
 
     def main(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument("-v", "--verbose", help="more verbose",
+        parser.add_argument("-d", "--debug", help="debug verbosity",
+                            action="store_true")
+        parser.add_argument("-v", "--verbose", help="verbose mode",
                             action="store_true")
         parser.add_argument("-o", "--observers", type=str,
                             help="observers, example: -oLogger,Emailer")
@@ -49,6 +56,8 @@ class ArbitrerCLI:
         args = parser.parse_args()
         level = logging.INFO
         if args.verbose:
+            level = logging.VERBOSE
+        if args.debug:
             level = logging.DEBUG
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
                             level=level)

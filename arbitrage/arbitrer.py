@@ -146,7 +146,7 @@ class Arbitrer(object):
 
     def tickers(self):
         for market in self.markets:
-            logging.debug("ticker: " + market.name + " - " + str(
+            logging.verbose("ticker: " + market.name + " - " + str(
                 market.get_ticker()))
 
     def replay_history(self, directory):

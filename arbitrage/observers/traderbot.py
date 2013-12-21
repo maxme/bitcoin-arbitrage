@@ -43,8 +43,8 @@ class TraderBot(Observer):
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
                     weighted_buyprice, weighted_sellprice):
         if profit < config.profit_thresh or perc < config.perc_thresh:
-            logging.debug("[TraderBot] Profit or profit percentage lower than"+
-                          " thresholds")
+            logging.verbose("[TraderBot] Profit or profit percentage lower than"+
+                            " thresholds")
             return
         if kask not in self.clients:
             logging.warn("[TraderBot] Can't automate this trade, client not "+
