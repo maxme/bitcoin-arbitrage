@@ -20,10 +20,7 @@ Subject: %(subject)s
         logging.warn("Unable to send email")
 
 class Emailer(Observer):
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
-                    weighted_buyprice, weighted_sellprice):
-        if profit > config.profit_thresh and perc > config.perc_thresh:
-            message = """profit: %f USD with volume: %f BTC
-buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%
-""" % (profit, volume, buyprice, kask, sellprice, kbid, perc)
-            send_email("Arbitrage Bot", message)
+    def opportunity(self, tradechains):
+        for chain in tradechains:
+            if chain.profit > config.profit_thresh and chain.percentage > config.perc_thresh:
+                send_email("Arbitrage Bot", str(chain))
