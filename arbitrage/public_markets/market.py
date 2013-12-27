@@ -59,14 +59,15 @@ class Market(object):
                 'bids': [{'price': 0, 'amount': 0}]
             }
 
- 
-        if self.depth['bids'][0]['price'] > self.depth['asks'][0]['price']:
-            logging.warning(('Market: %s order book ' % self.name) \
-                + 'is invalid (bid>ask : quotation is stopped ?)')
-            self.depth = {
-                'asks': [{'price': 0, 'amount': 0}], 
-                'bids': [{'price': 0, 'amount': 0}]
-            }
+        # weidenrinde: Some markets have bid>ask, so this check is not
+        # correct.
+        #if self.depth['bids'][0]['price'] > self.depth['asks'][0]['price']:
+        #    logging.warning(('Market: %s order book ' % self.name) \
+        #        + 'is invalid (bid>ask)')
+        #    self.depth = {
+        #        'asks': [{'price': 0, 'amount': 0}], 
+        #        'bids': [{'price': 0, 'amount': 0}]
+        #    }
         return self.depth
 
 
