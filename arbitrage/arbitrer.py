@@ -126,8 +126,12 @@ class Arbitrer(object):
         """Logs the prices on every market."""
 
         for market in self.markets:
-            logging.debug("ticker: " + market.name + " - " + str(
-                market.get_ticker()))
+            ticker=market.get_ticker()
+            logging.debug(
+                "ticker: %-10s ask: %8.2f %3s (%5.2f) - bid: %8.2f %3s (%5.2f)" %
+                (market.name[:10],
+                 ticker["ask"]["price"],market.price_currency,ticker["ask"]["amount"],
+                 ticker["bid"]["price"],market.price_currency,ticker["bid"]["amount"]))
 
 
     def replay_history(self, directory):
