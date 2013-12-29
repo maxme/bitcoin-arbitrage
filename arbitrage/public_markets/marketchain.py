@@ -1,4 +1,5 @@
 from collections import namedtuple
+from copy import deepcopy
 from public_markets.tradechain import TradeChain
 
 # Allows us to keep track of exits and enterances in our chain of markets.
@@ -23,7 +24,7 @@ class MarketChain(object):
         return "-->".join(["%s" % market for market in self.markets])
 
     def copy(self):
-        new_marketchain = self
+        new_marketchain = deepcopy(self)
         new_marketchain.markets = self.markets[:]
         return new_marketchain
 
