@@ -6,6 +6,7 @@ import config
 import logging
 from decimal import Decimal
 from public_markets.trade import Trade
+from copy import deepcopy
 
 class Market(object):
     def __init__(self, price_currency="USD", amount_currency="BTC", update_rate=60):
@@ -29,12 +30,14 @@ class Market(object):
         """
         self.depth = self.get_depth()
         self.locked = True
+        self._pretransaction_depth = deepcopy(self.depth)
 
 
     def end_transaction(self):
         """Unlocks the orderbook."""
         self.locked = False
-        self.depth = self.get_depth()
+        self.depth = self._pretransaction_depth
+        self.depth = self.get_depth() # Refresh depth if it's gotten stale.
 
 
     def get_depth(self):
