@@ -46,11 +46,15 @@ class TestMarket(unittest.TestCase):
     def setUp(self):
         self.market = MockMarket()
 
-
-    def test_getdepth_invaliddata(self):
-        self.market.set_mock_depth(depth_bad)
-        self.market.get_depth()
-        assert self.market.depth['asks'][0]['price'] == 0
+    # Invalidated following @weidenrinde's (temporary?) removal of the
+    # market depth sanity check on the grounds that some markets have
+    # valid states where bid price is greater than ask price.
+    # Leaving this in here until the originator of the sanity check,
+    # @mdespriee, can weigh in on the check's removal.
+    #def test_getdepth_invaliddata(self):
+    #    self.market.set_mock_depth(depth_bad)
+    #    self.market.get_depth()
+    #    assert self.market.depth['asks'][0]['price'] == 0
 
 
     def test_getdepth_validdata(self):
