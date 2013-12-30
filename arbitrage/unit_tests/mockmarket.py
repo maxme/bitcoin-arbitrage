@@ -1,5 +1,5 @@
 from arbitrage.public_markets.market import Market
-
+import copy
 
 class MockMarket(Market):
     def __init__(self, **kwargs):
@@ -10,8 +10,8 @@ class MockMarket(Market):
         self.mock_depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [{'price': 0, 'amount': 0}]}
 
     def update_depth(self):
-        self.depth = self.mock_depth
+        pass
 
     def set_mock_depth(self, depth):
-        self.mock_depth = depth
+        self.depth = copy.deepcopy(depth)
 
