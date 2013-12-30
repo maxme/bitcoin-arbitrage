@@ -115,11 +115,11 @@ class MarketChain(object):
     def next(self):
         tradechain = TradeChain()
 
-        # Lock all the markets so we can do a proper analysis,
-        # if we are not already locked.
+        # Taking actions that mutate the underlying Market objects
+        # should not be allowed outside of transactions.
         already_locked = self.locked
         if not already_locked:
-            self.begin_transaction()
+            raise Exception("Cannot call `next` outside of a transaction!")
 
         # Build up the trade chain, now that we know how much volume these
         # order books can take without (theoretically) changing prices on us.
