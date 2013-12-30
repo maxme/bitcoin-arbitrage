@@ -1,4 +1,5 @@
 from collections import namedtuple
+from copy import deepcopy
 from public_markets.tradechain import TradeChain
 
 # Allows us to keep track of exits and enterances in our chain of markets.
@@ -19,6 +20,13 @@ class MarketChain(object):
         
         self.init_currency_pairs()
 
+    def __str__(self):
+        return "-->".join(["%s" % market for market in self.markets])
+
+    def copy(self):
+        new_marketchain = deepcopy(self)
+        new_marketchain.markets = self.markets[:]
+        return new_marketchain
 
     def init_currency_pairs(self):
         if self.markets[0].price_currency == self.pivot_currency:
