@@ -76,3 +76,24 @@ class TestMarketChain(unittest.TestCase):
 
         # Make sure we're unlocked now.
         assert not self.chain.locked
+
+    def test_market_depth_integrity(self):
+        """Make sure Markets shared across MarketChains don't suffer depth
+        depletion in the course of normal trade chain exploration.
+
+        """
+        chain_copy = self.chain.copy()
+
+        self.chain.begin_transaction()
+        tradechain = self.chain.next()
+        self.chain.end_transaction()
+
+        chain_copy.begin_transaction()
+        tradechain2 = chain_copy.next()
+        chain_copy.end_transaction()
+
+        # Make sure that the original MarketChain and its copy both
+        # produce the same TradeChain when the first one was produced
+        # inside a transaction. Transactions protect Market.depth from
+        # permanent mutation.
+        self.assertEqual(tradechain.profit, tradechain2.profit)
