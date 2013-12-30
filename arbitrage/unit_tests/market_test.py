@@ -120,6 +120,10 @@ class TestMarket(unittest.TestCase):
 
         self.market.end_transaction()
 
+        # Make sure the original market depth was restored
+        # after the transaction ended.
+        assert self.market.depth == depth_profit
+
 
 if __name__ == '__main__':
     unittest.main()
