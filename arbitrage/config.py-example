@@ -43,7 +43,7 @@ xmpp_jid = "FROM@jabber.org"
 xmpp_password = "FIXME"
 xmpp_to = "TO@jabber.org"
 
-#### PubNub Observer
-pubnub_pubkey = "pub-c-f8818c8d-7bc9-4aee-84c0-2e6678d219c5"
-pubnub_subkey = "sub-c-f4713826-7342-11e3-b060-02ee2ddab7fe"
+#### PubNub Observer (get your own keys at www.pubnub.com)
+pubnub_pubkey = 'FIXME'
+pubnub_subkey = 'FIXME'
 pubnub_topic  = "opportunities"
