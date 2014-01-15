@@ -31,7 +31,7 @@ class FiatConverter:
         data = json.loads(res.read().decode('utf8'))
         rate = 0
         if "rate" in data:
-            rate = data["rate"] * (1.0 - self.bank_fee)
+            rate = float(data["rate"]) * (1.0 - self.bank_fee)
         else:
             logging.error("Can't update fiat conversion rate: %s", url)
         return rate
