@@ -2,17 +2,14 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import json
-import sys
 from .market import Market
 
 
-class BitstampUSD(Market):
-    def __init__(self):
-        super(BitstampUSD, self).__init__("USD")
-        self.update_rate = 20
-
+class Btce(Market):
     def update_depth(self):
-        url = 'https://www.bitstamp.net/api/order_book/'
+        url = 'https://btc-e.com/api/2/%s_%s/depth' % (
+            self.amount_currency.lower(), self.price_currency.lower()
+        )
         req = urllib.request.Request(url, None, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",
@@ -21,11 +18,11 @@ class BitstampUSD(Market):
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
-    def sort_and_format(self, l, reverse):
+    def sort_and_format(self, l, reverse=False):
+        l.sort(key=lambda x: float(x[0]), reverse=reverse)
         r = []
         for i in l:
             r.append({'price': float(i[0]), 'amount': float(i[1])})
-        r.sort(key=lambda x: float(x['price']), reverse=reverse)
         return r
 
     def format_depth(self, depth):
@@ -34,5 +31,5 @@ class BitstampUSD(Market):
         return {'asks': asks, 'bids': bids}
 
 if __name__ == "__main__":
-    market = BitstampUSD()
+    market = Btce()
     print(market.get_ticker())

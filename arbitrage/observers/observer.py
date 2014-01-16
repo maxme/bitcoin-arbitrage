@@ -8,7 +8,10 @@ class Observer(object, metaclass=abc.ABCMeta):
     def end_opportunity_finder(self):
         pass
 
+    def shutdown(self):
+        pass
+
     ## abstract
     @abc.abstractmethod
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc, weighted_buyprice, weighted_sellprice):
+    def opportunity(self, tradechains):
         pass

@@ -16,7 +16,7 @@ import json
 import config
 
 
-class PrivateBitstampUSD(Market):
+class PrivateBitstamp(Market):
     balance_url = "https://www.bitstamp.net/api/balance/"
     buy_url = "https://www.bitstamp.net/api/buy/"
     sell_url = "https://www.bitstamp.net/api/sell/"
@@ -25,7 +25,6 @@ class PrivateBitstampUSD(Market):
         super().__init__()
         self.username = config.bitstamp_username
         self.password = config.bitstamp_password
-        self.currency = "USD"
         self.get_info()
 
     def _send_request(self, url, params={}, extra_headers=None):
@@ -49,16 +48,16 @@ class PrivateBitstampUSD(Market):
             return json.loads(jsonstr)
         return None
 
-    def _buy(self, amount, price):
+    def _buy(self, trade):
         """Create a buy limit order"""
-        params = {"amount": amount, "price": price}
+        params = {"amount": trade.amount, "price": trade.price}
         response = self._send_request(self.buy_url, params)
         if "error" in response:
             raise TradeException(response["error"])
 
-    def _sell(self, amount, price):
+    def _sell(self, trade):
         """Create a sell limit order"""
-        params = {"amount": amount, "price": price}
+        params = {"amount": trade.amount, "price": trade.price}
         response = self._send_request(self.sell_url, params)
         if "error" in response:
             raise TradeException(response["error"])

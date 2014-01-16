@@ -41,3 +41,15 @@ nosetests.xml
 config.py
 old/
 tmp/
+
+# PyCharm
+.idea/
+
+# run
+*.log
+
+# BTC-e nonce files
+*.nonce
+
+# Vim files.
+*.swp

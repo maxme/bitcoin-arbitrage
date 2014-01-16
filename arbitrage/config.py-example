@@ -1,12 +1,29 @@
 # watch the following markets
-# ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR", "Bitcoin24EUR",
-# "BitstampEUR", "BtceUSD", "MtGoxUSD", "BitfloorUSD", "BitstampUSD"]
-markets = ["BtceUSD", "MtGoxUSD", "BitstampUSD", "CampBXUSD", "BitcoinCentralUSD",
-           "Bitcoin24USD"]  # BitfloorUSD (closed)
+# ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR",
+# "BitstampEUR", "BtceUSD", "MtGoxUSD", "BitstampUSD"]
+markets = {
+    "Btce": [
+        ("BTC", "USD")
+    ],
+    "MtGox": [
+        ("BTC", "USD")
+    ],
+    "Bitstamp": [
+        ("BTC", "USD")
+    ],
+    "CampBX": [
+        ("BTC", "USD")
+    ],
+    "BitcoinCentral": [
+        ("BTC", "USD")
+    ]
+}
+pivot_currency = "USD"
+max_trade_path_length = 3
 
 # observers if any
 # ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
-observers = ["Logger"]
+observers = ["Logger", "TraderBotSim"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
@@ -42,3 +59,8 @@ smtp_to = 'FIXME'
 xmpp_jid = "FROM@jabber.org"
 xmpp_password = "FIXME"
 xmpp_to = "TO@jabber.org"
+
+#### PubNub Observer (get your own keys at www.pubnub.com)
+pubnub_pubkey = 'FIXME'
+pubnub_subkey = 'FIXME'
+pubnub_topic  = "opportunities"

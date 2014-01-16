@@ -1,191 +1,210 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+# Heavily modified by Ryan Casey <ryepdx@gmail.com>
 
 import public_markets
 import observers
 import config
+import config_dynamic
 import time
 import logging
 import json
-from concurrent.futures import ThreadPoolExecutor, wait
-
+from public_markets.marketchain import MarketChain
+from public_markets import bitcoincentral_market, bitfinex_market, \
+    bitstamp_market, btce_market, campbx_market, intersango_market, \
+    kraken_market, mtgox_market
+from observers import emailer, historydumper, logger, traderbot, \
+    traderbotsim, websocket
 
 class Arbitrer(object):
-    def __init__(self):
+    """Grabs prices from the markets defined in the config file
+    and does all the actual arbitrage calculations.
+
+    """
+
+    def __init__(self, config = config):
+        self.observers = {}
         self.markets = []
-        self.observers = []
-        self.depths = {}
+        self.reload(config)        
+        config_dynamic.updated.connect(self.reload)
+        
+
+    def reload(self, config):
+        for observer_name, observer in self.observers.items():
+            if observer_name not in config.observers:
+                observer.shutdown()
+
         self.init_markets(config.markets)
         self.init_observers(config.observers)
-        self.threadpool = ThreadPoolExecutor(max_workers=10)
+
 
     def init_markets(self, markets):
+        """Instantiates the market classes and populates the markets list.
+
+        Market objects provide currency pair prices, and trading fee data.
+
+        Positional args:
+        markets - A dictionary of exchange names
+            mapped to lists of currency pair tuples.
+
+        Example:
+
+        >>> from types import SimpleNamespace
+        >>> mock_config = SimpleNamespace(markets = [], observers = [])
+        >>> arb = Arbitrer(config = mock_config)
+        >>> arb.init_markets(mock_self, {"Btce": [("BTC", "USD")]})
+        >>> arb.markets[0].name
+        'Btce'
+
+        """
+
+        self.markets = []
         self.market_names = markets
-        for market_name in markets:
-            exec('import public_markets.' + market_name.lower())
-            market = eval('public_markets.' + market_name.lower() + '.' +
-                          market_name + '()')
-            self.markets.append(market)
+        for market_name, currency_pairs in markets.items():
+            market_class_name = market_name.lower() + "_market"
+            exec('from public_markets import ' + market_class_name)
+            
+            for pair in currency_pairs:
+                market = eval(market_class_name.lower() +
+                    '.' + market_name +
+                    '(amount_currency="%s", price_currency="%s")' % tuple(pair)
+                )
+                self.markets.append(market)
+
+        self.init_marketchains()
+
+
+    def init_marketchains(self):
+        # Generate all the valid market chains.
+        self.marketchains = []
+        marketchains = [MarketChain(market, pivot = config.pivot_currency)\
+            for market in self.markets \
+            if market.uses(config.pivot_currency)
+        ]
+
+        for i in range(0, config.max_trade_path_length - 1):
+            num_marketchains = len(marketchains)
+
+            for j in range(0, num_marketchains):
+                marketchain = marketchains.pop(0)
+
+                if marketchain.is_complete():
+                    marketchains.append(marketchain)
+                else:
+                    for market in self.markets:
+                        if marketchain.can_append(market):
+                            new_marketchain = marketchain.copy()
+                            new_marketchain.append(market)
+                            marketchains.append(new_marketchain)
+
+        for marketchain in marketchains:
+            if marketchain.is_complete():
+                self.marketchains.append(marketchain)
+
 
     def init_observers(self, _observers):
+        """Instantiates the observer classes and populates the observers list.
+
+        Observers allow for asynchronous output and/or order execution when the
+        `Arbitrer` object discovers profitable trades. 
+
+        Positional args:
+        _observers - A list of names of classes in the `observers` module.
+
+        """
+
+        self.observers = {}
         self.observer_names = _observers
         for observer_name in _observers:
             exec('import observers.' + observer_name.lower())
             observer = eval('observers.' + observer_name.lower() + '.' +
                             observer_name + '()')
-            self.observers.append(observer)
+            self.observers[observer_name] = observer
 
-    def get_profit_for(self, mi, mj, kask, kbid):
-        if self.depths[kask]["asks"][mi]["price"] \
-           >= self.depths[kbid]["bids"][mj]["price"]:
-            return 0, 0, 0, 0
-
-        max_amount_buy = 0
-        for i in range(mi + 1):
-            max_amount_buy += self.depths[kask]["asks"][i]["amount"]
-        max_amount_sell = 0
-        for j in range(mj + 1):
-            max_amount_sell += self.depths[kbid]["bids"][j]["amount"]
-        max_amount = min(max_amount_buy, max_amount_sell, config.max_tx_volume)
-
-        buy_total = 0
-        w_buyprice = 0
-        for i in range(mi + 1):
-            price = self.depths[kask]["asks"][i]["price"]
-            amount = min(max_amount, buy_total + self.depths[
-                         kask]["asks"][i]["amount"]) - buy_total
-            if amount <= 0:
-                break
-            buy_total += amount
-            if w_buyprice == 0:
-                w_buyprice = price
-            else:
-                w_buyprice = (w_buyprice * (
-                    buy_total - amount) + price * amount) / buy_total
-
-        sell_total = 0
-        w_sellprice = 0
-        for j in range(mj + 1):
-            price = self.depths[kbid]["bids"][j]["price"]
-            amount = min(max_amount, sell_total + self.depths[
-                         kbid]["bids"][j]["amount"]) - sell_total
-            if amount < 0:
-                break
-            sell_total += amount
-            if w_sellprice == 0 or sell_total == 0:
-                w_sellprice = price
-            else:
-                w_sellprice = (w_sellprice * (
-                    sell_total - amount) + price * amount) / sell_total
-
-        profit = sell_total * w_sellprice - buy_total * w_buyprice
-        return profit, sell_total, w_buyprice, w_sellprice
-
-    def get_max_depth(self, kask, kbid):
-        i = 0
-        if len(self.depths[kbid]["bids"]) != 0 and \
-           len(self.depths[kask]["asks"]) != 0:
-            while self.depths[kask]["asks"][i]["price"] \
-                  < self.depths[kbid]["bids"][0]["price"]:
-                if i >= len(self.depths[kask]["asks"]) - 1:
-                    break
-                i += 1
-        j = 0
-        if len(self.depths[kask]["asks"]) != 0 and \
-           len(self.depths[kbid]["bids"]) != 0:
-            while self.depths[kask]["asks"][0]["price"] \
-                  < self.depths[kbid]["bids"][j]["price"]:
-                if j >= len(self.depths[kbid]["bids"]) - 1:
-                    break
-                j += 1
-        return i, j
-
-    def arbitrage_depth_opportunity(self, kask, kbid):
-        maxi, maxj = self.get_max_depth(kask, kbid)
-        best_profit = 0
-        best_i, best_j = (0, 0)
-        best_w_buyprice, best_w_sellprice = (0, 0)
-        best_volume = 0
-        for i in range(maxi + 1):
-            for j in range(maxj + 1):
-                profit, volume, w_buyprice, w_sellprice = self.get_profit_for(
-                    i, j, kask, kbid)
-                if profit >= 0 and profit >= best_profit:
-                    best_profit = profit
-                    best_volume = volume
-                    best_i, best_j = (i, j)
-                    best_w_buyprice, best_w_sellprice = (
-                        w_buyprice, w_sellprice)
-        return best_profit, best_volume, \
-               self.depths[kask]["asks"][best_i]["price"], \
-               self.depths[kbid]["bids"][best_j]["price"], \
-               best_w_buyprice, best_w_sellprice
-
-    def arbitrage_opportunity(self, kask, ask, kbid, bid):
-        perc = (bid["price"] - ask["price"]) / bid["price"] * 100
-        profit, volume, buyprice, sellprice, weighted_buyprice,\
-            weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
-        if volume == 0 or buyprice == 0:
-            return
-        perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
-        for observer in self.observers:
-            observer.opportunity(
-                profit, volume, buyprice, kask, sellprice, kbid,
-                perc2, weighted_buyprice, weighted_sellprice)
-
-    def __get_market_depth(self, market, depths):
-        depths[market.name] = market.get_depth()
-
-    def update_depths(self):
-        depths = {}
-        futures = []
-        for market in self.markets:
-            futures.append(self.threadpool.submit(self.__get_market_depth,
-                                                  market, depths))
-        wait(futures, timeout=20)
-        return depths
 
     def tickers(self):
+        """Logs the prices on every market."""
+
         for market in self.markets:
-            logging.verbose("ticker: " + market.name + " - " + str(
-                market.get_ticker()))
+            ticker=market.get_ticker()
+            logging.debug(
+                "ticker: %-10s ask: %8.2f %3s (%5.2f) - bid: %8.2f %3s (%5.2f)" %
+                (market.name[:10],
+                 ticker["ask"]["price"],market.price_currency,ticker["ask"]["amount"],
+                 ticker["bid"]["price"],market.price_currency,ticker["bid"]["amount"]))
+
 
     def replay_history(self, directory):
+        """Takes the path of a directory containing JSON files named in such
+        a way that a naive sort by filename puts them in chronological order
+        and steps through them, treating each JSON file as a snapshot of the
+        market depths at a single point in time, and calculating arbitrage
+        profitability.
+
+        Running the bot with the HistoryDumper observer enabled will generate
+        JSON files that can be used to replay the market movements that
+        occurred while the bot was running.
+
+        Positional args:
+        directory - The path to the directory containing the market history
+        JSON files.
+
+        """
         import os
         import json
         import pprint
+
         files = os.listdir(directory)
         files.sort()
         for f in files:
             depths = json.load(open(directory + '/' + f, 'r'))
-            self.depths = {}
+
             for market in self.market_names:
                 if market in depths:
-                    self.depths[market] = depths[market]
+                    market.depth = depths[market]
             self.tick()
+
 
     def tick(self):
-        for observer in self.observers:
-            observer.begin_opportunity_finder(self.depths)
+        """Finds all arbitrage opportunities across all markets at the
+        present moment, and sends the opportunities on to the observers.
 
-        for kmarket1 in self.depths:
-            for kmarket2 in self.depths:
-                if kmarket1 == kmarket2:  # same market
-                    continue
-                market1 = self.depths[kmarket1]
-                market2 = self.depths[kmarket2]
-                if market1["asks"] and market2["bids"] \
-                   and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
-                    if float(market1["asks"][0]['price']) \
-                       < float(market2["bids"][0]['price']):
-                        self.arbitrage_opportunity(kmarket1, market1["asks"][0],
-                                                   kmarket2, market2["bids"][0])
+        """
+        # Alert observers to the fact that we've now begun a tick.
+        # This allows them to, for example, instantiate an empty list
+        # where they might keep profitable trades. 
+        for observer in self.observers.values():
+            observer.begin_opportunity_finder(self.markets)
 
-        for observer in self.observers:
+
+        # Build up our list of profitable trade chains.
+        for chain in self.marketchains:
+            tradechains = []
+            chain.begin_transaction()
+            tradechain = chain.next()
+
+            while (config.perc_thresh
+            and tradechain.percentage > config.perc_thresh) \
+            or (config.profit_thresh
+            and tradechain.profit > config.profit_thresh):
+                tradechains.append(tradechain)
+                tradechain = chain.next()
+
+            if len(tradechains) > 0:
+                # Notify our observers of the opportunities in this chain.
+                for observer in self.observers.values():
+                    observer.opportunity(tradechains)
+
+            chain.end_transaction()
+
+        # Let our observers know we're done feeding them opportunities.
+        for observer in self.observers.values():
             observer.end_opportunity_finder()
 
+
     def loop(self):
+        """Find arbitrage opportunities forever. (infinite loop)"""
+        time_to_wait = sorted([m.update_rate for m in self.markets], reverse=True)[0]
         while True:
-            self.depths = self.update_depths()
             self.tickers()
             self.tick()
-            time.sleep(config.refresh_rate)
+            time.sleep(max(config.refresh_rate, time_to_wait))
