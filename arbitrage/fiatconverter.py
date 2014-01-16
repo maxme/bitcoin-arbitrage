@@ -17,13 +17,13 @@ class FiatConverter:
         self.__dict__ = self.__shared_state
         self.rates = {
             "USD": 1,
-            "EUR": 0.77,
+            "EUR": 0.74,
             "CNY": 6.15,
             "SEK": 6.6,
         }
-        self.update_delay = 60 * 60 # every hour
+        self.update_delay = 60 * 60     # every hour
         self.last_update = 0
-        self.bank_fee = 0.007 # FIXME: bank fee
+        self.bank_fee = 0.007   # bank fee
 
     def get_currency_pair(self, code_from, code_to):
         url = self.rate_exchange_url % (code_from, code_to)
@@ -66,7 +66,7 @@ class FiatConverter:
         self.update()
         rate_from = self.rates[code_from]
         rate_to = self.rates[code_to]
-        return price / rate_from * rate_to
+        return round(price / rate_from * rate_to, 4)
 
 
 if __name__ == "__main__":

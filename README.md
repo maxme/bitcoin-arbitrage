@@ -1,3 +1,7 @@
+Fork from the work of Maxime Biais : https://github.com/maxme/bitcoin-arbitrage
+
+This is a work in progress.
+
 # bitcoin-arbitrage - opportunity detector and automated trading
 
 It gets order books from supported exchanges and calculate arbitrage
@@ -20,7 +24,9 @@ Currently supported exchanges to automate trade:
  - Bitstamp (USD)
  - Bitcoin-Central (EUR) - (API changed)
 
-Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+Contributer donation addresses:
+- Maxime Biais (maxme) - **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+- Ryan Casey (ryepdx) - **19MMTc2TZovaJZjwtmVgmoUuWk8XDYPSgi**
 
 # WARNING
 
@@ -32,7 +38,10 @@ Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
     cp arbitrage/config.py-example arbitrage/config.py
 
 Then edit config.py file to setup your preferences: watched markets
-and observers
+and observers. You can also create a config.json file to override
+the variables defined in config.py. If you have blinker and watchdog
+installed, the arbitrage bot will automatically update its settings
+any time a change is made to config.json.
 
 You need Python3 to run this program. To install on Debian, Ubuntu, or
 variants of them, use:
@@ -41,7 +50,26 @@ variants of them, use:
 
 To use the observer XMPPMessager you will need to install sleekxmpp:
 
-    $ pip3 install sleekxmpp
+    $ sudo pip3 install sleekxmpp
+
+To use the observer WebSocket, you will need to install tornado and blinker:
+
+    $ sudo pip3 install blinker tornado
+
+Watchdog must be installed and the WebSocket observer must be turned on in
+order to use bitcoin-arbitrage-ui. Bitcoin-arbitrage-ui is a browser-based
+GUI for this arbitrage bot, and can be downloaded from
+https://github.com/ryepdx/bitcoin-arbitrage-ui
+
+You may have trouble with the copy of watchdog currently in PyPI.
+If that's the case, try installing it directly from source:
+
+    $ wget https://github.com/gorakhargosh/watchdog/archive/master.zip
+    $ unzip master.zip
+    $ cd watchdog-master
+    $ sudo python3 setup.py install
+    $ cd ..
+    $ sudo rm -fr watchdog-master master.zip
 
 # Run
 
@@ -65,7 +93,7 @@ To check your balance on an exchange (also a good way to check your accounts con
 
 Run tests
 
-    $ nosetests arbitrage/
+    $ python3 arbitrage/run_tests.py
 
 # TODO
 
@@ -81,7 +109,6 @@ Run tests
    * Coupons
    * Ripple ?
    * Negative Operations
-   * use Litecoin or other cryptocurrencies trades
 
 # LICENSE
 

@@ -3,6 +3,11 @@ from .observer import Observer
 
 
 class Logger(Observer):
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
-                    weighted_buyprice, weighted_sellprice):
-        logging.info("profit: %f USD with volume: %f BTC - buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%" % (profit, volume, buyprice, kask, sellprice, kbid, perc))
+    def opportunity(self, tradechains):
+        best_chain = sorted(tradechains, key=lambda x: x.profit)[-1]
+        if logging.root.isEnabledFor(logging.DEBUG):
+            for chain in tradechains:
+                logging.debug(str(chain))
+        else:
+            logging.info(str(best_chain))
+        [h.flush() for h in logging.getLogger().handlers]

@@ -9,7 +9,7 @@ if sys.version_info < (3,):
     sys.exit(1)
 
 setup(name='bitcoin-arbitrage',
-      packages = ["arbitrage"],
+      packages=["arbitrage"],
       version='0.1',
       description='Bitcoin arbitrage opportunity watcher',
       author='Maxime Biais',
@@ -17,5 +17,6 @@ setup(name='bitcoin-arbitrage',
       url='https://github.com/maxme/bitcoin-arbitrage',
       arbitrage=['bin/bitcoin-arbitrage'],
       test_suite='nose.collector',
-      tests_require=['nose'],
-  )
+      tests_require=['nose', 'websocket'],
+      install_requires=['blinker','watchdog','tornado'],
+)
