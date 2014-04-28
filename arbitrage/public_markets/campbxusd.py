@@ -11,7 +11,9 @@ class CampBXUSD(Market):
         self.update_rate = 60
 
     def update_depth(self):
-        res = urllib.request.urlopen('http://campbx.com/api/xdepth.php')
+        req = urllib.request.Request('http://campbx.com/api/xdepth.php')
+        req.add_header('User-Agent', 'Mozilla/5.0')
+        res = urllib.request.urlopen(req)
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
