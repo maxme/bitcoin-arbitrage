@@ -1,7 +1,7 @@
 # watch the following markets
 # [PaymiumEUR", "IntersangoEUR", "Bitcoin24EUR", "BitstampEUR",
 # "BtceUSD", "BitfloorUSD", "BitstampUSD"]
-markets = ["BtceUSD", BitstampUSD", "CampBXUSD", "PaymiumUSD",
+markets = ["BtceUSD", "BitstampUSD", "CampBXUSD", "PaymiumUSD",
 	"Bitcoin24USD"]
 
 # observers if any
