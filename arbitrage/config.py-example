@@ -1,7 +1,7 @@
 # watch the following markets
-# [BitcoinCentralEUR", "IntersangoEUR", "Bitcoin24EUR", "BitstampEUR",
+# [PaymiumEUR", "IntersangoEUR", "Bitcoin24EUR", "BitstampEUR",
 # "BtceUSD", "BitfloorUSD", "BitstampUSD"]
-markets = ["BtceUSD", BitstampUSD", "CampBXUSD", "BitcoinCentralUSD",
+markets = ["BtceUSD", BitstampUSD", "CampBXUSD", "PaymiumUSD",
 	"Bitcoin24USD"]
 
 # observers if any
@@ -15,9 +15,9 @@ refresh_rate = 20
 #### Trader Bot Config
 # Access to Private APIs
 
-bitcoincentral_username = "FIXME"
-bitcoincentral_password = "FIXME"
-bitcoincentral_address = "FIXME"  # to deposit btc from markets / wallets
+paymium_username = "FIXME"
+paymium_password = "FIXME"
+paymium_address = "FIXME"  # to deposit btc from markets / wallets
 
 bitstamp_username = "FIXME"
 bitstamp_password = "FIXME"

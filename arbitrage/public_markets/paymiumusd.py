@@ -5,9 +5,9 @@ import json
 from .market import Market
 
 
-class BitcoinCentralUSD(Market):
+class PaymiumUSD(Market):
     def __init__(self):
-        super(BitcoinCentralUSD, self).__init__("USD")
+        super(PaymiumUSD, self).__init__("USD")
         self.update_rate = 60
 
     def update_depth(self):
@@ -30,5 +30,5 @@ class BitcoinCentralUSD(Market):
         return {'asks': asks, 'bids': bids}
 
 if __name__ == "__main__":
-    market = BitcoinCentralEUR()
+    market = PaymiumEUR()
     print(market.get_ticker())

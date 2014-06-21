@@ -14,17 +14,17 @@ import json
 import config
 
 
-class PrivateBitcoinCentral(Market):
+class PrivatePaymium(Market):
     balance_url = "https://bitcoin-central.net/api/v1/balances/"
     trade_url = "https://bitcoin-central.net/api/v1/trade_orders/"
     withdraw_url = "https://bitcoin-central.net/api/v1/transfers/send_bitcoins/"
 
     def __init__(self):
         # FIXME: update this file when bitcoin central re-opens
-        raise Exception("BitcoinCentral is closed")
+        raise Exception("Paymium is closed")
         super().__init__()
-        self.username = config.bitcoincentral_username
-        self.password = config.bitcoincentral_password
+        self.username = config.paymium_username
+        self.password = config.paymium_password
         self.currency = "EUR"
         self.get_info()
 
@@ -80,7 +80,7 @@ class PrivateBitcoinCentral(Market):
         return response
 
     def deposit(self):
-        return config.bitcoincentral_address
+        return config.paymium_address
 
     def get_info(self):
         response = self._send_request(self.balance_url)
@@ -90,6 +90,6 @@ class PrivateBitcoinCentral(Market):
             self.usd_balance = self.fc.convert(self.eur_balance, "EUR", "USD")
 
 if __name__ == "__main__":
-    market = PrivateBitcoinCentral()
+    market = PrivatePaymium()
     market.get_info()
     print(market)

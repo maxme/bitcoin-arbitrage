@@ -3,21 +3,21 @@ import config
 import time
 from .observer import Observer
 from private_markets import mtgox
-from private_markets import bitcoincentral
+from private_markets import paymium
 from .emailer import send_email
 
 
 class SpecializedTraderBot(Observer):
     def __init__(self):
         self.mtgox = mtgox.PrivateMtGox()
-        self.btcentral = bitcoincentral.PrivateBitcoinCentral()
+        self.btcentral = paymium.PrivatePaymium()
         self.clients = {
             "MtGoxEUR": self.mtgox,
-            "BitcoinCentralEUR": self.btcentral,
+            "PaymiumEUR": self.btcentral,
         }
         self.profit_percentage_thresholds = {  # Graph
-            "MtGoxEUR": {"BitcoinCentralEUR": 3.5},
-            "BitcoinCentralEUR": {"MtGoxEUR": 1},
+            "MtGoxEUR": {"PaymiumEUR": 3.5},
+            "PaymiumEUR": {"MtGoxEUR": 1},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0
