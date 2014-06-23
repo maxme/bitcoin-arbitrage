@@ -14,7 +14,7 @@ class PaymiumEUR(Market):
 
     def update_depth(self):
         res = urllib.request.urlopen(
-            'https://bitcoin-central.net/api/data/eur/depth')
+            'https://paymium.com/api/data/eur/depth')
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 

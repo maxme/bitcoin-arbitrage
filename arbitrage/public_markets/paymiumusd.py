@@ -12,7 +12,7 @@ class PaymiumUSD(Market):
 
     def update_depth(self):
         res = urllib.request.urlopen(
-            'https://bitcoin-central.net/api/v1/depth?currency=USD')
+            'https://paymium.com/api/v1/depth?currency=USD')
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 

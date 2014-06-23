@@ -15,9 +15,9 @@ import config
 
 
 class PrivatePaymium(Market):
-    balance_url = "https://bitcoin-central.net/api/v1/balances/"
-    trade_url = "https://bitcoin-central.net/api/v1/trade_orders/"
-    withdraw_url = "https://bitcoin-central.net/api/v1/transfers/send_bitcoins/"
+    balance_url = "https://paymium.com/api/v1/balances/"
+    trade_url = "https://paymium.com/api/v1/trade_orders/"
+    withdraw_url = "https://paymium.com/api/v1/transfers/send_bitcoins/"
 
     def __init__(self):
         # FIXME: update this file when bitcoin central re-opens
