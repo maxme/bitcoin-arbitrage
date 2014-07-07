@@ -12,7 +12,7 @@ class Bitcoin24EUR(Market):
 
     def update_depth(self):
         res = urllib.request.urlopen(
-            'https://bitcoin-24.com/api/EUR/orderbook.json')
+            'https://bitcoin-24.com/api/orderbook.json')
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
 
