@@ -43,9 +43,9 @@ class ArbitrerCLI:
 
     def main(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument("-d", "--debug", help="debug verbosity",
+        parser.add_argument("-d", "--debug", help="debug verbose mode",
                             action="store_true")
-        parser.add_argument("-v", "--verbose", help="verbose mode",
+        parser.add_argument("-v", "--verbose", help="info verbose mode",
                             action="store_true")
         parser.add_argument("-o", "--observers", type=str,
                             help="observers, example: -oLogger,Emailer")
