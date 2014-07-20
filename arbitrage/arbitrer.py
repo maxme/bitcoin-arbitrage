@@ -26,7 +26,7 @@ class Arbitrer(object):
                 market = eval('public_markets.' + market_name.lower() + '.' +
                               market_name + '()')
                 self.markets.append(market)
-            except ImportError as e:
+            except (ImportError, AttributeError) as e:
                 print("%s market name is invalid: Ignored (you should check your config file)" % (market_name))
 
     def init_observers(self, _observers):
@@ -37,7 +37,7 @@ class Arbitrer(object):
                 observer = eval('observers.' + observer_name.lower() + '.' +
                                 observer_name + '()')
                 self.observers.append(observer)
-            except ImportError as e:
+            except (ImportError, AttributeError) as e:
                 print("%s observer name is invalid: Ignored (you should check your config file)" % (observer_name))
 
     def get_profit_for(self, mi, mj, kask, kbid):
