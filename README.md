@@ -4,21 +4,18 @@ It gets order books from supported exchanges and calculate arbitrage
 opportunities between each markets. It takes market depth into account.
 
 Currently supported exchanges to get data:
- - MtGox (USD, EUR)
- - Bitstamp (USD, ~EUR)
+ - Bitstamp (USD)
  - Bitcoin24 (EUR)
- - Bitfloor (USD)
- - Bitcoin-Central (EUR)
+ - Paymium (USD, EUR)
  - BTC-e (USD, EUR)
- - Intersango (EUR)
  - Bitfinex (USD)
  - Kraken (USD, EUR)
- - Bitcoin-Central (EUR)
+ - OkCoin (CNY)
+ - CampBX (USD)
 
 Currently supported exchanges to automate trade:
- - MtGox (EUR, USD)
  - Bitstamp (USD)
- - Bitcoin-Central (EUR) - (API changed)
+ - Paymium (EUR) - (API changed)
 
 Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
 
@@ -53,11 +50,6 @@ To run the opportunity watcher:
     2013-03-12 03:52:14,357 [INFO] profit: 31.811390 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (IntersangoEUR) ~10.84%
     2013-03-12 03:52:45,090 [INFO] profit: 9.774324 EUR with volume: 10 BTC - buy at 35.3630 (Bitcoin24EUR) sell at 35.4300 (PaymiumEUR) ~2.76%
 
-Note, this example is real, it has happened when the blockchain
-forked. MtGox is a very reactive market, price dropped significally in
-1 hour, this kind of situation opens very good arbitrage
-opportunities with slower exchanges.
-
 To check your balance on an exchange (also a good way to check your accounts configuration):
 
     $ python3 arbitrage.py -m MtGoxEUR get-balance
@@ -75,7 +67,7 @@ Run tests
    * icbit
    * BitFinex
  * Update order books with a WebSocket client for supported exchanges
-   (MtGox, Bitcoin-Central)
+   (MtGox, Paymium)
  * Better history handling for observer "HistoryDumper" (Redis ?)
  * Move EUR / USD from a market to an other:
    * Coupons
