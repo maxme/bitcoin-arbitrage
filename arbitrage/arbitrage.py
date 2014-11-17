@@ -3,6 +3,10 @@
 import logging
 import argparse
 import sys
+import public_markets
+import glob
+import os
+import inspect
 from arbitrer import Arbitrer
 
 
@@ -17,22 +21,41 @@ class ArbitrerCLI:
 
     def exec_command(self, args):
         if "watch" in args.command:
+            self.create_arbitrer(args)
             self.arbitrer.loop()
         if "replay-history" in args.command:
+            self.create_arbitrer(args)
             self.arbitrer.replay_history(args.replay_history)
         if "get-balance" in args.command:
-            if not args.markets:
-                logging.error("You must use --markets argument to specify markets")
-                sys.exit(2)
-            pmarkets = args.markets.split(",")
-            pmarketsi = []
-            for pmarket in pmarkets:
-                exec('import private_markets.' + pmarket.lower())
-                market = eval('private_markets.' + pmarket.lower()
-                              + '.Private' + pmarket + '()')
-                pmarketsi.append(market)
-            for market in pmarketsi:
-                print(market)
+            self.get_balance(args)
+        if "list-public-markets" in args.command:
+            self.list_markets()
+
+    def list_markets(self):
+        for filename in glob.glob(os.path.join(public_markets.__path__[0], "*.py")):
+            module_name = os.path.basename(filename).replace('.py', '')
+            if not module_name.startswith('_'):
+                module = __import__("public_markets." + module_name)
+                test = eval('module.' + module_name)
+                for name, obj in inspect.getmembers(test):
+                    if inspect.isclass(obj) and 'Market' in (j.__name__ for j in obj.mro()[1:]):
+                        if not obj.__module__.split('.')[-1].startswith('_'):
+                            print(obj.__name__)
+        sys.exit(0)
+
+    def get_balance(self, args):
+        if not args.markets:
+            logging.error("You must use --markets argument to specify markets")
+            sys.exit(2)
+        pmarkets = args.markets.split(",")
+        pmarketsi = []
+        for pmarket in pmarkets:
+            exec('import private_markets.' + pmarket.lower())
+            market = eval('private_markets.' + pmarket.lower()
+                          + '.Private' + pmarket + '()')
+            pmarketsi.append(market)
+        for market in pmarketsi:
+            print(market)
 
     def create_arbitrer(self, args):
         self.arbitrer = Arbitrer()
@@ -40,6 +63,15 @@ class ArbitrerCLI:
             self.arbitrer.init_observers(args.observers.split(","))
         if args.markets:
             self.arbitrer.init_markets(args.markets.split(","))
+
+    def init_logger(self, args):
+        level = logging.INFO
+        if args.verbose:
+            level = logging.VERBOSE
+        if args.debug:
+            level = logging.DEBUG
+        logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
+                            level=level)
 
     def main(self):
         parser = argparse.ArgumentParser()
@@ -52,16 +84,9 @@ class ArbitrerCLI:
         parser.add_argument("-m", "--markets", type=str,
                             help="markets, example: -mMtGox,Bitstamp")
         parser.add_argument("command", nargs='*', default="watch",
-                            help='verb: "watch|replay-history|get-balance"')
+                            help='verb: "watch|replay-history|get-balance|list-public-markets"')
         args = parser.parse_args()
-        level = logging.INFO
-        if args.verbose:
-            level = logging.VERBOSE
-        if args.debug:
-            level = logging.DEBUG
-        logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
-                            level=level)
-        self.create_arbitrer(args)
+        self.init_logger(args)
         self.exec_command(args)
 
 def main():
