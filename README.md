@@ -6,7 +6,7 @@ opportunities between each markets. It takes market depth into account.
 Currently supported exchanges to get data:
  - Bitstamp (USD)
  - Bitcoin24 (EUR)
- - Paymium (USD, EUR)
+ - Paymium (EUR)
  - BTC-e (USD, EUR)
  - Bitfinex (USD)
  - Kraken (USD, EUR)
