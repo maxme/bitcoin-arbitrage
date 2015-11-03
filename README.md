@@ -5,7 +5,6 @@ opportunities between each markets. It takes market depth into account.
 
 Currently supported exchanges to get data:
  - Bitstamp (USD)
- - Bitcoin24 (EUR)
  - Paymium (EUR)
  - BTC-e (USD, EUR)
  - Bitfinex (USD)
@@ -17,7 +16,7 @@ Currently supported exchanges to automate trade:
  - Bitstamp (USD)
  - Paymium (EUR) - (API changed)
 
-Donation are always welcome: **1Maxime7WnLqq24hasMA872JZ4VBGMDbKk**
+Donation are always welcome: **1MaximevzHUTMykWG3RK88BzevbtYCJoqq**
 
 # WARNING
 
