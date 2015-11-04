@@ -12,6 +12,7 @@ Currently supported exchanges to get data:
  - OkCoin (CNY)
  - CampBX (USD)
  - Gemini (USD)
+ - BTCC (CNY)
 
 Currently supported exchanges to automate trade:
  - Bitstamp (USD)
