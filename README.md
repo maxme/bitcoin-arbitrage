@@ -60,6 +60,13 @@ Run tests
 
     $ nosetests arbitrage/
 
+## Alternative usage
+
+* List supported public markets:
+      $ python3 arbitrage.py list-public-markets
+* Help
+      $ python3 arbitrage.py -h
+
 # TODO
 
  * Tests

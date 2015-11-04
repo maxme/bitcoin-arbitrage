@@ -1,9 +1,17 @@
-# watch the following markets
-# ["PaymiumEUR", "Bitcoin24EUR", "BtceUSD", "BitstampUSD", "KrakenEUR",
-#  "KrakenUSD", "CampBXUSD", "BitfinexUSD"]
+markets = [
+"BitfinexUSD",
+"BitstampUSD",
+"BTCCCNY",
+"BtceEUR",
+"BtceUSD",
+"CampBXUSD",
+"GeminiUSD",
+"KrakenEUR",
+"KrakenUSD",
+"OKCoinCNY",
+"PaymiumEUR",
+]
 
-markets = ["PaymiumEUR", "Bitcoin24EUR", "BtceUSD", "BitstampUSD", "KrakenEUR",
-           "KrakenUSD", "CampBXUSD", "BitfinexUSD"]
 # observers if any
 # ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
 observers = ["Logger"]
