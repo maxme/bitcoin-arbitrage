@@ -11,6 +11,7 @@ Currently supported exchanges to get data:
  - Kraken (USD, EUR)
  - OkCoin (CNY)
  - CampBX (USD)
+ - Gemini (USD)
 
 Currently supported exchanges to automate trade:
  - Bitstamp (USD)
