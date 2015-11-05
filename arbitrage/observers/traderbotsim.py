@@ -1,8 +1,6 @@
 import logging
 import config
 from .observer import Observer
-from private_markets import mtgox
-from private_markets import paymium
 from .traderbot import TraderBot
 import json
 
@@ -55,18 +53,16 @@ class MockMarket(object):
 
 class TraderBotSim(TraderBot):
     def __init__(self):
-        self.mtgox = MockMarket("mtgox", 0.006)  # 0.6% fee
-        self.btcentral = MockMarket("bitcoin-central", 0.00489)
-        self.intersango = MockMarket("intersango", 0.0065)
-        self.bitcoin24 = MockMarket("bitcoin24", 0)
-        self.bitstamp = MockMarket("bitstamp", 0.005)  # 0.5% fee
+        self.kraken = MockMarket("kraken", 0.005) # 0.5% fee
+        self.paymium = MockMarket("paymium", 0.005) # 0.5% fee
+        self.bitstamp = MockMarket("bitstamp", 0.005) # 0.5% fee
         self.clients = {
-            "MtGoxEUR": self.mtgox,
-            "MtGoxUSD": self.mtgox,
+            "KrakenEUR": self.kraken,
+            "PaymiumEUR": self.paymium,
             "BitstampUSD": self.bitstamp,
         }
         self.profit_thresh = 1  # in EUR
-        self.perc_thresh = 0.6  # in %
+        self.perc_thresh = 0.06  # in %
         self.trade_wait = 120
         self.last_trade = 0
 
@@ -75,7 +71,7 @@ class TraderBotSim(TraderBot):
             price) for i in set(self.clients.values())]
         return sum(market_balances)
 
-    def execute_trade(self, volume, kask, kbid, 
+    def execute_trade(self, volume, kask, kbid,
                       weighted_buyprice, weighted_sellprice,
                       buyprice, sellprice):
         self.clients[kask].buy(volume, buyprice)

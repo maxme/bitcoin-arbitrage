@@ -4,17 +4,13 @@ import time
 from .observer import Observer
 from .emailer import send_email
 from fiatconverter import FiatConverter
-from private_markets import mtgoxeur
-from private_markets import mtgoxusd
-from private_markets import bitstampusd
 
 
 class TraderBot(Observer):
     def __init__(self):
         self.clients = {
-            "MtGoxEUR": mtgoxeur.PrivateMtGoxEUR(),
-            "MtGoxUSD": mtgoxusd.PrivateMtGoxUSD(),
-            "BitstampUSD": bitstampusd.PrivateBitstampUSD(),
+            # TODO: move that to the config file
+            # "BitstampUSD": bitstampusd.PrivateBitstampUSD(),
         }
         self.fc = FiatConverter()
         self.trade_wait = 120  # in seconds
