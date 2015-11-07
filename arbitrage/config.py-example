@@ -5,6 +5,7 @@ markets = [
 "BtceEUR",
 "BtceUSD",
 "CampBXUSD",
+"CoinbaseUSD",
 "GeminiUSD",
 "KrakenEUR",
 "KrakenUSD",
