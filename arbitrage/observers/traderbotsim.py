@@ -56,11 +56,13 @@ class TraderBotSim(TraderBot):
         self.paymium = MockMarket("paymium", 0.005, 5000) # 0.5% fee
         self.bitstamp = MockMarket("bitstamp", 0.005, 5000) # 0.5% fee
         self.btcc = MockMarket("btcc", 0.005, 5000) # 0.5% fee
+        self.okcoin = MockMarket("okcoin", 0.005, 5000) # 0.5% fee
         self.clients = {
             "KrakenEUR": self.kraken,
             "PaymiumEUR": self.paymium,
             "BitstampUSD": self.bitstamp,
             "BTCCCNY": self.btcc,
+            "OKCoinCNY": self.okcoin,
         }
         self.profit_thresh = 10  # in EUR
         self.perc_thresh = 0.02  # in %
