@@ -1,4 +1,5 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+# Copyright (C) 2016, Phil Song <songbohr@gmail.com>
 
 import logging
 import argparse
@@ -8,6 +9,9 @@ import glob
 import os
 import inspect
 from arbitrer import Arbitrer
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+# logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class ArbitrerCLI:
@@ -20,6 +24,7 @@ class ArbitrerCLI:
         logging.addLevelName(logging.VERBOSE, "VERBOSE")
 
     def exec_command(self, args):
+        logging.debug('exec_command:%s' % args)
         if "watch" in args.command:
             self.create_arbitrer(args)
             self.arbitrer.loop()
@@ -32,6 +37,7 @@ class ArbitrerCLI:
             self.list_markets()
 
     def list_markets(self):
+        logging.debug('list_markets') 
         for filename in glob.glob(os.path.join(public_markets.__path__[0], "*.py")):
             module_name = os.path.basename(filename).replace('.py', '')
             if not module_name.startswith('_'):
@@ -71,7 +77,8 @@ class ArbitrerCLI:
         if args.debug:
             level = logging.DEBUG
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
-                            level=level)
+                            level=level,
+                            stream=sys.stdout)
 
     def main(self):
         parser = argparse.ArgumentParser()
@@ -82,7 +89,7 @@ class ArbitrerCLI:
         parser.add_argument("-o", "--observers", type=str,
                             help="observers, example: -oLogger,Emailer")
         parser.add_argument("-m", "--markets", type=str,
-                            help="markets, example: -mMtGox,Bitstamp")
+                            help="markets, example: -mHaobtcCNY,Bitstamp")
         parser.add_argument("command", nargs='*', default="watch",
                             help='verb: "watch|replay-history|get-balance|list-public-markets"')
         args = parser.parse_args()

@@ -1,21 +1,23 @@
 markets = [
-"BitfinexUSD",
-"BitstampUSD",
-"BTCCCNY",
-"BtceEUR",
-"BtceUSD",
-"CampBXUSD",
-"CoinbaseUSD",
-"GeminiUSD",
-"KrakenEUR",
-"KrakenUSD",
-"OKCoinCNY",
-"PaymiumEUR",
+# "BitfinexUSD",
+# "BitstampUSD",
+# "BTCCCNY",
+# "BtceEUR",
+# "BtceUSD",
+# "CampBXUSD",
+# "CoinbaseUSD",
+# "GeminiUSD",
+# "KrakenEUR",
+# "KrakenUSD",
+# "OKCoinCNY",
+"HaobtcCNY",
+# "HuobiCNY",
+# "PaymiumEUR",
 ]
 
 # observers if any
-# ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
-observers = ["Logger"]
+# ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer", "SpecializedTraderBot"]
+observers = ["DetailedLogger", "TraderBotSim"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
@@ -33,10 +35,10 @@ bitstamp_password = "FIXME"
 
 # SafeGuards
 max_tx_volume = 10  # in BTC
-min_tx_volume = 1  # in BTC
+min_tx_volume = 0.01  # in BTC
 balance_margin = 0.05  # 5%
-profit_thresh = 1  # in EUR
-perc_thresh = 2  # in %
+profit_thresh = 1  # in CNY
+perc_thresh = 0.01  # in 0.01%
 
 #### Emailer Observer Config
 smtp_host = 'FIXME'

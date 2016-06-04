@@ -14,12 +14,20 @@ Currently supported exchanges to get data:
  - Gemini (USD)
  - BTCC (CNY)
  - Coinbase Exchange (USD)
+ - Haobtc (CNY)
+ - Huobi (CNY)
 
 Currently supported exchanges to automate trade:
  - Bitstamp (USD)
- - Paymium (EUR) - (API changed)
+ - Haobtc (CNY)
+ - OkCoin (CNY)
+ - Huobi (CNY)
 
-Donation are always welcome: **1MaximevzHUTMykWG3RK88BzevbtYCJoqq**
+Donation are always welcome: 
+ - Maxme: **1MaximevzHUTMykWG3RK88BzevbtYCJoqq** 
+ - Phil: **1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8** 
+
+
 
 # WARNING
 
@@ -37,6 +45,7 @@ You need Python3 to run this program. To install on Debian, Ubuntu, or
 variants of them, use:
 
     $ sudo apt-get install python3 python3-pip python-nose
+    $ pip3 install requests
 
 To use the observer XMPPMessager you will need to install sleekxmpp:
 
@@ -46,16 +55,13 @@ To use the observer XMPPMessager you will need to install sleekxmpp:
 
 To run the opportunity watcher:
 
-    $ python3 arbitrage/arbitrage.py
-    2013-03-12 03:52:14,341 [INFO] profit: 30.539722 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 29.4670 (Bitcoin24EUR) ~10.41%
-    2013-03-12 03:52:14,356 [INFO] profit: 66.283642 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (PaymiumEUR) ~22.59%
-    2013-03-12 03:52:14,357 [INFO] profit: 31.811390 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (IntersangoEUR) ~10.84%
-    2013-03-12 03:52:45,090 [INFO] profit: 9.774324 EUR with volume: 10 BTC - buy at 35.3630 (Bitcoin24EUR) sell at 35.4300 (PaymiumEUR) ~2.76%
+    $ python3 arbitrage/arbitrage.py watch -v
 
 To check your balance on an exchange (also a good way to check your accounts configuration):
 
-    $ python3 arbitrage.py -m MtGoxEUR get-balance
-    $ python3 arbitrage.py -m MtGoxEUR,MtGoxUSD,BitstampUSD get-balance
+    $ python3 arbitrage/arbitrage.py -m HaobtcCNY get-balance
+    $ python3 arbitrage/arbitrage.py -m HaobtcCNY,BitstampUSD get-balance
+    $ python3 arbitrage/arbitrage.py -m HaobtcCNY,OkCoinCNY,HuobiCNY get-balance
 
 Run tests
 
@@ -64,9 +70,25 @@ Run tests
 ## Alternative usage
 
 * List supported public markets:
-      $ python3 arbitrage.py list-public-markets
+
+      $ python3 arbitrage/arbitrage.py list-public-markets
 * Help
-      $ python3 arbitrage.py -h
+
+      $ python3 arbitrage/arbitrage.py -h
+
+## Example
+
+* arbitrage in haobtc, watch in huobi or okcoin
+
+  Firstly, in config.py, keep only haobtc in markets array 
+
+    $ python3 arbitrage/arbitrage.py -oTraderBot -mHuobiCNY,HaobtcCNY
+
+    $ python3 arbitrage/arbitrage.py -oTraderBot -mOKCoinCNY,HaobtcCNY
+
+* arbitrage in haobtc itself
+
+    $ python3 arbitrage/arbitrage.py -oMakerTaker -mHaobtcCNY
 
 # TODO
 
@@ -76,19 +98,21 @@ Run tests
    * icbit
    * BitFinex
  * Update order books with a WebSocket client for supported exchanges
-   (MtGox, Paymium)
  * Better history handling for observer "HistoryDumper" (Redis ?)
  * Move EUR / USD from a market to an other:
    * Coupons
-   * Ripple ?
    * Negative Operations
-   * use Litecoin or other cryptocurrencies trades
+ * use Ethercoin or other cryptocurrencies for triangular arbitrage
 
 # LICENSE
+
 
 MIT
 
 Copyright (c) 2013 Maxime Biais <firstname.lastname@gmail.com>
+
+Copyright (c) 2016 Phil Song <songbohr@gmail.com>
+
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

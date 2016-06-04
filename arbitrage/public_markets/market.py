@@ -13,7 +13,7 @@ class Market(object):
         self.name = self.__class__.__name__
         self.currency = currency
         self.depth_updated = 0
-        self.update_rate = 60
+        self.update_rate = 1
         self.fc = FiatConverter()
         self.fc.update()
 
@@ -21,6 +21,7 @@ class Market(object):
         timediff = time.time() - self.depth_updated
         if timediff > self.update_rate:
             self.ask_update_depth()
+            
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
             logging.warn('Market: %s order book is expired' % self.name)
@@ -28,17 +29,17 @@ class Market(object):
                 {'price': 0, 'amount': 0}]}
         return self.depth
 
-    def convert_to_usd(self):
-        if self.currency == "USD":
+    def convert_to_cny(self):
+        if self.currency == "CNY":
             return
         for direction in ("asks", "bids"):
             for order in self.depth[direction]:
-                order["price"] = self.fc.convert(order["price"], self.currency, "USD")
+                order["price"] = self.fc.convert(order["price"], self.currency, "CNY")
 
     def ask_update_depth(self):
         try:
             self.update_depth()
-            self.convert_to_usd()
+            # self.convert_to_usd()
             self.depth_updated = time.time()
         except (urllib.error.HTTPError, urllib.error.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)

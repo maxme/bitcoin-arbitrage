@@ -1,4 +1,5 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+# Copyright (C) 2016, Phil Song <songbohr@gmail.com>
 
 import urllib.request
 import sys
@@ -17,9 +18,8 @@ class FiatConverter:
         self.__dict__ = self.__shared_state
         self.rates = {
             "USD": 1,
-            "EUR": 0.77,
-            "CNY": 6.15,
-            "SEK": 6.6,
+            "EUR": 0.8825,
+            "CNY": 6.5184,
         }
         self.update_delay = 60 * 60 # every hour
         self.last_update = 0
@@ -55,6 +55,9 @@ class FiatConverter:
             self.rates[code_to] = rate
 
     def update(self):
+        #CLOSE THE CONVERT
+        return
+        
         timediff = time.time() - self.last_update
         if timediff < self.update_delay:
             return
@@ -63,6 +66,9 @@ class FiatConverter:
             self.update_currency_pair(currency)
 
     def convert(self, price, code_from, code_to):
+        if code_from == code_to:
+            return price
+
         self.update()
         rate_from = self.rates[code_from]
         rate_to = self.rates[code_to]
@@ -73,4 +79,8 @@ if __name__ == "__main__":
     fc = FiatConverter()
     print(fc.convert(12., "USD", "EUR"))
     print(fc.convert(12., "EUR", "USD"))
+    print(fc.convert(1., "USD", "CNY"))
+    print(fc.convert(1., "CNY", "USD"))
+    print(fc.convert(1., "EUR", "CNY"))
+
     print(fc.rates)

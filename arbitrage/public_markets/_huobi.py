@@ -4,7 +4,7 @@ import urllib.parse
 import json
 from .market import Market
 
-class OKCoin(Market):
+class Huobi(Market):
     def __init__(self, currency, code):
         super().__init__(currency)
         self.code = code
@@ -12,7 +12,7 @@ class OKCoin(Market):
 
     def update_depth(self):
         # print("OKCoin update_depth...")
-        url = 'https://www.okcoin.cn/api/depth.do?size=10&symbol=' + self.code
+        url = 'http://api.huobi.com/staticmarket/depth_%s_50.js' % self.code
         req = urllib.request.Request(url, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",

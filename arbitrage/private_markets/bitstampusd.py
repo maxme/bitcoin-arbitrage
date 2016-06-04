@@ -69,3 +69,4 @@ class PrivateBitstampUSD(Market):
         if response:
             self.btc_balance = float(response["btc_available"])
             self.usd_balance = float(response["usd_available"])
+            self.cny_balance = self.fc.convert(self.usd_balance, "USD", "CNY")

@@ -88,6 +88,7 @@ class PrivatePaymium(Market):
             self.btc_balance = response["BTC"]
             self.eur_balance = response["EUR"]
             self.usd_balance = self.fc.convert(self.eur_balance, "EUR", "USD")
+            self.cny_balance = self.fc.convert(self.eur_balance, "EUR", "CNY")
 
 if __name__ == "__main__":
     market = PrivatePaymium()

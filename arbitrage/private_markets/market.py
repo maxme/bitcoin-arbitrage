@@ -12,33 +12,75 @@ class Market:
         self.btc_balance = 0.
         self.eur_balance = 0.
         self.usd_balance = 0.
+        self.cny_balance = 0.
+
         self.fc = FiatConverter()
 
     def __str__(self):
         return "%s: %s" % (self.name, str({"btc_balance": self.btc_balance,
-                                           "eur_balance": self.eur_balance,
-                                           "usd_balance": self.usd_balance}))
+                                           "cny_balance": self.cny_balance}))
 
     def buy(self, amount, price):
-        """Orders are always priced in USD"""
-        local_currency_price = self.fc.convert(price, "USD", self.currency)
-        logging.info("Buy %f BTC at %f %s (%f USD) @%s" % (amount,
+        """Orders are always priced in CNY"""
+        local_currency_price = self.fc.convert(price, "CNY", self.currency)
+        logging.verbose("Buy %f BTC at %f %s (%f CNY) @%s" % (amount,
                      local_currency_price, self.currency, price, self.name))
-        self._buy(amount, local_currency_price)
+        return self._buy(amount, local_currency_price)
 
 
     def sell(self, amount, price):
-        """Orders are always priced in USD"""
-        local_currency_price = self.fc.convert(price, "USD", self.currency)
-        logging.info("Sell %f BTC at %f %s (%f USD) @%s" % (amount,
+        """Orders are always priced in CNY"""
+        local_currency_price = self.fc.convert(price, "CNY", self.currency)
+        logging.verbose("Sell %f BTC at %f %s (%f CNY) @%s" % (amount,
                      local_currency_price, self.currency, price, self.name))
-        self._sell(amount, local_currency_price)
+        return self._sell(amount, local_currency_price)
+
+    def buy_maker(self, amount, price):
+        """Orders are always priced in CNY"""
+
+        local_currency_price = self.fc.convert(price, "CNY", self.currency)
+        local_currency_price = int(local_currency_price)
+        logging.verbose("Buy maker %f BTC at %d %s (%d CNY) @%s" % (amount,
+                     local_currency_price, self.currency, price, self.name))
+
+        return self._buy_maker(amount, local_currency_price)
+
+
+    def sell_maker(self, amount, price):
+        """Orders are always priced in CNY"""
+        local_currency_price = self.fc.convert(price, "CNY", self.currency)
+        local_currency_price = int(local_currency_price)
+
+        logging.verbose("Sell maker %f BTC at %d %s (%d CNY) @%s" % (amount,
+                     local_currency_price, self.currency, price, self.name))
+
+        return self._sell_maker(amount, local_currency_price)
+
+    def get_order(self, order_id):
+        return self._get_order(order_id)
+
+    def cancel_order(self, order_id):
+        return self._cancel_order(order_id)
 
     def _buy(self, amount, price):
-        raise NotImplementedError("%s.sell(self, amount, price)" % self.name)
+        raise NotImplementedError("%s.buy(self, amount, price)" % self.name)
 
     def _sell(self, amount, price):
         raise NotImplementedError("%s.sell(self, amount, price)" % self.name)
+
+    def _buy_maker(self, amount, price):
+        raise NotImplementedError("%s.buy_maker(self, amount, price)" % self.name)
+
+    def _sell_maker(self, amount, price):
+        raise NotImplementedError("%s.sell_maker(self, amount, price)" % self.name)
+
+
+    def _get_order(self, order_id):
+        raise NotImplementedError("%s.get_order(self, order_id)" % self.name)
+
+    def _cancel_order(self, order_id):
+        raise NotImplementedError("%s.cancel_order(self, order_id)" % self.name)
+
 
     def deposit(self):
         raise NotImplementedError("%s.sell(self, amount, price)" % self.name)
