@@ -25,8 +25,6 @@ Currently supported exchanges to automate trade:
 
 Donation are always welcome: 
  - Maxme: **1MaximevzHUTMykWG3RK88BzevbtYCJoqq** 
- - Phil: **1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8** 
-
 
 
 # WARNING
