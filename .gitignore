@@ -15,7 +15,6 @@ var
 sdist
 develop-eggs
 .installed.cfg
-lib
 lib64
 
 # Installer logs
@@ -41,3 +40,7 @@ nosetests.xml
 config.py
 old/
 tmp/
+local_settings.py
+__pycache__
+makertaker.py
+.DS_Store
