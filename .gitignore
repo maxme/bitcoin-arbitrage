@@ -44,3 +44,7 @@ local_settings.py
 __pycache__
 makertaker.py
 .DS_Store
+arbitragerbot.py
+*.csv
+*.dta
+
