@@ -87,6 +87,7 @@ Run tests
 * arbitrage in haobtc itself
 
     $ python3 arbitrage/arbitrage.py -oMakerTaker -mHaobtcCNY
+    $ python3 arbitrage/arbitrage.py -oMakerTaker, TraderBot -mHaobtcCNY,OKCoinCNY
 
 # TODO
 

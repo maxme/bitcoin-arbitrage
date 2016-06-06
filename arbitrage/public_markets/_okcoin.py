@@ -11,7 +11,6 @@ class OKCoin(Market):
         self.update_rate = 1
 
     def update_depth(self):
-        # print("OKCoin update_depth...")
         url = 'https://www.okcoin.cn/api/depth.do?size=10&symbol=' + self.code
         req = urllib.request.Request(url, headers={
             "Content-Type": "application/x-www-form-urlencoded",

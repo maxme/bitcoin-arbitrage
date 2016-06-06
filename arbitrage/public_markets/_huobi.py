@@ -11,7 +11,6 @@ class Huobi(Market):
         self.update_rate = 1
 
     def update_depth(self):
-        # print("OKCoin update_depth...")
         url = 'http://api.huobi.com/staticmarket/depth_%s_50.js' % self.code
         req = urllib.request.Request(url, headers={
             "Content-Type": "application/x-www-form-urlencoded",

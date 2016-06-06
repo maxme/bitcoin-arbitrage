@@ -33,6 +33,15 @@ paymium_address = "FIXME"  # to deposit btc from markets / wallets
 bitstamp_username = "FIXME"
 bitstamp_password = "FIXME"
 
+HUOBI_API_KEY = ''
+HUOBI_SECRET_TOKEN = ''
+
+OKCOIN_API_KEY = ''
+OKCOIN_SECRET_TOKEN = ''
+
+HAOBTC_API_KEY = ''
+HAOBTC_SECRET_TOKEN = ''
+
 # SafeGuards
 max_tx_volume = 10  # in BTC
 min_tx_volume = 0.01  # in BTC
@@ -51,3 +60,4 @@ smtp_to = 'FIXME'
 xmpp_jid = "FROM@jabber.org"
 xmpp_password = "FIXME"
 xmpp_to = "TO@jabber.org"
+

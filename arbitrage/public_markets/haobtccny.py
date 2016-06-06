@@ -10,7 +10,6 @@ class HaobtcCNY(Market):
         self.update_rate = 1
 
     def update_depth(self):
-        # print("HaobtcCNY update_depth...")
         url = 'https://haobtc.com/exchange/api/v1/depth/?size=50'
         req = urllib.request.Request(url, headers={
             "Content-Type": "application/x-www-form-urlencoded",

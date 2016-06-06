@@ -47,4 +47,5 @@ makertaker.py
 arbitragerbot.py
 *.csv
 *.dta
+local_config.py
 

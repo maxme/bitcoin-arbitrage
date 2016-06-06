@@ -11,14 +11,14 @@ class TraderBot(Observer):
     def __init__(self):
         self.clients = {
             # TODO: move that to the config file
-            "HaobtcCNY": haobtccny.PrivateHaobtcCNY(),
-            "OKCoinCNY": okcoincny.PrivateOkCoinCNY(),
-            "HuobiCNY": huobicny.PrivateHuobiCNY(),
+            "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
+            "OKCoinCNY": okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN),
+            "HuobiCNY": huobicny.PrivateHuobiCNY(config.HUOBI_API_KEY, config.HUOBI_SECRET_TOKEN),
         }
 
         self.profit_thresh = config.profit_thresh
         self.perc_thresh = config.perc_thresh
-        self.trade_wait = 120 * 1  # in seconds
+        self.trade_wait = 10 * 1  # in seconds
         self.last_trade = 0
 
     def begin_opportunity_finder(self, depths):
@@ -50,15 +50,15 @@ class TraderBot(Observer):
             return
 
         if profit < self.profit_thresh or perc < self.perc_thresh:
-            logging.verbose("[TraderBot] Profit or profit percentage(%0.4f/%0.4f) lower than thresholds(%s/%s)" 
+            logging.info("[TraderBot] Profit or profit percentage(%0.4f/%0.4f) lower than thresholds(%s/%s)" 
                             % (profit, perc, self.profit_thresh, self.perc_thresh))
             return
         else:
-            logging.verbose("[TraderBot] Profit or profit percentage(%0.4f/%0.4f) higher than thresholds(%s/%s)" 
+            logging.info("[TraderBot] Profit or profit percentage(%0.4f/%0.4f) higher than thresholds(%s/%s)" 
                             % (profit, perc, self.profit_thresh, self.perc_thresh))    
         
         if perc > 20:  # suspicous profit, added after discovering btc-central may send corrupted order book
-            logging.warn("Profit=%f seems malformed" % (perc, ))
+            logging.warn("[TraderBot]Profit=%f seems malformed" % (perc, ))
             return
 
         # Update client balance
@@ -70,7 +70,7 @@ class TraderBot(Observer):
 
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction"+
+            logging.warn("[TraderBot]Can't automate this trade, minimum volume transaction"+
                          " not reached %f/%f" % (volume, config.min_tx_volume))
             logging.warn("Balance on %s: %f CNY - Balance on %s: %f BTC"
                          % (kask, self.clients[kask].cny_balance, kbid,
@@ -93,20 +93,20 @@ class TraderBot(Observer):
     def execute_trade(self, volume, kask, kbid, weighted_buyprice,
                       weighted_sellprice, buyprice, sellprice):
         self.last_trade = time.time()
-        logging.info("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
+        logging.info("[TraderBot]Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
 
-        buyprice = int(buyprice)+1
+        buyprice = int(buyprice)
         result = self.clients[kask].buy(volume, buyprice)
         if result == False:
-            logging.warn("Buy @%s %f BTC failed" % (kask, volume))
+            logging.warn("[TraderBot]Buy @%s %f BTC failed" % (kask, volume))
             return
             
-        sellprice = int(sellprice)-1
+        sellprice = int(sellprice)
         result = self.clients[kbid].sell(volume, sellprice)
         if result == False:
-            logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
+            logging.warn("[TraderBot]Sell @%s %f BTC failed" % (kbid, volume))
             return
 
         if config.send_trade_mail:
-            send_email("Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),
+            send_email("[TraderBot]Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),
                    "weighted_buyprice=%f weighted_sellprice=%f" % (weighted_buyprice, weighted_sellprice))

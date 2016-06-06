@@ -43,7 +43,8 @@ class Arbitrer(object):
                 self.observers.append(observer)
             except (ImportError, AttributeError) as e:
                 print("%s observer name is invalid: Ignored (you should check your config file)" % (observer_name))
-
+                print(e)
+                
     def get_profit_for(self, mi, mj, kask, kbid):
         if self.depths[kask]["asks"][mi]["price"] >= self.depths[kbid]["bids"][mj]["price"]:
             return 0, 0, 0, 0

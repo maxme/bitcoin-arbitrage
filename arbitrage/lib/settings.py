@@ -3,9 +3,6 @@ import sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,parentdir)
 
-
-HAOBTC_API_KEY = ' '
-HAOBTC_SECRET_TOKEN = ''
 HAOBTC_API_URL = {
                   'host' :'www.haobtc.com',
                   'trade':'https://haobtc.com/exchange/api/v1/trade',
@@ -23,8 +20,6 @@ HAOBTC_API_URL = {
                   }
 HAOBTC_API = {'fee':0.001}
 
-HUOBI_API_KEY = ''
-HUOBI_SECRET_TOKEN = ''
 HUOBI_API_URL = {
                   'host':'api.huobi.com/apiv3',
                   'ticker':'http://api.huobi.com/staticmarket/ticker_btc_json.js',
@@ -43,8 +38,6 @@ HUOBI_API_URL = {
                 }
 
 
-OKCOIN_API_KEY = ''
-OKCOIN_SECRET_TOKEN = ''
 OKCOIN_API_URL = {
                    'host':'www.okcoin.cn',
                    'ticker': 'https://www.okcoin.cn/api/v1/ticker.do',

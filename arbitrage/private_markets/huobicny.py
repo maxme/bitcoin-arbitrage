@@ -14,17 +14,15 @@ import hashlib
 import sys
 import json
 import config
-from lib.exchange import exchange, market_instance
+from lib.exchange import exchange
+from lib.settings import HUOBI_API_URL
 
 class PrivateHuobiCNY(Market):
-    haobtc = None
-    okcoin = None
     huobi = None
 
-    def __init__(self):
+    def __init__(self,HUOBI_API_KEY, HUOBI_SECRET_TOKEN):
         super().__init__()
-        self.haobtc ,self.okcoin, self.huobi = market_instance(exchange)
-
+        self.huobi = exchange(HUOBI_API_URL, HUOBI_API_KEY, HUOBI_SECRET_TOKEN, 'huobi')
         self.currency = "CNY"
         self.get_info()
 

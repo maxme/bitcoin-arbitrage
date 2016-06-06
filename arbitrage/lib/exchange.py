@@ -454,8 +454,3 @@ class exchange:
         if self.role == 'default' or self.role == 'haobtc':
             return requestGet(self.url['fast_ticker'])
 
-def market_instance(exchange):
-    haobtc = exchange(HAOBTC_API_URL, HAOBTC_API_KEY, HAOBTC_SECRET_TOKEN, 'haobtc')
-    okcoin = exchange(OKCOIN_API_URL, OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN, 'okcoin')
-    huobi = exchange(HUOBI_API_URL, HUOBI_API_KEY, HUOBI_SECRET_TOKEN, 'huobi')
-    return haobtc, okcoin, huobi

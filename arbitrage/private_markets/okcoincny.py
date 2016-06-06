@@ -14,16 +14,15 @@ import hashlib
 import sys
 import json
 import config
-from lib.exchange import exchange, market_instance
+from lib.exchange import exchange
+from lib.settings import OKCOIN_API_URL
 
 class PrivateOkCoinCNY(Market):
-    haobtc = None
     okcoin = None
-    huobi = None
 
-    def __init__(self):
+    def __init__(self,OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN):
         super().__init__()
-        self.haobtc ,self.okcoin, self.huobi = market_instance(exchange)
+        self.okcoin = exchange(OKCOIN_API_URL, OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN, 'okcoin')
 
         self.currency = "CNY"
         self.get_info()
