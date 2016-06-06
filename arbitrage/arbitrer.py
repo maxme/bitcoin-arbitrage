@@ -86,9 +86,9 @@ class Arbitrer(object):
             else:
                 w_sellprice = (w_sellprice * (
                     sell_total - amount) + price * amount) / sell_total
-        if sell_total != buy_total:
+        if abs(sell_total-buy_total) < 0.00001:
             logging.warn("sell_total=%s,buy_total=%s", sell_total, buy_total)
-        assert(sell_total == buy_total)
+        assert(abs(sell_total-buy_total) < 0.00001)
 
         profit = sell_total * w_sellprice - buy_total * w_buyprice
         return profit, sell_total, w_buyprice, w_sellprice
