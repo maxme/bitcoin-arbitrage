@@ -15,9 +15,10 @@ append using "HaobtcCNY1.dta"
 sort timestamp
 save "HaobtcCNY.dta", replace
 
-format %13.0f timestamp
+gen datetime = timestamp*1000 + Clock("1 Jan 1970", "DMY")+ Clock("08:00", "hm")
+format %tCYY-NN-DD datetime
 
-line price timestamp, yaxis(1) || connected cny timestamp, yaxis(2) || connected btc timestamp, yaxis(3)
+line price datetime, yaxis(1) || connected cny datetime, yaxis(2) || connected btc datetime, yaxis(3)
 //twoway (line btc timestamp ) (scatter btc timestamp )
 //twoway (line cny timestamp ) (scatter cny timestamp ) 
 //(line diff3 timestamp ) (scatter diff3 timestamp ) (line diff4 timestamp ) (scatter diff4 timestamp ) 

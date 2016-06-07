@@ -35,7 +35,7 @@ Donation are always welcome:
 
 # Installation And Configuration
 
-    cp arbitrage/config.py-example arbitrage/config.py
+    $ cp arbitrage/config.py-example arbitrage/config.py
 
 Then edit config.py file to setup your preferences: watched markets
 and observers
@@ -78,10 +78,10 @@ Help
 
 # Example
 
-arbitrage between in haobtc, huobi or okcoin
+arbitrage in haobtc, huobi or okcoin
 
-    $ python3 arbitrage/arbitrage.py -oTraderBot -mHuobiCNY,HaobtcCNY
-    $ python3 arbitrage/arbitrage.py -oTraderBot -mOKCoinCNY,HaobtcCNY
+    $ python3 arbitrage/arbitrage.py -oTraderBot -mHaobtcCNY,HuobiCNY
+    $ python3 arbitrage/arbitrage.py -oTraderBot -mHaobtcCNY,OKCoinCNY
 
 
 # TODO
