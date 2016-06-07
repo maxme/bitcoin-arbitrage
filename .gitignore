@@ -47,4 +47,6 @@ makertaker.py
 arbitragerbot.py
 *.csv
 *.dta
+trade_history
+download.sh
 

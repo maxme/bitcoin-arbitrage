@@ -1,4 +1,4 @@
-cd "/Users/phil/work/bitcoin-arbitrage/"
+cd "/Users/phil/work/bitcoin-arbitrage/trade_history"
 
 insheet using "HaobtcCNY1.csv", clear
 sort timestamp
@@ -8,9 +8,14 @@ insheet using "HaobtcCNY2.csv", clear
 sort timestamp
 save "HaobtcCNY2.dta", replace
 
+insheet using "HaobtcCNY100.csv", clear
+sort timestamp
+save "HaobtcCNY100.dta", replace
+
 insheet using "HaobtcCNY.csv", clear
 append using "HaobtcCNY2.dta"
 append using "HaobtcCNY1.dta"
+append using "HaobtcCNY100.dta"
 
 sort timestamp
 save "HaobtcCNY.dta", replace

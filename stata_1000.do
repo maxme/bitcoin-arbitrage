@@ -1,4 +1,4 @@
-cd "/Users/phil/work/bitcoin-arbitrage/"
+cd "/Users/phil/work/bitcoin-arbitrage/trade_history"
 
 insheet using "HaobtcCNY1.csv", clear
 sort timestamp
