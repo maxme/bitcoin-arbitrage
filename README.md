@@ -25,6 +25,7 @@ Currently supported exchanges to automate trade:
 
 Donation are always welcome: 
  - Maxme: **1MaximevzHUTMykWG3RK88BzevbtYCJoqq** 
+ - Philsong: **1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8**
 
 
 # WARNING
@@ -65,29 +66,23 @@ Run tests
 
     $ nosetests arbitrage/
 
-## Alternative usage
+# Alternative usage
 
-* List supported public markets:
+List supported public markets:
 
       $ python3 arbitrage/arbitrage.py list-public-markets
-* Help
 
+Help
+      
       $ python3 arbitrage/arbitrage.py -h
 
-## Example
+# Example
 
-* arbitrage in haobtc, watch in huobi or okcoin
-
-  Firstly, in config.py, keep only haobtc in markets array 
+arbitrage between in haobtc, huobi or okcoin
 
     $ python3 arbitrage/arbitrage.py -oTraderBot -mHuobiCNY,HaobtcCNY
-
     $ python3 arbitrage/arbitrage.py -oTraderBot -mOKCoinCNY,HaobtcCNY
 
-* arbitrage in haobtc itself
-
-    $ python3 arbitrage/arbitrage.py -oMakerTaker -mHaobtcCNY
-    $ python3 arbitrage/arbitrage.py -oMakerTaker, TraderBot -mHaobtcCNY,OKCoinCNY
 
 # TODO
 

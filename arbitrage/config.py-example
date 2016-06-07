@@ -50,6 +50,8 @@ profit_thresh = 1  # in CNY
 perc_thresh = 0.01  # in 0.01%
 
 #### Emailer Observer Config
+send_trade_mail = False
+
 smtp_host = 'FIXME'
 smtp_login = 'FIXME'
 smtp_passwd = 'FIXME'
