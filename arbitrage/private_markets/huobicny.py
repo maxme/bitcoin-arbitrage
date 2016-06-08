@@ -20,8 +20,11 @@ from lib.settings import HUOBI_API_URL
 class PrivateHuobiCNY(Market):
     huobi = None
 
-    def __init__(self,HUOBI_API_KEY, HUOBI_SECRET_TOKEN):
+    def __init__(self,HUOBI_API_KEY=None, HUOBI_SECRET_TOKEN=None):
         super().__init__()
+        if HUOBI_API_KEY == None:
+            HUOBI_API_KEY = config.HUOBI_API_KEY
+            HUOBI_SECRET_TOKEN = config.HUOBI_SECRET_TOKEN
         self.huobi = exchange(HUOBI_API_URL, HUOBI_API_KEY, HUOBI_SECRET_TOKEN, 'huobi')
         self.currency = "CNY"
         self.get_info()

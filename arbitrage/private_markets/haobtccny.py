@@ -22,8 +22,11 @@ import logging
 class PrivateHaobtcCNY(Market):
     haobtc = None
 
-    def __init__(self, HAOBTC_API_KEY, HAOBTC_SECRET_TOKEN):
+    def __init__(self, HAOBTC_API_KEY=None, HAOBTC_SECRET_TOKEN=None):
         super().__init__()
+        if HAOBTC_API_KEY == None:
+            HAOBTC_API_KEY = config.HAOBTC_API_KEY
+            HAOBTC_SECRET_TOKEN = config.HAOBTC_SECRET_TOKEN
         self.haobtc =  exchange(HAOBTC_API_URL, HAOBTC_API_KEY, HAOBTC_SECRET_TOKEN, 'haobtc')
 
         self.currency = "CNY"
@@ -83,7 +86,7 @@ class PrivateHaobtcCNY(Market):
         """Get balance"""
         response = self.haobtc.accountInfo()
         if "code" in response:
-            logging.warn("get_info failed", response)
+            logging.warn("get_info failed %s", response)
             return
             raise TradeException(response["error"])
         if response:

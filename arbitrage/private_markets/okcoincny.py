@@ -20,8 +20,11 @@ from lib.settings import OKCOIN_API_URL
 class PrivateOkCoinCNY(Market):
     okcoin = None
 
-    def __init__(self,OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN):
+    def __init__(self,OKCOIN_API_KEY = None, OKCOIN_SECRET_TOKEN = None):
         super().__init__()
+        if OKCOIN_API_KEY == None:
+            OKCOIN_API_KEY = config.OKCOIN_API_KEY
+            OKCOIN_SECRET_TOKEN = config.OKCOIN_SECRET_TOKEN
         self.okcoin = exchange(OKCOIN_API_URL, OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN, 'okcoin')
 
         self.currency = "CNY"
