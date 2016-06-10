@@ -19,6 +19,7 @@ from lib.settings import HUOBI_API_URL
 import sys
 import traceback
 import config
+import logging
 
 class PrivateHuobiCNY(Market):
     huobi = None

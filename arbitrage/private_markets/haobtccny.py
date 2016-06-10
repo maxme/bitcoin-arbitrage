@@ -16,7 +16,6 @@ import json
 import config
 from lib.exchange import exchange
 from lib.settings import HAOBTC_API_URL
-
 import logging
 
 class PrivateHaobtcCNY(Market):

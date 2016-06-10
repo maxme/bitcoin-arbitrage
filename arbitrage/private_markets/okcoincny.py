@@ -16,6 +16,7 @@ import json
 import config
 from lib.exchange import exchange
 from lib.settings import OKCOIN_API_URL
+import logging
 
 class PrivateOkCoinCNY(Market):
     okcoin = None
