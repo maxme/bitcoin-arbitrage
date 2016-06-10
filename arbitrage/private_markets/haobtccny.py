@@ -87,7 +87,7 @@ class PrivateHaobtcCNY(Market):
         response = self.haobtc.accountInfo()
         if "code" in response:
             logging.warn("get_info failed %s", response)
-            return
+            return False
             raise TradeException(response["error"])
         if response:
             self.btc_balance = float(response["exchange_btc"])

@@ -16,6 +16,9 @@ import json
 import config
 from lib.exchange import exchange
 from lib.settings import HUOBI_API_URL
+import sys
+import traceback
+import config
 
 class PrivateHuobiCNY(Market):
     huobi = None
@@ -32,20 +35,34 @@ class PrivateHuobiCNY(Market):
     def _buy(self, amount, price):
         """Create a buy limit order"""
         response = self.huobi.buy(amount, price)
-        if "error" in response:
-            raise TradeException(response["error"])
+        if "code" in response:
+            print(response)
+            return False
+            raise TradeException(response["message"])
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
         response = self.huobi.sell(amount, price)
-        if "error" in response:
-            raise TradeException(response["error"])
+        if "code" in response:
+            print(response)
+            return False
+            raise TradeException(response["message"])
 
     def get_info(self):
         """Get balance"""
-        response = self.huobi.accountInfo()
-        if "error" in response:
-            raise TradeException(response["error"])
-        if response:
-            self.btc_balance = float(response["available_btc_display"])
-            self.cny_balance = float(response["available_cny_display"])
+        try:
+            response = self.huobi.accountInfo()
+            if "code" in response:
+                print(response)
+                return False
+                raise TradeException(response["message"])
+            if response:
+                self.btc_balance = float(response["available_btc_display"])
+                self.cny_balance = float(response["available_cny_display"])
+        except  Exception as ex:
+            logging.warn("get_info failed :%s" % ex)
+            t,v,tb = sys.exc_info()
+            traceback.print_exc()
+
+            return False
+
