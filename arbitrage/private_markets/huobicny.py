@@ -60,6 +60,8 @@ class PrivateHuobiCNY(Market):
             if response:
                 self.btc_balance = float(response["available_btc_display"])
                 self.cny_balance = float(response["available_cny_display"])
+                self.btc_frozen = float(response["frozen_btc_display"])
+                self.cny_frozen = float(response["frozen_cny_display"])
         except  Exception as ex:
             logging.warn("get_info failed :%s" % ex)
             t,v,tb = sys.exc_info()

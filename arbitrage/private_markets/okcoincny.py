@@ -57,3 +57,5 @@ class PrivateOkCoinCNY(Market):
         if response:
             self.btc_balance = float(response['info']['funds']['free']['btc'])
             self.cny_balance = float(response['info']['funds']['free']['cny'])
+            self.btc_frozen =  float(response['info']['funds']['freezed']['btc'])
+            self.cny_frozen =  float(response['info']['funds']['freezed']['cny'])

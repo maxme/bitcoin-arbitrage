@@ -13,7 +13,8 @@ class Market:
         self.eur_balance = 0.
         self.usd_balance = 0.
         self.cny_balance = 0.
-
+        self.btc_frozen = 0.
+        self.cny_frozen = 0.
         self.fc = FiatConverter()
 
     def __str__(self):
