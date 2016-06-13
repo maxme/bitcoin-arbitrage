@@ -13,8 +13,3 @@ graph twoway line price datetime, yaxis(1) || connected cny datetime, yaxis(2) |
 || ,saving(figure_profit)
 
 //line price datetime in -500/-1, yaxis(1) || connected cny datetime in -500/-1, yaxis(2) || connected btc datetime in -500/-1, yaxis(3)
-
-//twoway (line btc timestamp ) (scatter btc timestamp )
-//twoway (line cny timestamp ) (scatter cny timestamp ) 
-//(line diff3 timestamp ) (scatter diff3 timestamp ) (line diff4 timestamp ) (scatter diff4 timestamp ) 
-//twoway (rconnected stratumantpoolcom stratumf2poolcom stratumantpoolcom)
