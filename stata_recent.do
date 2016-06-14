@@ -21,7 +21,7 @@ sort timestamp
 save "HaobtcCNY4.dta", replace
 
 
-insheet using "HaobtcCNY.csv", clear
+//insheet using "HaobtcCNY.csv", clear
 append using "HaobtcCNY4.dta"
 //append using "HaobtcCNY3.dta"
 //append using "HaobtcCNY2.dta"

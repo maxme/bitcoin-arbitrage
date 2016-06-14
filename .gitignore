@@ -49,4 +49,7 @@ arbitragerbot.py
 *.dta
 trade_history
 download.sh
+*.log
+*.do
+
 

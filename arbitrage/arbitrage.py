@@ -9,10 +9,7 @@ import glob
 import os
 import inspect
 from arbitrer import Arbitrer
-
-logging.getLogger("requests").setLevel(logging.WARNING)
-# logging.getLogger("urllib3").setLevel(logging.WARNING)
-
+from logging.handlers import RotatingFileHandler
 
 class ArbitrerCLI:
     def __init__(self):
@@ -77,8 +74,16 @@ class ArbitrerCLI:
         if args.debug:
             level = logging.DEBUG
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
-                            level=level,
-                            stream=sys.stdout)
+                            level=level)
+
+        Rthandler = RotatingFileHandler('arbitrage.log', maxBytes=100*1024*1024,backupCount=10)
+        Rthandler.setLevel(level)
+        formatter = logging.Formatter('%(asctime)-12s [%(levelname)s] %(message)s')  
+        Rthandler.setFormatter(formatter)
+        logging.getLogger('').addHandler(Rthandler)
+
+        logging.getLogger("requests").setLevel(logging.WARNING)
+        # logging.getLogger("urllib3").setLevel(logging.WARNING)
 
     def main(self):
         parser = argparse.ArgumentParser()
