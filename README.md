@@ -83,7 +83,10 @@ arbitrage in haobtc, huobi or okcoin
     $ python3 arbitrage/arbitrage.py -oTraderBot -mHaobtcCNY,HuobiCNY
     $ python3 arbitrage/arbitrage.py -oTraderBot -mHaobtcCNY,OKCoinCNY
 
+balance statatistic 
 
+    $ python3 arbitrage/arbitrage.py -oBalanceDumper -mHaobtcCNY
+    
 # TODO
 
  * Tests

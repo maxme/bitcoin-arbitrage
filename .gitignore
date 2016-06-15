@@ -48,6 +48,7 @@ arbitragerbot.py
 *.csv
 *.dta
 trade_history
+balance_history
 download.sh
 *.log
 *.do
