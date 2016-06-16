@@ -10,6 +10,11 @@ class MockMarket(object):
         self.filename = "traderbot-sim-" + name + ".json"
         self.cny_balance = cny_balance
         self.btc_balance = btc_balance
+        self.cny_frozen = 0
+        self.btc_frozen = 0
+        self.cny_total = 0
+        self.btc_total = 0
+
         self.fee = fee
         self.persistent = persistent
         if self.persistent:
