@@ -83,11 +83,18 @@ class BalanceDumper(Observer):
             logging.warn("exception ticker")
             return
         
-        if abs(self.cny_total - self.cny_balance_total(bid_price)) > 3 or abs(self.btc_total - self.btc_balance_total(ask_price)) > 0.002:
+        cny_abs = abs(self.cny_total - self.cny_balance_total(bid_price))
+        cny_diff = self.cny_total*0.1
+        btc_abs = abs(self.btc_total - self.btc_balance_total(ask_price))
+        btc_diff = self.btc_total*0.1
+        if cny_abs > 3 and cny_abs < cny_diff:
             logging.info("update_balance-->")
             self.cny_total = self.cny_balance_total(bid_price)
             self.btc_total = self.btc_balance_total(ask_price)
             self.update_trade_history(self.exchange, time.time(), bid_price, self.cny_total, self.btc_total)
+        else:
+            self.cny_total = self.cny_balance_total(bid_price)
+            self.btc_total = self.btc_balance_total(ask_price)
 
     def end_opportunity_finder(self):
         pass
