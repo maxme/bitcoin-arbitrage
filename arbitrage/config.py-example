@@ -63,3 +63,6 @@ xmpp_jid = "FROM@jabber.org"
 xmpp_password = "FIXME"
 xmpp_to = "TO@jabber.org"
 
+ENV = 'local'
+
+

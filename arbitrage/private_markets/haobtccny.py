@@ -35,7 +35,7 @@ class PrivateHaobtcCNY(Market):
         """Create a buy limit order"""
         response = self.haobtc.buy(amount, price)
         if "code" in response:
-            print (response)
+            logging.warn (response)
             return False
             raise TradeException(response["code"])
         return response
@@ -44,7 +44,7 @@ class PrivateHaobtcCNY(Market):
         """Create a sell limit order"""
         response = self.haobtc.sell(amount, price)
         if "code" in response:
-            print (response)
+            logging.warn (response)
             return False
             raise TradeException(response["code"])
         return response
@@ -52,7 +52,7 @@ class PrivateHaobtcCNY(Market):
     def _buy_maker(self, amount, price):
         response = self.haobtc.bidMakerOnly(amount, price)
         if "code" in response:
-            print (response)
+            logging.warn (response)
             return False
             raise TradeException(response["code"])
         return response
@@ -60,7 +60,7 @@ class PrivateHaobtcCNY(Market):
     def _sell_maker(self, amount, price):
         response = self.haobtc.askMakerOnly(amount, price)
         if "code" in response:
-            print (response)
+            logging.warn (response)
             return False
             raise TradeException(response["code"])
         return response
@@ -68,7 +68,7 @@ class PrivateHaobtcCNY(Market):
     def _get_order(self, order_id):
         response = self.haobtc.orderInfo(order_id)
         if "code" in response:
-            print (response)
+            logging.warn (response)
             return False
             raise TradeException(response["code"])
         return response
@@ -76,7 +76,7 @@ class PrivateHaobtcCNY(Market):
     def _cancel_order(self, order_id):
         response = self.haobtc.cancel(order_id)
         if "code" in response:
-            print (response)
+            logging.warn (response)
             return False
             raise TradeException(response["code"])
         return response
@@ -84,7 +84,7 @@ class PrivateHaobtcCNY(Market):
     def _cancel_all(self):
         response = self.haobtc.cancelAll()
         if "code" in response:
-            print (response)
+            logging.warn (response)
             return False
             raise TradeException(response["code"])
         return response

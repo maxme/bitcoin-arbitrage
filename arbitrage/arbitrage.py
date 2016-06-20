@@ -83,7 +83,7 @@ class ArbitrerCLI:
         logging.getLogger('').addHandler(Rthandler)
 
         logging.getLogger("requests").setLevel(logging.WARNING)
-        # logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
 
     def main(self):
         parser = argparse.ArgumentParser()
