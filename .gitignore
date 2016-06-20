@@ -43,6 +43,7 @@ tmp/
 local_settings.py
 __pycache__
 makertaker.py
+marketmaker.py
 .DS_Store
 arbitragerbot.py
 *.csv
@@ -53,4 +54,5 @@ download.sh
 *.log
 *.do
 stata/
+
 

@@ -81,6 +81,14 @@ class PrivateHaobtcCNY(Market):
             raise TradeException(response["code"])
         return response
 
+    def _cancel_all(self):
+        response = self.haobtc.cancelAll()
+        if "code" in response:
+            print (response)
+            return False
+            raise TradeException(response["code"])
+        return response
+
     def get_info(self):
         """Get balance"""
         response = self.haobtc.accountInfo()

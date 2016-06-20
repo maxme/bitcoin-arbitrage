@@ -63,6 +63,10 @@ class Market:
     def cancel_order(self, order_id):
         return self._cancel_order(order_id)
 
+    def cancel_all(self):
+        return self._cancel_all()
+
+
     def _buy(self, amount, price):
         raise NotImplementedError("%s.buy(self, amount, price)" % self.name)
 
@@ -82,6 +86,8 @@ class Market:
     def _cancel_order(self, order_id):
         raise NotImplementedError("%s.cancel_order(self, order_id)" % self.name)
 
+    def _cancel_all(self):
+        raise NotImplementedError("%s.cancel_all(self)" % self.name)
 
     def deposit(self):
         raise NotImplementedError("%s.sell(self, amount, price)" % self.name)
