@@ -92,7 +92,7 @@ class MarketMaker(Observer):
                 sellprice +=1
 
         peer_bid_hedge_price = int(peer_bid_price*(1+self.bid_fee_rate))
-        peer_ask_hedge_price = int(peer_ask_price*(1+self.ask_fee_rate))
+        peer_ask_hedge_price = int(peer_ask_price*(1-self.ask_fee_rate))
 
         buyprice=min(buyprice, peer_bid_hedge_price)
         sellprice=max(sellprice, peer_ask_hedge_price)
