@@ -1,4 +1,4 @@
-# Copyright (C) 2013, Maxime Biais <maxime@biais.org>
+# Copyright (C) 2016, Philsong <songbohr@gmail.com>
 
 from .market import Market, TradeException
 import time
@@ -7,9 +7,6 @@ import hmac
 import urllib.request
 import urllib.parse
 import urllib.error
-import urllib.request
-import urllib.error
-import urllib.parse
 import hashlib
 import sys
 import json

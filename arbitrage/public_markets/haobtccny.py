@@ -1,3 +1,5 @@
+# Copyright (C) 2016, Philsong <songbohr@gmail.com>
+
 import urllib.request
 import urllib.error
 import urllib.parse
