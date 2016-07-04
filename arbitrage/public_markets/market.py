@@ -7,6 +7,7 @@ import logging
 import sys
 from fiatconverter import FiatConverter
 from utils import log_exception
+import traceback
 
 class Market(object):
     def __init__(self, currency):
@@ -47,6 +48,7 @@ class Market(object):
         except Exception as e:
             logging.error("Can't update market: %s - %s" % (self.name, str(e)))
             log_exception(logging.DEBUG)
+            traceback.print_exc()
 
     def get_ticker(self):
         depth = self.get_depth()

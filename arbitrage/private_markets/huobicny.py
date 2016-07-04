@@ -10,7 +10,6 @@ import urllib.error
 import hashlib
 import sys
 import json
-import config
 from lib.exchange import exchange
 from lib.settings import HUOBI_API_URL
 import sys

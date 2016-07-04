@@ -8,7 +8,7 @@ import time
 import logging
 import json
 from concurrent.futures import ThreadPoolExecutor, wait
-
+import traceback
 
 class Arbitrer(object):
     def __init__(self):
@@ -30,7 +30,8 @@ class Arbitrer(object):
                 self.markets.append(market)
             except (ImportError, AttributeError) as e:
                 print("%s market name is invalid: Ignored (you should check your config file)" % (market_name))
-
+                logging.warn("exception import:%s" % e)
+                traceback.print_exc()
     def init_observers(self, _observers):
         logging.debug("_observers:%s" % _observers)
 

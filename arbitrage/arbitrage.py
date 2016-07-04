@@ -10,6 +10,9 @@ import os
 import inspect
 from arbitrer import Arbitrer
 from logging.handlers import RotatingFileHandler
+import lib.broker_api as exchange_api
+from observers.emailer import send_email
+import datetime
 
 class ArbitrerCLI:
     def __init__(self):
@@ -32,6 +35,8 @@ class ArbitrerCLI:
             self.get_balance(args)
         if "list-public-markets" in args.command:
             self.list_markets()
+        if "get-broker-balance" in args.command:
+            self.get_broker_balance(args)
 
     def list_markets(self):
         logging.debug('list_markets') 
@@ -59,6 +64,43 @@ class ArbitrerCLI:
             pmarketsi.append(market)
         for market in pmarketsi:
             print(market)
+
+    def get_broker_balance(self, args):
+        accounts = exchange_api.exchange_get_account()
+        ticker = exchange_api.exchange_get_ticker()
+
+        if accounts:
+            cny_balance = 0
+            btc_balance = 0
+            cny_frozen = 0
+            btc_frozen = 0
+            broker_msg = '--------------------------broker balance report----------------------------\n\n'
+            broker_msg += 'datetime\t\t %s\n' % str(datetime.datetime.now())
+            for account in accounts:
+                cny_balance += account.available_cny
+                btc_balance += account.available_btc
+                cny_frozen +=  account.frozen_cny
+                btc_frozen +=  account.frozen_btc
+
+                broker_msg +=  "%s:\t\t %s\n" % (account.exchange, str({"cny_balance": account.available_cny,
+                                           "btc_balance": account.available_btc,
+                                           "cny_frozen": account.frozen_cny,
+                                           "btc_frozen": account.frozen_btc}))
+                # broker_msg += '---------------------------\n'
+
+            broker_msg +=  "%s:\t\t %s\n" % ('All   ', str({"cny_balance": cny_balance,
+                                           "btc_balance": btc_balance,
+                                           "cny_frozen": cny_frozen,
+                                           "btc_frozen": btc_frozen}))
+            broker_msg +=  "%s:\t\t %s\n" % ('Price', str({"ask": '%.2f' % ticker.ask,
+                                           "bid": '%.2f' % ticker.bid}))
+            
+            broker_msg +=  "%s:\t %s\n" % ('Converted', str({"cny": '%.2f' % ((btc_balance+btc_frozen)*ticker.bid + cny_balance+cny_frozen),
+                                                        "btc": '%.2f' % (btc_balance+btc_frozen + (cny_balance+cny_frozen)/ticker.ask)}))
+
+            broker_msg += '\n------------------------------------------------------------------------------------\n'
+
+            send_email('broker balance report', broker_msg)
 
     def create_arbitrer(self, args):
         self.arbitrer = Arbitrer()

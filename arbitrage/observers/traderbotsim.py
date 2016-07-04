@@ -64,6 +64,7 @@ class TraderBotSim(TraderBot):
         self.haobtc = MockMarket("haobtc", 0.002, 5000) # 0.2% fee
         self.okcoin = MockMarket("okcoin", 0.000, 5000) # 0.0% fee
         self.huobi = MockMarket("huobi", 0.000, 5000) # 0.0% fee
+        self.broker = MockMarket("broker", 0.000, 5000) # 0.0% fee
 
         self.clients = {
             "KrakenEUR": self.kraken,
@@ -73,6 +74,7 @@ class TraderBotSim(TraderBot):
             "HaobtcCNY": self.haobtc,
             "OKCoinCNY": self.okcoin,
             "HuobiCNY": self.huobi,
+            "BrokerCNY": self.broker,
         }
 
         self.profit_thresh = 0.1  # in CNY

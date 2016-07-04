@@ -4,14 +4,13 @@ import time
 from .observer import Observer
 from .emailer import send_email
 from fiatconverter import FiatConverter
-from private_markets import bitstampusd,haobtccny,huobicny,okcoincny
-from .emailer import send_email
+from private_markets import bitstampusd,haobtccny,huobicny,okcoincny, brokercny
 import os, time
 import sys
 import traceback
 
 class TraderBot(Observer):
-    exchange = 'OKCoinCNY'
+    exchange = 'HaobtcCNY'
     out_dir = 'trade_history/'
 
     def __init__(self):
@@ -20,6 +19,7 @@ class TraderBot(Observer):
             "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
             "OKCoinCNY": okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN),
             "HuobiCNY": huobicny.PrivateHuobiCNY(config.HUOBI_API_KEY, config.HUOBI_SECRET_TOKEN),
+            "BrokerCNY": tradercny.PrivateBrokerCNY(),
         }
 
         self.profit_thresh = config.profit_thresh

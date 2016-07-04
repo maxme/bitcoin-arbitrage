@@ -38,6 +38,7 @@ nosetests.xml
 
 # Project
 config.py
+config_local.py
 old/
 tmp/
 local_settings.py
