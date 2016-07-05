@@ -13,6 +13,7 @@ from logging.handlers import RotatingFileHandler
 import lib.broker_api as exchange_api
 from observers.emailer import send_email
 import datetime
+import time
 
 class ArbitrerCLI:
     def __init__(self):
@@ -66,41 +67,72 @@ class ArbitrerCLI:
             print(market)
 
     def get_broker_balance(self, args):
-        accounts = exchange_api.exchange_get_account()
-        ticker = exchange_api.exchange_get_ticker()
+        while True:
+            accounts = exchange_api.exchange_get_account()
+            ticker = exchange_api.exchange_get_ticker()
 
-        if accounts:
-            cny_balance = 0
-            btc_balance = 0
-            cny_frozen = 0
-            btc_frozen = 0
-            broker_msg = '--------------------------broker balance report----------------------------\n\n'
-            broker_msg += 'datetime\t\t %s\n' % str(datetime.datetime.now())
-            for account in accounts:
-                cny_balance += account.available_cny
-                btc_balance += account.available_btc
-                cny_frozen +=  account.frozen_cny
-                btc_frozen +=  account.frozen_btc
+            cny_init = 3000000
+            btc_init = 600
+            price_init = 4450
 
-                broker_msg +=  "%s:\t\t %s\n" % (account.exchange, str({"cny_balance": account.available_cny,
-                                           "btc_balance": account.available_btc,
-                                           "cny_frozen": account.frozen_cny,
-                                           "btc_frozen": account.frozen_btc}))
-                # broker_msg += '---------------------------\n'
+            if accounts:
+                cny_balance = 0
+                btc_balance = 0
+                cny_frozen = 0
+                btc_frozen = 0
+                broker_msg = '--------------------------broker balance report----------------------------\n\n'
+                broker_msg += 'datetime\t %s\n' % str(datetime.datetime.now())
+                for account in accounts:
+                    cny_balance += account.available_cny
+                    btc_balance += account.available_btc
+                    cny_frozen +=  account.frozen_cny
+                    btc_frozen +=  account.frozen_btc
 
-            broker_msg +=  "%s:\t\t %s\n" % ('All   ', str({"cny_balance": cny_balance,
-                                           "btc_balance": btc_balance,
-                                           "cny_frozen": cny_frozen,
-                                           "btc_frozen": btc_frozen}))
-            broker_msg +=  "%s:\t\t %s\n" % ('Price', str({"ask": '%.2f' % ticker.ask,
-                                           "bid": '%.2f' % ticker.bid}))
-            
-            broker_msg +=  "%s:\t %s\n" % ('Converted', str({"cny": '%.2f' % ((btc_balance+btc_frozen)*ticker.bid + cny_balance+cny_frozen),
-                                                        "btc": '%.2f' % (btc_balance+btc_frozen + (cny_balance+cny_frozen)/ticker.ask)}))
+                    broker_msg +=  "%s:\t\t %s\n" % (account.exchange, str({"cny_balance": account.available_cny,
+                                               "btc_balance": account.available_btc,
+                                               "cny_frozen": account.frozen_cny,
+                                               "btc_frozen": account.frozen_btc}))
+                    # broker_msg += '---------------------------\n'
+                broker_msg +=  "%s:\t\t %s\n" % ('Asset0', str({"cny": cny_init,
+                                               "btc":  btc_init, "price" : price_init}))
+                broker_msg +=  "%s:\t %s\n" % ('0CNY Conv', str({"cny": '%.2f' % (cny_init + btc_init *price_init),
+                                               "btc":  0}))
+                broker_msg +=  "%s:\t %s\n" % ('0BTC Conv', str({"cny": 0,
+                                               "btc":  '%.2f' % (btc_init + cny_init/price_init)}))
 
-            broker_msg += '\n------------------------------------------------------------------------------------\n'
+                broker_msg +=  "%s:\t %s\n" % ('Asset Now', str({"cny": '%.2f' %(cny_balance + cny_frozen),
+                                               "btc":  '%.2f' % (btc_balance+ btc_frozen), "price" : '%.2f' % ticker.bid}))
+                
+                cny_total=(btc_balance+btc_frozen)*ticker.bid + cny_balance+cny_frozen
+                btc_total=btc_balance+btc_frozen + (cny_balance+cny_frozen)/ticker.bid
+                cny_diff = cny_balance+cny_frozen - cny_init
+                btc_diff = btc_balance+btc_frozen - btc_init
 
-            send_email('broker balance report', broker_msg)
+                btc_bonus = 0
+                btc_bonus = cny_diff/ ticker.bid
+                cny_bonus = 0 
+                cny_bonus = btc_diff * ticker.bid
+
+                broker_msg +=  "%s:\t %s\n" % ('CNY Based', str({"cny": '%.2f' % cny_init,
+                                                            "btc": '%.2f' % (btc_balance+btc_frozen+btc_bonus)}))
+
+
+                broker_msg +=  "%s:\t %s\n" % ('BTC Based', str({"cny": '%.2f' % (cny_balance+cny_frozen+cny_bonus),
+                                                            "btc": '%.2f' % btc_init}))
+
+                broker_msg +=  "%s:\t %s\n" % ('CNY conv', str({"cny": '%.2f' % cny_total,
+                                                            "btc": 0}))
+                broker_msg +=  "%s:\t %s\n" % ('BTC conv', str({"cny": 0,
+                                                            "btc": '%.2f' % btc_total}))
+
+                broker_msg += '\n------------------------------------------------------------------------------------\n'
+
+                print(broker_msg)
+
+                if not args.status:
+                    send_email('broker balance report', broker_msg)
+                    break
+                time.sleep(10)
 
     def create_arbitrer(self, args):
         self.arbitrer = Arbitrer()
@@ -137,8 +169,9 @@ class ArbitrerCLI:
                             help="observers, example: -oLogger,Emailer")
         parser.add_argument("-m", "--markets", type=str,
                             help="markets, example: -mHaobtcCNY,Bitstamp")
+        parser.add_argument("-s", "--status", help="status", action="store_true")
         parser.add_argument("command", nargs='*', default="watch",
-                            help='verb: "watch|replay-history|get-balance|list-public-markets"')
+                            help='verb: "watch|replay-history|get-balance|list-public-markets|get-broker-balance"')
         args = parser.parse_args()
         self.init_logger(args)
         self.exec_command(args)

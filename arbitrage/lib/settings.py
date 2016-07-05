@@ -4,19 +4,19 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,parentdir)
 
 HAOBTC_API_URL = {
-                  'host' :'www.haobtc.com',
-                  'trade':'https://haobtc.com/exchange/api/v1/trade',
-                  'cancel_order':'https://haobtc.com/exchange/api/v1/cancel_order',
-                  'order_info':'https://haobtc.com/exchange/api/v1/order_info',
-                  'orders_info':'https://haobtc.com/exchange/api/v1/orders_info',
-                  'history_info':'https://haobtc.com/exchange/api/v1/history_info',
-                  'account_info':'https://haobtc.com/exchange/api/v1/account_info',
-                  'ticker':'https://haobtc.com/exchange/api/v1/ticker' ,
-                  'depth':'https://haobtc.com/exchange/api/v1/depth',
-                  'batch_trade':'https://haobtc.com/exchange/api/v1/batch_trade',
-                  'cancel_all':'https://haobtc.com/exchange/api/v1/cancel_all',
-                  'cancel_list':'https://haobtc.com/exchange/api/v1/cancel_list',
-                  'fast_ticker':'https://haobtc.com/api/v1/price/cny',
+                  'host' :'api.haobtc.com',
+                  'trade':'https://api.haobtc.com/exchange/api/v1/trade',
+                  'cancel_order':'https://api.haobtc.com/exchange/api/v1/cancel_order',
+                  'order_info':'https://api.haobtc.com/exchange/api/v1/order_info',
+                  'orders_info':'https://api.haobtc.com/exchange/api/v1/orders_info',
+                  'history_info':'https://api.haobtc.com/exchange/api/v1/history_info',
+                  'account_info':'https://api.haobtc.com/exchange/api/v1/account_info',
+                  'ticker':'https://api.haobtc.com/exchange/api/v1/ticker' ,
+                  'depth':'https://api.haobtc.com/exchange/api/v1/depth',
+                  'batch_trade':'https://api.haobtc.com/exchange/api/v1/batch_trade',
+                  'cancel_all':'https://api.haobtc.com/exchange/api/v1/cancel_all',
+                  'cancel_list':'https://api.haobtc.com/exchange/api/v1/cancel_list',
+                  'fast_ticker':'https://api.haobtc.com/api/v1/price/cny',
                   }
 HAOBTC_API = {'fee':0.001}
 

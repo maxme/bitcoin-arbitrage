@@ -22,7 +22,7 @@ class MarketMaker(Observer):
     def __init__(self):
         self.clients = {
             # TODO: move that to the config file
-            "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_MAKER_API_KEY, config.HAOBTC_MAKER_SECRET_TOKEN),
+            "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
         }
         
         self.trade_timeout = 10  # in seconds
@@ -38,6 +38,8 @@ class MarketMaker(Observer):
         self.min_tx_volume = config.MAKER_MIN_VOLUME
         self.bid_fee_rate = 0.0005
         self.ask_fee_rate = 0.001
+        self.bid_price_risk = 0
+        self.ask_price_risk = 0
 
         self.peer_exchange ='OKCoinCNY'
         # self.peer_exchange ='HuobiCNY'
@@ -52,6 +54,9 @@ class MarketMaker(Observer):
 
         logging.info('Setup complete')
         # time.sleep(2)
+
+    def hedge_order(self, order):
+        pass
 
     def market_maker(self, depths):
         kexchange = self.exchange
@@ -94,8 +99,8 @@ class MarketMaker(Observer):
         peer_bid_hedge_price = int(peer_bid_price*(1+self.bid_fee_rate))
         peer_ask_hedge_price = int(peer_ask_price*(1-self.ask_fee_rate))
 
-        buyprice=min(buyprice, peer_bid_hedge_price)
-        sellprice=max(sellprice, peer_ask_hedge_price)
+        buyprice=min(buyprice, peer_bid_hedge_price) - self.bid_price_risk
+        sellprice=max(sellprice, peer_ask_hedge_price) + self.ask_price_risk
         logging.info("sellprice/buyprice=(%s/%s)" % (sellprice, buyprice))
 
         self.buyprice = buyprice
@@ -116,13 +121,14 @@ class MarketMaker(Observer):
 
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
                     self.remove_order(buy_order['id'])
+                    self.hedge_order(result)
                 else:
                     current_time = time.time()
                     if (result['price'] != buyprice) and \
                         ((result['price'] > peer_bid_hedge_price) or \
                         ( current_time - buy_order['time'] > self.trade_timeout and  \
                         (result['price'] < bid_price or result['price'] > (bid1_price + 1)))):
-                        logging.warn("[TraderBot] cancel last buy trade " +
+                        logging.info("[TraderBot] cancel last buy trade " +
                                      "occured %.2f seconds ago" %
                                      (current_time - buy_order['time']))
                         logging.info("buyprice %s result['price'] = %s[%s]" % (buyprice, result['price'], result['price'] != buyprice))
@@ -141,19 +147,19 @@ class MarketMaker(Observer):
 
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
                     self.remove_order(sell_order['id'])
+                    self.hedge_order(result)
                 else:
                     current_time = time.time()
                     if (result['price'] != sellprice) and \
                         ((result['price'] < peer_ask_hedge_price) or \
                         (current_time - sell_order['time'] > self.trade_timeout and \
                             (result['price'] > ask_price or result['price'] < (ask1_price - 1)))):
-                        logging.warn("[TraderBot] cancel last SELL trade " +
+                        logging.info("[TraderBot] cancel last SELL trade " +
                                      "occured %.2f seconds ago" %
                                      (current_time - sell_order['time']))
                         logging.info("sellprice %s result['price'] = %s [%s]" % (sellprice, result['price'], result['price'] != sellprice))
 
                         self.cancel_order(kexchange, 'sell', sell_order['id'])
-
 
         # excute trade
         if not self.is_buying():
@@ -227,8 +233,8 @@ class MarketMaker(Observer):
         if resp_order_id == -1:
             logging.warn("cancel %s #%s failed, %s" % (type, order_id, resp_order_id))
         else:
-            logging.warn("Canceled order %s #%s ok" % (type, order_id))
-            self.remove_order(order_id)
+            logging.info("Canceled order %s #%s ok" % (type, order_id))
+            # self.remove_order(order_id)
             return True
 
         return False
@@ -260,12 +266,13 @@ class MarketMaker(Observer):
 
     def update_balance(self):
         for kclient in self.clients:
-            self.clients[kclient].get_info()
-            self.cny_balance = self.clients[kclient].cny_balance
-            self.btc_balance = self.clients[kclient].btc_balance
-            
-            self.cny_frozen = self.clients[kclient].cny_frozen
-            self.btc_frozen = self.clients[kclient].btc_frozen
+            if kclient == self.exchange:
+                self.clients[kclient].get_info()
+                self.cny_balance = self.clients[kclient].cny_balance
+                self.btc_balance = self.clients[kclient].btc_balance
+                
+                self.cny_frozen = self.clients[kclient].cny_frozen
+                self.btc_frozen = self.clients[kclient].btc_frozen
 
         cny_abs = abs(self.cny_total - self.cny_balance_total(self.buyprice))
         cny_diff = self.cny_total*0.1

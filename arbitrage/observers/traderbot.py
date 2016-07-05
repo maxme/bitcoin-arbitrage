@@ -15,21 +15,25 @@ class TraderBot(Observer):
 
     def __init__(self):
         self.clients = {
-            # TODO: move that to the config file
-            "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
+            # "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
             "OKCoinCNY": okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN),
             "HuobiCNY": huobicny.PrivateHuobiCNY(config.HUOBI_API_KEY, config.HUOBI_SECRET_TOKEN),
-            "BrokerCNY": tradercny.PrivateBrokerCNY(),
+            # "BrokerCNY": brokercny.PrivateBrokerCNY(),
         }
 
+        self.reverse_profit_thresh = config.reverse_profit_thresh
+        self.reverse_perc_thresh = config.reverse_perc_thresh
         self.profit_thresh = config.profit_thresh
         self.perc_thresh = config.perc_thresh
         self.trade_wait = 10 * 1  # in seconds
         self.last_trade = 0
-        self.cny_balance = 0
-        self.btc_balance = 0
-        self.cny_frozen = 0
-        self.btc_frozen = 0
+        self.init_cny = {'OKCoinCNY':250000, 'HuobiCNY':250000}
+        self.init_btc = {'OKCoinCNY':50, 'HuobiCNY':450}
+
+        self.cny_balance = {}
+        self.btc_balance = {}
+        self.cny_frozen = {}
+        self.btc_frozen = {}
         self.cny_total = 0
         self.btc_total = 0
        
@@ -40,6 +44,7 @@ class TraderBot(Observer):
 
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
+        return
 
         # Update client balance
         self.update_balance()
@@ -61,8 +66,8 @@ class TraderBot(Observer):
             logging.warn("exception ticker")
             return
 
-        self.cny_total = self.cny_balance_total(bid_price)
-        self.btc_total = self.btc_balance_total(ask_price)
+        self.update_cny_total(bid_price)
+        self.update_btc_total(ask_price)
 
         self.update_trade_history(time.time(), bid_price, self.cny_total, self.btc_total)
 
@@ -80,23 +85,27 @@ class TraderBot(Observer):
         return min(min1, min2)
 
     def update_balance(self):
-        self.cny_balance = 0
-        self.btc_balance = 0
-        self.cny_frozen = 0
-        self.btc_frozen = 0
+        self.cny_balance = {}
+        self.btc_balance = {}
+        self.cny_frozen = {}
+        self.btc_frozen = {}
         for kclient in self.clients:
             self.clients[kclient].get_info()
-            self.cny_balance += self.clients[kclient].cny_balance
-            self.btc_balance += self.clients[kclient].btc_balance
+            self.cny_balance[kclient] += self.clients[kclient].cny_balance
+            self.btc_balance[kclient] += self.clients[kclient].btc_balance
             
-            self.cny_frozen += self.clients[kclient].cny_frozen
-            self.btc_frozen += self.clients[kclient].btc_frozen
+            self.cny_frozen[kclient] += self.clients[kclient].cny_frozen
+            self.btc_frozen[kclient] += self.clients[kclient].btc_frozen
 
-    def cny_balance_total(self, price):
-        return self.cny_balance + self.cny_frozen+ (self.btc_balance + self.btc_frozen)* price
+    def update_cny_total(self, price):
+        self.cny_total = 0
+        for kclient in self.clients:
+            self.cny_total += self.cny_balance[kclient] + self.cny_frozen[kclient]+ (self.btc_balance[kclient] + self.btc_frozen[kclient])* price
     
-    def btc_balance_total(self, price):
-        return self.btc_balance + self.btc_frozen  + (self.cny_balance +self.cny_frozen ) / (price*1.0)
+    def update_btc_total(self, price):
+        self.btc_total = 0
+        for kclient in self.clients:
+            self.btc_total = self.btc_balance[kclient] + self.btc_frozen[kclient]  + (self.cny_balance[kclient] +self.cny_frozen[kclient] ) / (price*1.0)
 
 
     def update_trade_history(self, time, price, cny, btc):
@@ -116,6 +125,8 @@ class TraderBot(Observer):
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
                     weighted_buyprice, weighted_sellprice):
+        reverse_trade = False
+
         if kask not in self.clients:
             logging.warn("[TraderBot] Can't automate this trade, client not available: %s" % kask)
             return
@@ -123,14 +134,17 @@ class TraderBot(Observer):
             logging.warn("[TraderBot] Can't automate this trade, client not available: %s" % kbid)
             return
 
-        if profit < self.profit_thresh or perc < self.perc_thresh:
+        if profit < self.reverse_profit_thresh and perc < self.reverse_perc_thresh:
             logging.info("[TraderBot] Profit or profit percentage(%0.4f/%0.4f) lower than thresholds(%s/%s)" 
-                            % (profit, perc, self.profit_thresh, self.perc_thresh))
+                            % (profit, perc, self.reverse_profit_thresh, self.reverse_perc_thresh))
+            reverse_trade = True
             return
-        else:
+        elif profit > self.profit_thresh and perc > self.perc_thresh:
             logging.info("[TraderBot] Profit or profit percentage(%0.4f/%0.4f) higher than thresholds(%s/%s)" 
                             % (profit, perc, self.profit_thresh, self.perc_thresh))    
-        
+        else:
+            return
+
         if perc > 20:  # suspicous profit, added after discovering btc-central may send corrupted order book
             logging.warn("[TraderBot]Profit=%f seems malformed" % (perc, ))
             return
@@ -142,7 +156,7 @@ class TraderBot(Observer):
         logging.info("volume:%s max_volume:%0.4f", volume, max_volume)
 
         volume = min(volume, max_volume, config.max_tx_volume)
-        if volume < config.min_tx_volume:
+        if volume < config.min_tx_volume and reverse_trade == False:
             logging.warn("[TraderBot]Can't automate this trade, minimum volume transaction"+
                          " not reached %f/%f" % (volume, config.min_tx_volume))
             logging.warn("Balance on %s: %f CNY / %s: %f BTC"
@@ -159,28 +173,49 @@ class TraderBot(Observer):
 
         self.potential_trades.append([profit, volume, kask, kbid,
                                       weighted_buyprice, weighted_sellprice,
-                                      buyprice, sellprice])
-
-    def watch_balances(self):
-        pass
+                                      buyprice, sellprice, reverse_trade])
 
     def execute_trade(self, volume, kask, kbid, weighted_buyprice,
-                      weighted_sellprice, buyprice, sellprice):
-        self.last_trade = time.time()
+                      weighted_sellprice, buyprice, sellprice, reverse_trade):
         logging.info("[TraderBot]Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
+
+        if volume < 0.1:
+            return
+
+        if reverse_trade:
+            logging.warn("reverse_trade")
+            ktemp = kask
+            kask = kbid
+            kbid = ktemp
+
+            logging.info("R-[TraderBot]Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
 
         volume = float(("%0.4f") % volume)
         buyprice = (buyprice)
+        sellprice = (sellprice)
+
+        logging.warn("%s cny=%s, %s btc=%s, volume=%s", kask, self.clients[kask].cny_balance, kbid, self.clients[kbid].btc_balance, volume)
+        if self.clients[kask].cny_balance < volume*buyprice*10:
+            logging.warn("%s cny is insufficent" % kask)
+            return
+
+        if self.clients[kbid].btc_balance < volume*10:
+            logging.warn("%s btc is insufficent" % kbid)
+            return
+
         result = self.clients[kask].buy(volume, buyprice)
         if result == False:
             logging.warn("[TraderBot]Buy @%s %f BTC failed" % (kask, volume))
             return
             
-        sellprice = (sellprice)
+        self.last_trade = time.time()
+
+
         result = self.clients[kbid].sell(volume, sellprice)
         if result == False:
             logging.warn("[TraderBot]Sell @%s %f BTC failed" % (kbid, volume))
             return
+
 
         if config.send_trade_mail:
             send_email("[TraderBot]Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),

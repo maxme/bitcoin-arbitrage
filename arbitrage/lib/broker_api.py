@@ -32,7 +32,7 @@ def exchange_check_price(price, trade_type):
 
 def exchange_buy(client_id, btc, price):
   logging.debug('exchange_buy %s %s %s', client_id, btc, price)
-  buyOrder = Trade(str(client_id), btc, price)
+  buyOrder = broker_thrift.Trade(str(client_id), btc, price)
   client.buy(buyOrder)
   logging.debug("exchange_buy-> end")
   
@@ -40,7 +40,7 @@ def exchange_buy(client_id, btc, price):
 
 def exchange_sell(client_id, btc, price):
   logging.debug('exchange_sell %s %s %s', client_id, btc, price)
-  sellOrder = Trade(str(client_id), btc, price)
+  sellOrder = broker_thrift.Trade(str(client_id), btc, price)
   client.sell(sellOrder)
   logging.debug("exchange_sell-> end")
     

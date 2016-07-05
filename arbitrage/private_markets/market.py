@@ -23,7 +23,7 @@ class Market:
                                            "cny_frozen": self.cny_frozen,
                                            "btc_frozen": self.btc_frozen}))
 
-    def buy(self, amount, price):
+    def buy(self, amount, price, client_id=None):
         """Orders are always priced in CNY"""
         local_currency_price = self.fc.convert(price, "CNY", self.currency)
         logging.verbose("Buy %f BTC at %f %s (%f CNY) @%s" % (amount,
@@ -31,7 +31,7 @@ class Market:
         return self._buy(amount, local_currency_price)
 
 
-    def sell(self, amount, price):
+    def sell(self, amount, price, client_id=None):
         """Orders are always priced in CNY"""
         local_currency_price = self.fc.convert(price, "CNY", self.currency)
         logging.verbose("Sell %f BTC at %f %s (%f CNY) @%s" % (amount,

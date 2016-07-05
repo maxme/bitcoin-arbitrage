@@ -22,18 +22,39 @@ class PrivateBrokerCNY(Market):
         self.get_info()
         self.client_id = 0
 
-    def _buy(self, amount, price):
+        self.filename = "broker-clientid.json"
+        try:
+            self.load()
+        except IOError:
+            logging.warn("load client id failed!")
+            pass
+
+    def load(self):
+        data = json.load(open(self.filename, "r"))
+        self.client_id = data["client_id"]
+
+    def save(self):
+        data = {'client_id': self.client_id}
+        json.dump(data, open(self.filename, "w"))
+
+    def _buy(self, amount, price, client_id=None):
         """Create a buy limit order"""
-        return
-        exchange_api.exchange_buy(self.client_id, amount, price)
+        if not client_id:
+            self.client_id+=1
+            client_id = self.client_id
+            self.save()
+        
+        exchange_api.exchange_buy(client_id, amount, price)
  
-        self.client_id+=1
-    def _sell(self, amount, price):
+    def _sell(self, amount, price, client_id=None):
         """Create a sell limit order"""
-        return
-        exchange_api.exchange_sell(self.client_id, amount, price)
-  
-        self.client_id+=1
+        if not client_id:
+            self.client_id+=1
+            client_id = self.client_id
+            self.save()
+        
+        exchange_api.exchange_sell(client_id, amount, price)
+
     def get_info(self):
         """Get balance"""
         accounts = exchange_api.exchange_get_account()

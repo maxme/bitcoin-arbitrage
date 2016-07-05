@@ -69,6 +69,10 @@ xmpp_jid = "FROM@jabber.org"
 xmpp_password = "FIXME"
 xmpp_to = "TO@jabber.org"
 
+# broker thrift server
+BROKER_HOST = "127.0.0.1"
+BROKER_PORT = 19090
+
 ENV = 'local'
 
 try:
