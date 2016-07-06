@@ -48,7 +48,7 @@ class TraderBot(Observer):
         self.execute_trade(*self.potential_trades[0][1:])
 
     def get_min_tradeable_volume(self, buyprice, cny_bal, btc_bal):
-        min1 = float(cny_bal) * (1. + config.balance_margin) / buyprice
+        min1 = float(cny_bal) * (1. - config.balance_margin) / buyprice
         min2 = float(btc_bal) * (1. - config.balance_margin)
         return min(min1, min2)
 
@@ -73,7 +73,7 @@ class TraderBot(Observer):
                     logging.info("[TraderBot]reverse urgent: no arbitrage chance, balance the fund for urgent")
                     ktemp = kbid
                     kbid = kask
-                    kask = kbid
+                    kask = ktemp
                 else:
                     logging.debug("[TraderBot]wait for higher")
                     return
