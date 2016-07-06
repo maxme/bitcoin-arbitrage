@@ -93,8 +93,6 @@ struct TradeOrder {
 	20:i64			match_id             
 }
 
-
-// 交易服务
 service TradeService {
 	oneway void 		ping(),
 	oneway void  		config_keys(1: list<ExchangeConfig> exchange_configs),
