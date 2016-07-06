@@ -50,6 +50,7 @@ class TraderBot(Observer):
     def get_min_tradeable_volume(self, buyprice, cny_bal, btc_bal):
         min1 = float(cny_bal) * (1. - config.balance_margin) / buyprice
         min2 = float(btc_bal) * (1. - config.balance_margin)
+
         return min(min1, min2)
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
@@ -103,7 +104,6 @@ class TraderBot(Observer):
         max_volume = self.get_min_tradeable_volume(buyprice,
                                                    self.clients[kask].cny_balance,
                                                    self.clients[kbid].btc_balance)
-
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
             logging.warn("[TraderBot]Can't automate this trade, minimum volume transaction"+
@@ -123,7 +123,15 @@ class TraderBot(Observer):
 
     def execute_trade(self, volume, kask, kbid, weighted_buyprice,
                       weighted_sellprice, buyprice, sellprice):
-        volume = float('%02.f' % volume)
+        volume = float('%0.2f' % volume)
+
+        if self.clients[kask].cny_balance < volume*buyprice*10:
+            logging.warn("%s cny is insufficent" % kask)
+            return
+ 
+        if self.clients[kbid].btc_balance < volume*10:
+            logging.warn("%s btc is insufficent" % kbid)
+            return
 
         logging.info("[TraderBot]Fire:Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
 

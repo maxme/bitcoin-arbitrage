@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-s = u’示例’
 # Copyright (C) 2016, Philsong <songbohr@gmail.com>
 
 from .market import Market, TradeException
