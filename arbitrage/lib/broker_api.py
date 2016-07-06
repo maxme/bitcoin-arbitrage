@@ -7,10 +7,24 @@ from thriftpy.transport.framed import TFramedTransportFactory
 
 import config
 import logging
+import traceback
+
 
 client = make_client(broker_thrift.TradeService, config.BROKER_HOST, config.BROKER_PORT,
+                         proto_factory=TBinaryProtocolFactory(),
+                         trans_factory=TFramedTransportFactory(),
+                         timeout=60000)  
+
+def re_init():
+  try:
+    global client
+    client = make_client(broker_thrift.TradeService, config.BROKER_HOST, config.BROKER_PORT,
                            proto_factory=TBinaryProtocolFactory(),
-                           trans_factory=TFramedTransportFactory())
+                           trans_factory=TFramedTransportFactory(),
+                           timeout=60000)  
+  except Exception as e:
+    logging.warn("make_client exception")
+    traceback.print_exc()
 
 def exchange_ping():
   client.ping()

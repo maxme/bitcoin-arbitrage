@@ -27,8 +27,8 @@ class HedgerBot(MarketMaker):
 
         self.bid_fee_rate = 0.001
         self.ask_fee_rate = 0.001
-        self.bid_price_risk = 0
-        self.ask_price_risk = 0
+        self.bid_price_risk = 1
+        self.ask_price_risk = 1
         self.peer_exchange = self.hedger
 
         try:

@@ -126,7 +126,7 @@ class exchange:
 
             payload = urllib.parse.urlencode(params)
             r = requests.post("http://"+self.url['host'], params=payload)
-            if r.status_code == 200:
+            if  r and r.status_code == 200:
                 data = r.json()
                 return data
             else:
@@ -168,7 +168,7 @@ class exchange:
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
             r = requestPost(self.url['host'], params=payload)
-            if r.status_code == 200:
+            if  r and r.status_code == 200:
                 data = r.json()
                 return data
             else:
@@ -210,7 +210,7 @@ class exchange:
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
             r = requestPost(self.url['host'], params=payload)
-            if r.status_code == 200:
+            if r and r.status_code == 200:
                 data = r.json()
                 return data
             else:
@@ -248,7 +248,7 @@ class exchange:
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
             r = requestPost(self.url['host'], params=payload)
-            if r.status_code == 200:
+            if  r and r.status_code == 200:
                 data = r.json()
                 return data
             else:
@@ -322,7 +322,7 @@ class exchange:
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
             r = requestPost(self.url['host'], params=payload)
-            if r.status_code == 200:
+            if  r and r.status_code == 200:
                 data = r.json()
                 return data
             else:
@@ -392,8 +392,11 @@ class exchange:
             params['api_key'] = self.apikey
             params['sign'] = buildSign(params,self.secretToken,'okcoin')
             r =  httpPost(self.url['host'], body, params)
-            return json.loads(r)
-
+            if r:
+                return json.loads(r)
+            else:
+                return None
+                
         if self.role == 'huobi':
             timestamp = int(time.time()) #python3 use int to replace int
             params = {"access_key": self.apikey,"secret_key": self.secretToken, "created": timestamp,"method":self.url['account_info']}

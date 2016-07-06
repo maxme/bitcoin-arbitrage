@@ -13,10 +13,15 @@ class BrokerCNY(Market):
         self.update_rate = 1
 
     def update_depth(self):
-        ticker = exchange_api.exchange_get_ticker()
         depth = {}
-        depth['asks'] = [[ticker.ask, 30]]
-        depth['bids'] = [[ticker.bid, 30]]
+        try:
+            ticker = exchange_api.exchange_get_ticker()
+            depth['asks'] = [[ticker.ask, 30]]
+            depth['bids'] = [[ticker.bid, 30]]
+        except Exception as e:
+            exchange_api.re_init()
+            return
+
         self.depth = self.format_depth(depth)
 
     def sort_and_format(self, l, reverse=False):

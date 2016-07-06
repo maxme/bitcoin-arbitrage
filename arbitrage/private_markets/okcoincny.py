@@ -47,12 +47,14 @@ class PrivateOkCoinCNY(Market):
     def get_info(self):
         """Get balance"""
         response = self.okcoin.accountInfo()
-        if "error_code" in response:
-            print(response)
-            return False
-            raise TradeException(response["error"])
         if response:
-            self.btc_balance = float(response['info']['funds']['free']['btc'])
-            self.cny_balance = float(response['info']['funds']['free']['cny'])
-            self.btc_frozen =  float(response['info']['funds']['freezed']['btc'])
-            self.cny_frozen =  float(response['info']['funds']['freezed']['cny'])
+            if "error_code" in response:
+                print(response)
+                return False
+            else:
+                self.btc_balance = float(response['info']['funds']['free']['btc'])
+                self.cny_balance = float(response['info']['funds']['free']['cny'])
+                self.btc_frozen =  float(response['info']['funds']['freezed']['btc'])
+                self.cny_frozen =  float(response['info']['funds']['freezed']['cny'])
+        return response
+        

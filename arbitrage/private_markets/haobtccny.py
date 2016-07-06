@@ -80,23 +80,22 @@ class PrivateHaobtcCNY(Market):
 
     def _cancel_all(self):
         response = self.haobtc.cancelAll()
-        if "code" in response:
+        if response and  "code" in response:
             logging.warn (response)
             return False
-            raise TradeException(response["code"])
         return response
 
     def get_info(self):
         """Get balance"""
         response = self.haobtc.accountInfo()
-        if "code" in response:
-            logging.warn("get_info failed %s", response)
-            return False
-            raise TradeException(response["error"])
         if response:
-            self.btc_balance = float(response["exchange_btc"])
-            self.cny_balance = float(response["exchange_cny"])
-            self.btc_frozen = float(response["exchange_frozen_btc"])
-            self.cny_frozen = float(response["exchange_frozen_cny"])
+            if "code" in response:
+                logging.warn("get_info failed %s", response)
+                return False
+            else:
+                self.btc_balance = float(response["exchange_btc"])
+                self.cny_balance = float(response["exchange_cny"])
+                self.btc_frozen = float(response["exchange_frozen_btc"])
+                self.cny_frozen = float(response["exchange_frozen_cny"])
 
         return response
