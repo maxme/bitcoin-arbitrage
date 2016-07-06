@@ -30,6 +30,9 @@ class TraderBot(Observer):
         self.lower_btc_price_site = 'OKCoinCNY'
         self.higher_btc_price_site = 'HuobiCNY'
 
+        self.stage0_percent = 0.2
+        self.stage0_percent = 0.7
+
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
 
@@ -67,11 +70,11 @@ class TraderBot(Observer):
                             % (profit, perc, self.reverse_profit_thresh, self.reverse_perc_thresh))
             
             if kask == self.lower_btc_price_site:
-                if self.clients[self.higher_btc_price_site].btc_balance < 0.2*self.init_btc[self.higher_btc_price_site]:
+                if self.clients[self.higher_btc_price_site].btc_balance < self.stage0_percent*self.init_btc[self.higher_btc_price_site]:
                     logging.info("[TraderBot]Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                     logging.info("[TraderBot]%s fund:%s init:%s", self.higher_btc_price_site, self.clients[self.higher_btc_price_site].btc_balance, self.init_btc[self.higher_btc_price_site])
 
-                    logging.info("[TraderBot]reverse urgent: no arbitrage chance, balance the fund for urgent")
+                    logging.info("[TraderBot]reverse urgent: balance the fund")
                     ktemp = kbid
                     kbid = kask
                     kask = ktemp
@@ -79,7 +82,7 @@ class TraderBot(Observer):
                     logging.debug("[TraderBot]wait for higher")
                     return
             else:
-                if self.clients[self.higher_btc_price_site].btc_balance < 0.3*self.init_btc[self.higher_btc_price_site]:
+                if self.clients[self.higher_btc_price_site].btc_balance < self.stage1_percent*self.init_btc[self.higher_btc_price_site]:
                     logging.info("[TraderBot]Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                     logging.info("[TraderBot]%s fund:%s init:%s", self.higher_btc_price_site, self.clients[self.higher_btc_price_site].btc_balance, self.init_btc[self.higher_btc_price_site])
 
