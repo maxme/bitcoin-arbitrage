@@ -31,7 +31,7 @@ class PrivateOkCoinCNY(Market):
     def _buy(self, amount, price):
         """Create a buy limit order"""
         response = self.okcoin.buy(amount, price)
-        if "error_code" in response:
+        if response and "error_code" in response:
             print(response)
             return False
             raise TradeException(response["error"])
@@ -39,7 +39,7 @@ class PrivateOkCoinCNY(Market):
     def _sell(self, amount, price):
         """Create a sell limit order"""
         response = self.okcoin.sell(amount, price)
-        if "error_code" in response:
+        if response and "error_code" in response:
             print(response)
             return False
             raise TradeException(response["error"])
