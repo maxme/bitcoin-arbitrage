@@ -73,7 +73,11 @@ xmpp_to = "TO@jabber.org"
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 19090
 
+stage0_percent=0.5
+stage1_percent=0.8
+
 ENV = 'local'
+
 
 try:
     from config_local import *
