@@ -31,7 +31,7 @@ class TraderBot(Observer):
         self.higher_btc_price_site = 'HuobiCNY'
 
         self.stage0_percent = 0.2
-        self.stage0_percent = 0.7
+        self.stage1_percent = 0.7
 
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
