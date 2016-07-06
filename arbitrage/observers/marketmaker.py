@@ -65,12 +65,14 @@ class MarketMaker(Observer):
         try:
             bid_price = int(depths[self.exchange]["bids"][0]['price'])
             ask_price =  int(depths[self.exchange]["asks"][0]['price'])
+            bid_amount = (depths[self.exchange]["bids"][0]['amount'])
+            ask_amount=  (depths[self.exchange]["asks"][0]['amount'])
+
             bid1_price = int(depths[self.exchange]["bids"][1]['price'])
             ask1_price =  int(depths[self.exchange]["asks"][1]['price'])
             peer_bid_price = int(depths[self.peer_exchange]["bids"][0]['price'])
             peer_ask_price = int(depths[self.peer_exchange]["asks"][0]['price'])
-            bid_amount = (depths[self.exchange]["bids"][0]['amount'])
-            ask_amount=  (depths[self.exchange]["asks"][0]['amount'])
+
         except  Exception as ex:
             logging.warn("exception depths:%s" % ex)
             traceback.print_exc()
@@ -161,6 +163,16 @@ class MarketMaker(Observer):
 
                         self.cancel_order(kexchange, 'sell', sell_order['id'])
 
+        # if ask_price*(1+2*self.bid_fee_rate) < peer_bid_price:
+        #     logging.warn("eat to buy %s/%s", peer_bid_price, ask_price*(1+self.bid_fee_rate))
+        #     self.new_order(kexchange, 'buy', maker_only=False, amount=ask_amount, price=ask_price)
+        #     return
+
+        # if bid_price*(1+2*self.ask_fee_rate) > peer_ask_price:
+        #     logging.warn("eat to buy %s/%s", peer_ask_price, bid_price*(1+self.ask_fee_rate))
+        #     self.new_order(kexchange, 'sell', maker_only=False, amount= bid_amount,  price=bid_price)
+        #     return
+            
         # excute trade
         if not self.is_buying():
             self.new_order(kexchange, 'buy')
@@ -182,24 +194,31 @@ class MarketMaker(Observer):
         fp.write(("%d") % time +','+("%.2f") % price+','+("%.2f") % cny+','+ str(("%.4f") % btc) +'\n')
         fp.close()
 
-    def new_order(self, kexchange, type):
+    def new_order(self, kexchange, type, maker_only=True, amount=None, price=None):
         if type == 'buy' or type == 'sell':
-            if type == 'buy':
-                price = self.get_buy_price()
-                amount = math.floor((self.cny_balance/price)*10)/10
-            else:
-                price = self.get_sell_price()
-                amount = math.floor(self.btc_balance * 10) / 10
+            if not price or not amount:
+                if type == 'buy':
+                    price = self.get_buy_price()
+                    amount = math.floor((self.cny_balance/price)*10)/10
+                else:
+                    price = self.get_sell_price()
+                    amount = math.floor(self.btc_balance * 10) / 10
             
             amount = min(self.max_tx_volume, amount)
             if amount < self.min_tx_volume:
                 logging.debug('Amount is too low %s %s' % (type, amount))
                 return False
             else:
-                if type == 'buy':
-                    result = self.clients[kexchange].buy_maker(amount, price)
+                if maker_only:                
+                    if type == 'buy':
+                        result = self.clients[kexchange].buy_maker(amount, price)
+                    else:
+                        result = self.clients[kexchange].sell_maker(amount, price)
                 else:
-                    result = self.clients[kexchange].sell_maker(amount, price)
+                    if type == 'buy':
+                        result = self.clients[kexchange].buy(amount, price)
+                    else:
+                        result = self.clients[kexchange].sell(amount, price)
 
             if result == False:
                 logging.warn("%s @%s %f/%f BTC failed" % (type, kexchange, amount, price))
