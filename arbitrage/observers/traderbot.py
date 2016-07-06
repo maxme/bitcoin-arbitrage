@@ -78,7 +78,7 @@ class TraderBot(Observer):
                     logging.debug("[TraderBot]wait for higher")
                     return
             else:
-                if self.clients[self.higher_btc_price_site].btc_balance < self.init_btc[self.higher_btc_price_site]:
+                if self.clients[self.higher_btc_price_site].btc_balance < 0.3*self.init_btc[self.higher_btc_price_site]:
                     logging.info("[TraderBot]Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                     logging.info("[TraderBot]%s fund:%s init:%s", self.higher_btc_price_site, self.clients[self.higher_btc_price_site].btc_balance, self.init_btc[self.higher_btc_price_site])
 
