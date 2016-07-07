@@ -142,7 +142,7 @@ class TraderBot(Observer):
         else:
             self.trend_up = False
 
-        logging.info("trend is %s[%s->%s]", "up" if self.trend_up else "down", self.last_bid_price, buyprice)
+        logging.info("trend is %s[%s->%s]", "up, buy then sell" if self.trend_up else "down, sell then buy", self.last_bid_price, buyprice)
         self.last_bid_price = buyprice
 
         # trade
