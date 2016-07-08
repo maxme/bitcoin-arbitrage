@@ -55,7 +55,7 @@ class MarketMaker(Observer):
         logging.info('Setup complete')
         # time.sleep(2)
 
-    def hedge_order(self, order):
+    def hedge_order(self, order, result):
         pass
 
     def market_maker(self, depths):
@@ -121,9 +121,10 @@ class MarketMaker(Observer):
                     logging.warn("get_order buy #%s failed" % (buy_order['id']))
                     return
 
+                self.hedge_order(buy_order, result)
+
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
                     self.remove_order(buy_order['id'])
-                    self.hedge_order(result)
                 else:
                     current_time = time.time()
                     if (result['price'] != buyprice) and \
@@ -147,9 +148,10 @@ class MarketMaker(Observer):
                     logging.warn("get_order sell #%s failed" % (sell_order['id']))
                     return
 
+                self.hedge_order(sell_order, result)
+
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
                     self.remove_order(sell_order['id'])
-                    self.hedge_order(result)
                 else:
                     current_time = time.time()
                     if (result['price'] != sellprice) and \
@@ -169,7 +171,7 @@ class MarketMaker(Observer):
         #     return
 
         # if bid_price*(1+2*self.ask_fee_rate) > peer_ask_price:
-        #     logging.warn("eat to buy %s/%s", peer_ask_price, bid_price*(1+self.ask_fee_rate))
+        #     logging.warn("eat to sell %s/%s", peer_ask_price, bid_price*(1+self.ask_fee_rate))
         #     self.new_order(kexchange, 'sell', maker_only=False, amount= bid_amount,  price=bid_price)
         #     return
             
@@ -232,6 +234,7 @@ class MarketMaker(Observer):
                         'id': order_id,
                         'price': price,
                         'amount': amount,
+                        'deal_amount':0,
                         'type': type,
                         'time': time.time()
                     }

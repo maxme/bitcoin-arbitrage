@@ -14,6 +14,7 @@ import lib.broker_api as exchange_api
 from observers.emailer import send_email
 import datetime
 import time
+import config
 import traceback
 
 class ArbitrerCLI:
@@ -68,7 +69,11 @@ class ArbitrerCLI:
             print(market)
 
     def get_broker_balance(self, args):
-        last_email_time = 0
+        last_email_time = 0           
+        cny_init = config.cny_init
+        btc_init = config.btc_init
+        price_init = config.price_init
+
         while True:
             try:
                 accounts = exchange_api.exchange_get_account()
@@ -79,17 +84,13 @@ class ArbitrerCLI:
                 time.sleep(3)
                 continue
 
-            cny_init = 4000000
-            btc_init = 800
-            price_init = 4450
-
             if accounts:
                 cny_balance = 0
                 btc_balance = 0
                 cny_frozen = 0
                 btc_frozen = 0
 
-                broker_msg = '----------------------------1803 Hedge Fund statistics------------------------------\n'
+                broker_msg = '\n----------------------------Hedge Fund statistics------------------------------\n'
                 broker_msg += 'datetime\t %s\n\n' % str(datetime.datetime.now())
                 for account in accounts:
                     cny_balance += account.available_cny
@@ -142,7 +143,7 @@ class ArbitrerCLI:
 
                 broker_msg += '\n------------------------------------------------------------------------------------\n'
 
-                print(broker_msg)
+                logging.info(broker_msg)
 
                 if not args.status:
                     send_email('1803 Hedge Fund Statistics', broker_msg)

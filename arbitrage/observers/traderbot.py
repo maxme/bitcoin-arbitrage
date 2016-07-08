@@ -22,7 +22,7 @@ class TraderBot(Observer):
         self.reverse_perc_thresh = config.reverse_perc_thresh
         self.profit_thresh = config.profit_thresh
         self.perc_thresh = config.perc_thresh
-        self.trade_wait = 5 * 1  # in seconds
+        self.trade_wait = 15 * 1  # in seconds
         self.last_trade = 0
         self.init_cny = {'OKCoinCNY':2500000, 'HuobiCNY':2500000}
         self.init_btc = {'OKCoinCNY':250, 'HuobiCNY':250}
@@ -75,6 +75,7 @@ class TraderBot(Observer):
                             % (profit, perc, self.reverse_profit_thresh, self.reverse_perc_thresh))
             
             if self.clients[kbid].btc_balance < self.stage0_percent*self.init_btc[kbid]:
+                return
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                 logging.info("%s fund:%s < %s * init:%s, reverse", kbid, self.clients[kbid].btc_balance, self.stage0_percent, self.init_btc[kbid])
                 ktemp = kbid

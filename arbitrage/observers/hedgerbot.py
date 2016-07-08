@@ -41,18 +41,25 @@ class HedgerBot(MarketMaker):
         logging.info('Setup complete')
         # time.sleep(2)
 
-    def hedge_order(self, order):
-        if order['deal_size'] <= 0:
+    def hedge_order(self, order, result):
+        if result['deal_size'] <= 0:
             logging.debug("[hedger]NOTHING TO BE DEALED.")
             return
 
-        logging.warn("[hedger]: %s", order)
+        logging.warn("[hedger]: %s", result)
 
-        client_id = order['order_id']
-        amount = order['deal_size']
-        price = order['avg_price']
+        client_id = result['order_id']
+        deal_size = result['deal_size']
+        price = result['avg_price']
 
-        hedge_side = 'SELL' if order['side'] =='BUY' else 'BUY'
+        last_deal_amount = order['deal_amount']
+
+        amount = deal_size - last_deal_amount
+        if amount <= 0:
+            logging.debug("[hedger]deal nothing while.")
+            return
+
+        hedge_side = 'SELL' if result['side'] =='BUY' else 'BUY'
         logging.warn('[hedger] %s to broker: %s %s %s', client_id, hedge_side, amount, price)
 
         if hedge_side == 'SELL':
@@ -60,5 +67,8 @@ class HedgerBot(MarketMaker):
         else:
             self.clients[self.hedger].buy(amount, price, client_id)
 
-
+        # update the deal_amount of local order
+        self.remove_order(client_id)
+        order['deal_amount'] = deal_size
+        self.orders.append(order)
         
