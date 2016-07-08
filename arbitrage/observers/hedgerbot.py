@@ -27,8 +27,8 @@ class HedgerBot(MarketMaker):
 
         self.bid_fee_rate = 0.001
         self.ask_fee_rate = 0.001
-        self.bid_price_risk = 1
-        self.ask_price_risk = 1
+        self.bid_price_risk = config.bid_price_risk
+        self.ask_price_risk = config.ask_price_risk
         self.peer_exchange = self.hedger
 
         try:
@@ -48,16 +48,16 @@ class HedgerBot(MarketMaker):
 
         logging.warn("[hedger]: %s", result)
 
-        client_id = result['order_id']
+        order_id = result['order_id']        
         deal_size = result['deal_size']
         price = result['avg_price']
 
-        last_deal_amount = order['deal_amount']
-
-        amount = deal_size - last_deal_amount
+        amount = deal_size - order['deal_amount']
         if amount <= 0:
             logging.debug("[hedger]deal nothing while.")
             return
+
+        client_id = str(order_id) + '-' + str(order['deal_index'])
 
         hedge_side = 'SELL' if result['side'] =='BUY' else 'BUY'
         logging.warn('[hedger] %s to broker: %s %s %s', client_id, hedge_side, amount, price)
@@ -70,5 +70,6 @@ class HedgerBot(MarketMaker):
         # update the deal_amount of local order
         self.remove_order(client_id)
         order['deal_amount'] = deal_size
+        order['deal_index'] +=1
         self.orders.append(order)
         

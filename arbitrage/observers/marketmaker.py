@@ -235,6 +235,7 @@ class MarketMaker(Observer):
                         'price': price,
                         'amount': amount,
                         'deal_amount':0,
+                        'deal_index': 0, 
                         'type': type,
                         'time': time.time()
                     }

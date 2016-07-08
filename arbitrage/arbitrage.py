@@ -146,11 +146,11 @@ class ArbitrerCLI:
                 logging.info(broker_msg)
 
                 if not args.status:
-                    send_email('1803 Hedge Fund Statistics', broker_msg)
+                    send_email('Hedge Fund Statistics', broker_msg)
                     break
                 if  time.time() - last_email_time > 60*10:
                     last_email_time = time.time()
-                    send_email('1803 Hedge Fund Statistics', broker_msg)
+                    send_email('Hedge Fund Statistics', broker_msg)
                 time.sleep(20)
 
     def create_arbitrer(self, args):
