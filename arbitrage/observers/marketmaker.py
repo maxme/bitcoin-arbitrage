@@ -181,9 +181,9 @@ class MarketMaker(Observer):
         #     return
             
         # excute trade
-        if not self.is_buying():
+        if self.buying_len() < config.MAKER_BUY_QUEUE:
             self.new_order(kexchange, 'buy')
-        if not self.is_selling():
+        if self.selling_len() < config.MAKER_SELL_QUEUE:
             self.new_order(kexchange, 'sell')
 
     def update_trade_history(self, time, price, cny, btc):
@@ -205,10 +205,10 @@ class MarketMaker(Observer):
         if type == 'buy' or type == 'sell':
             if not price or not amount:
                 if type == 'buy':
-                    price = self.get_buy_price()
+                    price = self.get_buy_price() - self.buying_len()*config.MAKER_BUY_STAGE
                     amount = math.floor((self.cny_balance/price)*10)/10
                 else:
-                    price = self.get_sell_price()
+                    price = self.get_sell_price() + self.selling_len()*config.MAKER_SELL_STAGE
                     amount = math.floor(self.btc_balance * 10) / 10
             
             amount = min(self.max_tx_volume, amount)
@@ -245,6 +245,9 @@ class MarketMaker(Observer):
                         'time': time.time()
                     }
                     self.orders.append(order)
+                    self.orders.sort(key=lambda x: x['price'], reverse=True if type=='buy' else False)
+                    print("--------------")
+                    print(self.orders)
                     logging.info("submit order %s" % (order))
 
                     return True
@@ -273,6 +276,12 @@ class MarketMaker(Observer):
     def get_orders(self, type):
         orders = [x for x in self.orders if x['type'] == type]
         return orders
+
+    def selling_len(self):
+        return len(self.get_orders('sell'))
+
+    def buying_len(self):
+        return len(self.get_orders('buy'))
 
     def is_selling(self):
         return len(self.get_orders('sell')) > 0
