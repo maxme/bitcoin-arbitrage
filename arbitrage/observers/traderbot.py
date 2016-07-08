@@ -70,7 +70,8 @@ class TraderBot(Observer):
         if profit < self.reverse_profit_thresh and perc < self.reverse_perc_thresh:
             logging.info("Profit or profit percentage(%0.4f/%0.4f) lower than thresholds(%s/%s)" 
                             % (profit, perc, self.reverse_profit_thresh, self.reverse_perc_thresh))
-            
+            arbitrage_max_volume = config.reverse_max_tx_volume
+
             if self.clients[kbid].btc_balance < self.stage0_percent*self.init_btc[kbid]:
                 return
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
@@ -78,8 +79,6 @@ class TraderBot(Observer):
                 ktemp = kbid
                 kbid = kask
                 kask = ktemp
-                arbitrage_max_volume = config.reverse_max_tx_volume
-
             elif self.clients[kask].btc_balance < self.stage1_percent*self.init_btc[kask]:
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                 logging.info("%s fund:%s init:%s, go on", kask, self.clients[kask].btc_balance, self.init_btc[kask])
