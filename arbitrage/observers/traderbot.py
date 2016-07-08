@@ -15,6 +15,7 @@ class TraderBot(Observer):
             # "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
             "OKCoinCNY": okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN),
             "HuobiCNY": huobicny.PrivateHuobiCNY(config.HUOBI_API_KEY, config.HUOBI_SECRET_TOKEN),
+            # "BrokerCNY": brokercny.PrivateBrokerCNY(),
         }
 
         self.reverse_profit_thresh = config.reverse_profit_thresh
@@ -23,6 +24,8 @@ class TraderBot(Observer):
         self.perc_thresh = config.perc_thresh
         self.trade_wait = 15 * 1  # in seconds
         self.last_trade = 0
+
+        self.init_btc = {'OKCoinCNY':500, 'HuobiCNY':500}
 
         self.stage0_percent = config.stage0_percent
         self.stage1_percent = config.stage1_percent
