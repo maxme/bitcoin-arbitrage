@@ -22,7 +22,7 @@ class TraderBot(Observer):
         self.reverse_perc_thresh = config.reverse_perc_thresh
         self.profit_thresh = config.profit_thresh
         self.perc_thresh = config.perc_thresh
-        self.trade_wait = 15 * 1  # in seconds
+        self.trade_wait = config.trade_wait  # in seconds
         self.last_trade = 0
 
         self.init_btc = {'OKCoinCNY':500, 'HuobiCNY':500}

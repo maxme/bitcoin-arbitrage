@@ -53,7 +53,7 @@ class HedgerBot(MarketMaker):
         price = result['avg_price']
 
         amount = deal_size - order['deal_amount']
-        if amount <= 0:
+        if amount <= config.broker_min_amount:
             logging.debug("[hedger]deal nothing while.")
             return
 
