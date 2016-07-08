@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 # Copyright (C) 2016, Phil Song <songbohr@gmail.com>
 
@@ -9,6 +11,24 @@ import logging
 import json
 from concurrent.futures import ThreadPoolExecutor, wait
 import traceback
+
+import re,sys,re
+import string
+import signal
+ 
+def sigint_handler(signum, frame):
+    global is_sigint_up
+    is_sigint_up = True
+    print ('catched interrupt signal!')
+ 
+#
+signal.signal(signal.SIGINT, sigint_handler)
+ 
+#以下那句在windows python2.4不通过,但在freebsd下通过
+signal.signal(signal.SIGHUP, sigint_handler)
+ 
+signal.signal(signal.SIGTERM, sigint_handler)
+is_sigint_up = False
 
 class Arbitrer(object):
     def __init__(self):
@@ -205,6 +225,11 @@ class Arbitrer(object):
         for observer in self.observers:
             observer.end_opportunity_finder()
 
+    def clean_up(self):
+        for observer in self.observers:
+            observer.clean_up()
+            return
+
     def loop(self):
         while True:
             self.depths = self.update_depths()
@@ -212,3 +237,9 @@ class Arbitrer(object):
             self.tickers()
             self.tick()
             time.sleep(config.refresh_rate)
+            
+            if is_sigint_up:
+                # 中断时需要处理的代码
+                self.clean_up()
+                print ("Exit")
+                break

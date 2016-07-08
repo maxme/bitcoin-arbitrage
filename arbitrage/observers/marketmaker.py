@@ -55,6 +55,11 @@ class MarketMaker(Observer):
         logging.info('Setup complete')
         # time.sleep(2)
 
+    def clean_up(self):
+        self.clients[self.exchange].cancel_all()
+
+        logging.info('Clean up complete')
+
     def hedge_order(self, order, result):
         pass
 

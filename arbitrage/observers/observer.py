@@ -2,6 +2,9 @@ import abc
 
 
 class Observer(object, metaclass=abc.ABCMeta):
+    def clean_up(self):
+        pass
+    
     def begin_opportunity_finder(self, depths):
         pass
 
