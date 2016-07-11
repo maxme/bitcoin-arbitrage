@@ -215,39 +215,42 @@ class MarketMaker(Observer):
             if amount < self.min_tx_volume:
                 logging.debug('Amount is too low %s %s' % (type, amount))
                 return False
-            else:
-                if maker_only:                
-                    if type == 'buy':
-                        result = self.clients[kexchange].buy_maker(amount, price)
-                    else:
-                        result = self.clients[kexchange].sell_maker(amount, price)
+            
+            if maker_only:                
+                if type == 'buy':
+                    result = self.clients[kexchange].buy_maker(amount, price)
                 else:
-                    if type == 'buy':
-                        result = self.clients[kexchange].buy(amount, price)
-                    else:
-                        result = self.clients[kexchange].sell(amount, price)
+                    result = self.clients[kexchange].sell_maker(amount, price)
+            else:
+                if type == 'buy':
+                    result = self.clients[kexchange].buy(amount, price)
+                else:
+                    result = self.clients[kexchange].sell(amount, price)
 
-            if result == False:
+            if not result:
                 logging.warn("%s @%s %f/%f BTC failed" % (type, kexchange, amount, price))
-            else:
-                order_id = result['order_id']
-                if order_id == -1:
-                    logging.warn("%s @%s %f/%f BTC failed, %s" % (type, kexchange, amount, price, order_id))
-                else:
-                    order = {
-                        'market': kexchange, 
-                        'id': order_id,
-                        'price': price,
-                        'amount': amount,
-                        'deal_amount':0,
-                        'deal_index': 0, 
-                        'type': type,
-                        'time': time.time()
-                    }
-                    self.orders.append(order)
-                    logging.info("submit order %s" % (order))
+                return False
+            
+            order_id = result['order_id']
+            if order_id == -1:
+                logging.warn("%s @%s %f/%f BTC failed, %s" % (type, kexchange, amount, price, order_id))
+                return False
+            
+            order = {
+                'market': kexchange, 
+                'id': order_id,
+                'price': price,
+                'amount': amount,
+                'deal_amount':0,
+                'deal_index': 0, 
+                'type': type,
+                'time': time.time()
+            }
+            self.orders.append(order)
+            logging.info("submit order %s" % (order))
 
-                    return True
+            return True
+
         return False
         
 

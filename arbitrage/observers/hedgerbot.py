@@ -25,8 +25,8 @@ class HedgerBot(MarketMaker):
             "BrokerCNY": brokercny.PrivateBrokerCNY(),
         }
 
-        self.bid_fee_rate = 0.001
-        self.ask_fee_rate = 0.001
+        self.bid_fee_rate = config.bid_fee_rate
+        self.ask_fee_rate = config.ask_fee_rate
         self.bid_price_risk = config.bid_price_risk
         self.ask_price_risk = config.ask_price_risk
         self.peer_exchange = self.hedger
@@ -92,7 +92,7 @@ class HedgerBot(MarketMaker):
         self.buyprice_spread = set(range(min_buy_price+1, buyprice+1))
         self.sellprice_spread = set(range(sellprice, max_sell_price))
 
-        logging.info("%s/%s", self.sellprice_spread, self.buyprice_spread)
+        logging.debug("%s/%s", self.sellprice_spread, self.buyprice_spread)
 
         self.buyprice = buyprice
         self.sellprice = sellprice
@@ -105,7 +105,7 @@ class HedgerBot(MarketMaker):
             buy_orders = self.get_orders('buy')
             buy_orders.sort(key=lambda x: x['price'], reverse=True)
             buy_prices = [x['price'] for x in buy_orders]
-            logging.info(buy_prices)
+            logging.debug(buy_prices)
 
             for buy_order in buy_orders:
                 logging.debug(buy_order)
@@ -128,7 +128,7 @@ class HedgerBot(MarketMaker):
             sell_orders = self.get_orders('sell')
             sell_orders.sort(key=lambda x: x['price'])
             sell_prices = [x['price'] for x in sell_orders]
-            logging.info(sell_prices)
+            logging.debug(sell_prices)
             for sell_order in self.get_orders('sell'):
                 logging.debug(sell_order)
                 result = self.clients[kexchange].get_order(sell_order['id'])
