@@ -187,8 +187,6 @@ class HedgerBot(MarketMaker):
             logging.debug("[hedger]NOTHING TO BE DEALED.")
             return
 
-        logging.warn("[hedger]: %s", result)
-
         order_id = result['order_id']        
         deal_size = result['deal_size']
         price = result['avg_price']
@@ -200,8 +198,9 @@ class HedgerBot(MarketMaker):
 
         client_id = str(order_id) + '-' + str(order['deal_index'])
 
+        logging.info("[hedger] new deal: %s", result)
         hedge_side = 'SELL' if result['side'] =='BUY' else 'BUY'
-        logging.warn('[hedger] %s to broker: %s %s %s', client_id, hedge_side, amount, price)
+        logging.info('[hedger] %s to broker: %s %s %s', client_id, hedge_side, amount, price)
 
         if hedge_side == 'SELL':
             self.clients[self.hedger].sell(amount, price, client_id)
