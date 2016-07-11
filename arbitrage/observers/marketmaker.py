@@ -205,10 +205,10 @@ class MarketMaker(Observer):
         if type == 'buy' or type == 'sell':
             if not price or not amount:
                 if type == 'buy':
-                    price = self.get_buy_price() - self.buying_len()*config.MAKER_BUY_STAGE
+                    price = self.get_buy_price()
                     amount = math.floor((self.cny_balance/price)*10)/10
                 else:
-                    price = self.get_sell_price() + self.selling_len()*config.MAKER_SELL_STAGE
+                    price = self.get_sell_price()
                     amount = math.floor(self.btc_balance * 10) / 10
             
             amount = min(self.max_tx_volume, amount)
@@ -245,9 +245,6 @@ class MarketMaker(Observer):
                         'time': time.time()
                     }
                     self.orders.append(order)
-                    self.orders.sort(key=lambda x: x['price'], reverse=True if type=='buy' else False)
-                    print("--------------")
-                    print(self.orders)
                     logging.info("submit order %s" % (order))
 
                     return True
@@ -298,9 +295,6 @@ class MarketMaker(Observer):
     def get_spread(self):
         return self.sellprice - self.buyprice
 
-    def update_price(self):
-        pass
-
     def update_balance(self):
         for kclient in self.clients:
             if kclient == self.exchange:
@@ -323,7 +317,7 @@ class MarketMaker(Observer):
             logging.debug("update_balance-->")
             self.update_trade_history(time.time(), self.buyprice, self.cny_total, self.btc_total)
 
-        logging.info("cny_balance=%s/%s, btc_balance=%s/%s, total_cny=%0.2f, total_btc=%0.2f", 
+        logging.debug("cny_balance=%s/%s, btc_balance=%s/%s, total_cny=%0.2f, total_btc=%0.2f", 
             self.cny_balance, self.cny_frozen, self.btc_balance, self.btc_frozen, 
             self.cny_balance_total(self.buyprice), self.btc_balance_total(self.sellprice))
 
