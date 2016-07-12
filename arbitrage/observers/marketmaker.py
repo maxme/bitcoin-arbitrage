@@ -34,8 +34,10 @@ class MarketMaker(Observer):
         self.cny_total = 0
         self.btc_total = 0
 
-        self.max_tx_volume = config.MAKER_MAX_VOLUME
-        self.min_tx_volume = config.MAKER_MIN_VOLUME
+        self.max_maker_volume = config.MAKER_MAX_VOLUME
+        self.min_maker_volume = config.MAKER_MIN_VOLUME
+        self.max_taker_volume = config.TAKER_MAX_VOLUME
+        self.min_taker_volume = config.TAKER_MIN_VOLUME
         self.bid_fee_rate = 0.0005
         self.ask_fee_rate = 0.001
         self.bid_price_risk = 0
@@ -211,10 +213,16 @@ class MarketMaker(Observer):
                     price = self.get_sell_price()
                     amount = math.floor(self.btc_balance * 10) / 10
             
-            amount = min(self.max_tx_volume, amount)
-            if amount < self.min_tx_volume:
-                logging.debug('Amount is too low %s %s' % (type, amount))
-                return False
+            if maker_only:
+                amount = min(self.max_maker_volume, amount)
+                if amount < self.min_maker_volume:
+                    logging.debug('Maker amount is too low %s %s' % (type, amount))
+                    return False
+            else:
+                amount = min(self.max_taker_volume, amount)
+                if amount < self.min_taker_volume:
+                    logging.debug('Taker amount is too low %s %s' % (type, amount))
+                    return False
             
             if maker_only:                
                 if type == 'buy':
@@ -244,6 +252,7 @@ class MarketMaker(Observer):
                 'deal_amount':0,
                 'deal_index': 0, 
                 'type': type,
+                'maker_only': maker_only,
                 'time': time.time()
             }
             self.orders.append(order)

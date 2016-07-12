@@ -80,11 +80,11 @@ class HedgerBot(MarketMaker):
             elif sellprice < ask_price:
                 sellprice +=1
 
-        peer_bid_hedge_price = int(peer_bid_price*(1+self.bid_fee_rate))
-        peer_ask_hedge_price = int(peer_ask_price*(1-self.ask_fee_rate))
+        peer_bid_maker_price = int(peer_bid_price*(1+self.bid_fee_rate))
+        peer_ask_maker_price = int(peer_ask_price*(1-self.ask_fee_rate))
 
-        buyprice=min(buyprice, peer_bid_hedge_price) - self.bid_price_risk
-        sellprice=max(sellprice, peer_ask_hedge_price) + self.ask_price_risk
+        buyprice=min(buyprice, peer_bid_maker_price) - self.bid_price_risk
+        sellprice=max(sellprice, peer_ask_maker_price) + self.ask_price_risk
 
         min_buy_price = buyprice - config.MAKER_BUY_QUEUE*config.MAKER_BUY_STAGE
         max_sell_price = sellprice + config.MAKER_SELL_QUEUE*config.MAKER_SELL_STAGE
@@ -144,22 +144,30 @@ class HedgerBot(MarketMaker):
                 elif (result['price'] not in self.sellprice_spread):
                     logging.info("cancel sellprice %s result['price'] = %s" % (self.sellprice_spread, result['price']))
                     self.cancel_order(kexchange, 'sell', sell_order['id'])
-
-        # if ask_price*(1+2*self.bid_fee_rate) < peer_bid_price:
-        #     logging.warn("eat to buy %s/%s", peer_bid_price, ask_price*(1+self.bid_fee_rate))
-        #     self.new_order(kexchange, 'buy', maker_only=False, amount=ask_amount, price=ask_price)
-        #     return
-
-        # if bid_price*(1+2*self.ask_fee_rate) > peer_ask_price:
-        #     logging.warn("eat to sell %s/%s", peer_ask_price, bid_price*(1+self.ask_fee_rate))
-        #     self.new_order(kexchange, 'sell', maker_only=False, amount= bid_amount,  price=bid_price)
-        #     return
             
-        # excute trade
-        if self.buying_len() < config.MAKER_BUY_QUEUE:
-            self.new_order(kexchange, 'buy')
-        if self.selling_len() < config.MAKER_SELL_QUEUE:
-            self.new_order(kexchange, 'sell')
+        # excute maker trade
+        if config.MAKER_TRADE_ENABLE:
+            if self.buying_len() < config.MAKER_BUY_QUEUE:
+                self.new_order(kexchange, 'buy')
+            if self.selling_len() < config.MAKER_SELL_QUEUE:
+                self.new_order(kexchange, 'sell')
+
+        # excute taker trade
+        if config.TAKER_TRADE_ENABLE:
+            taker_buy_price = peer_bid_price*(1-2*self.bid_fee_rate)
+            taker_sell_price = peer_ask_price*(1+2*self.ask_fee_rate)
+
+            logging.debug("price [%s,%s], peer [%s,%s] taker price:[%s,%s]", ask_price, bid_price, peer_ask_price, peer_bid_price, taker_buy_price, taker_sell_price)
+
+            if ask_price < taker_buy_price:
+                logging.info("to taker buy %s<%s", ask_price, taker_buy_price)
+                self.new_order(kexchange, 'buy', maker_only=False, amount=ask_amount, price=ask_price)
+                return
+
+            if bid_price > taker_sell_price:
+                logging.info("to taker sell %s>%s", bid_price, taker_sell_price)
+                self.new_order(kexchange, 'sell', maker_only=False, amount= bid_amount,  price=bid_price)
+                return
 
     def get_sell_price(self):
         sell_orders = self.get_orders('sell')
@@ -196,11 +204,12 @@ class HedgerBot(MarketMaker):
             logging.debug("[hedger]deal nothing while.")
             return
 
-        client_id = str(order_id) + '-' + str(order['deal_index'])
+        maker_only = order['maker_only']
+        client_id = str(order_id) + '-' + str(order['deal_index'])+('' if maker_only else '-taker')
 
-        logging.info("[hedger] new deal: %s", result)
+        logging.info("hedge new deal: %s", result)
         hedge_side = 'SELL' if result['side'] =='BUY' else 'BUY'
-        logging.info('[hedger] %s to broker: %s %s %s', client_id, hedge_side, amount, price)
+        logging.info('hedge [%s] to broker: %s %s %s', client_id, hedge_side, amount, price)
 
         if hedge_side == 'SELL':
             self.clients[self.hedger].sell(amount, price, client_id)
