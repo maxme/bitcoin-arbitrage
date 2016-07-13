@@ -211,8 +211,8 @@ class TraderBot(BasicBot):
                     logging.warn("Buy @%s %f BTC failed" % (kask, volume))
                     return
                 else:
-                    self.remove_order(result［'order_id'])
-                    
+                    self.remove_order(result['order_id'])
+
                 self.last_trade = time.time()
 
                 result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
@@ -223,10 +223,10 @@ class TraderBot(BasicBot):
                         logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
                         return
                     else:
-                        self.remove_order(result［'order_id'])
+                        self.remove_order(result['order_id'])
                         return
                 else:
-                    self.remove_order(result［'order_id'])
+                    self.remove_order(result['order_id'])
                     return
             else:
 
@@ -235,7 +235,7 @@ class TraderBot(BasicBot):
                     logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
                     return
                 else:
-                    self.remove_order(result［'order_id'])
+                    self.remove_order(result['order_id'])
 
                 self.last_trade = time.time()
 
@@ -247,8 +247,8 @@ class TraderBot(BasicBot):
                         logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
                         return
                     else:
-                        self.remove_order(result［'order_id'])
+                        self.remove_order(result['order_id'])
                         return
                 else:
-                    self.remove_order(result［'order_id'])
+                    self.remove_order(result['order_id'])
                     return
