@@ -57,6 +57,9 @@ reverse_max_tx_volume = 1  # in BTC
 stage0_percent=0.1
 stage1_percent=0.2
 
+ARBITRAGER_BUY_QUEUE = 5
+ARBITRAGER_SELL_QUEUE = 5
+
 broker_min_amount = 0.01
 
 #stata

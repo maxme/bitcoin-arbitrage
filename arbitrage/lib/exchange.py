@@ -45,7 +45,11 @@ class exchange:
                 params['amount'] = amount
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return httpPost(self.url['host'], body, params)
+            r = httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
         if self.role == 'huobi':
             timestamp = int(time.time())
@@ -70,8 +74,7 @@ class exchange:
                 data = r.json()
                 return data
             else:
-                return handle_error('API','API Error')
-            #return requestPost(self.url['host'], payload)
+                return None
 
     def bidMakerOnly(self, amount, price):
         if self.role == 'haobtc' or self.role == 'default':
@@ -105,7 +108,11 @@ class exchange:
                 params['amount'] = amount
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return httpPost(self.url['host'], body, params)
+            r =  httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
         if self.role == 'huobi':
             timestamp = int(time.time())
@@ -130,7 +137,7 @@ class exchange:
                 data = r.json()
                 return data
             else:
-                return handle_error('API','API Error')
+                return None
 
 
     def marketBuy(self, amount):
@@ -152,7 +159,11 @@ class exchange:
                 params['amount'] = amount
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return httpPost(self.url['host'], body, params)
+            r =  httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
         if self.role == 'huobi':
             timestamp = int(time.time())
@@ -173,7 +184,6 @@ class exchange:
                 return data
             else:
                 return None
-            return
 
     def marketSell(self, amount):
         if self.role == 'haobtc' or self.role == 'default':
@@ -194,7 +204,11 @@ class exchange:
                 params['amount'] = amount
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return httpPost(self.url['host'], body, params)
+            r =  httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
         if self.role == 'huobi':
             timestamp = int(time.time())
@@ -215,7 +229,6 @@ class exchange:
                 return data
             else:
                 return None
-            return
 
 
     def cancel(self,id):
@@ -233,7 +246,11 @@ class exchange:
             }
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return httpPost(self.url['host'], body, params)
+            r = httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
         if self.role == 'huobi':
             timestamp = int(time.time())
@@ -307,7 +324,11 @@ class exchange:
             }
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return httpPost(self.url['host'], body, params)
+            r = httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
         if self.role == 'huobi':
             timestamp = int(time.time())
@@ -327,8 +348,6 @@ class exchange:
                 return data
             else:
                 return None
-            return
-
 
     def ordersInfo(self,id=''):
         if self.role == 'haobtc' or self.role == 'default':
@@ -346,12 +365,14 @@ class exchange:
             }
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return httpPost(self.url['host'], body, params)
-
+            r = httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
 
     def orderHistory(self):
-
         if self.role == 'okcoin':
             body = requestBody(self.url['order_history'], self.url['host'])
             params = {
@@ -363,8 +384,11 @@ class exchange:
             }
 
             params['sign'] = buildSign(params,self.secretToken, self.role)
-            return json.loads(httpPost(self.url['host'], body, params))
-
+            r = httpPost(self.url['host'], body, params)
+            if r:
+                return json.loads(r)
+            else:
+                return None
 
     def historyInfo(self,size):
         if self.role == 'haobtc' or self.role == 'default':
@@ -377,7 +401,7 @@ class exchange:
 
 
         if self.role == '':
-            returnsadfgh
+            return
 
 
     def accountInfo(self):
@@ -409,7 +433,7 @@ class exchange:
                 data = r.json()
                 return data
             else:
-                return handle_error('API','API Error')
+                return None
 
     def ticker(self,symbol=''):
 

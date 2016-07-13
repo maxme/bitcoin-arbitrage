@@ -17,11 +17,11 @@ import lib.broker_api as exchange_api
 class PrivateBrokerCNY(Market):
     def __init__(self):
         super().__init__()
+        exchange_api.init_broker()
 
         self.currency = "CNY"
         self.get_info()
         self.client_id = 0
-        exchange_api.init_broker()
 
         self.filename = "broker-clientid.json"
         try:

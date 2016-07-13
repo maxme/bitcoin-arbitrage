@@ -4,18 +4,21 @@ import time
 from .observer import Observer
 from .emailer import send_email
 from fiatconverter import FiatConverter
-from private_markets import bitstampusd,haobtccny,huobicny,okcoincny, brokercny
+from private_markets import huobicny,okcoincny,brokercny
 import os, time
 import sys
 import traceback
+from .basicbot import BasicBot
 
-class TraderBot(Observer):
+class TraderBot(BasicBot):
     def __init__(self):
+        super().__init__()
+
         self.clients = {
             # "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
             "OKCoinCNY": okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN),
             "HuobiCNY": huobicny.PrivateHuobiCNY(config.HUOBI_API_KEY, config.HUOBI_SECRET_TOKEN),
-            # "BrokerCNY": brokercny.PrivateBrokerCNY(),
+            "BrokerCNY": brokercny.PrivateBrokerCNY(),
         }
 
         self.reverse_profit_thresh = config.reverse_profit_thresh
@@ -32,13 +35,15 @@ class TraderBot(Observer):
         self.last_bid_price = 0
         self.trend_up = True
 
-        self.exchange = 'OKCoinCNY'
+        self.hedger = 'BrokerCNY'
 
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
 
         # Update client balance
         self.update_balance()
+
+        # self.check_order()
 
     def update_balance(self):
         for kclient in self.clients:
@@ -57,6 +62,46 @@ class TraderBot(Observer):
 
         return min(min1, min2)
 
+    def check_order(self):
+        # query orders
+        if self.is_buying():
+            buy_orders = self.get_orders('buy')
+            buy_orders.sort(key=lambda x: x['price'], reverse=True)
+
+            for buy_order in buy_orders:
+                logging.debug(buy_order)
+                result = self.clients[buy_order['market']].get_order(buy_order['id'])
+                logging.info (result)
+                if not result:
+                    logging.warn("get_order buy #%s failed" % (buy_order['id']))
+                    return
+
+                if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
+                    self.remove_order(buy_order['id'])
+                elif (result['price'] not in self.buyprice_spread):
+                    logging.info("cancel buyprice %s result['price'] = %s" % (self.buyprice_spread, result['price']))
+                    self.cancel_order(buy_order['market'], 'buy', buy_order['id'])
+
+
+        if self.is_selling():
+            sell_orders = self.get_orders('sell')
+            sell_orders.sort(key=lambda x: x['price'])
+
+            for sell_order in self.get_orders('sell'):
+                logging.debug(sell_order)
+                result = self.clients[sell_order['market']].get_order(sell_order['id'])
+                logging.info (result)
+                if not result:
+                    logging.warn("get_order sell #%s failed" % (sell_order['id']))
+                    return
+
+                if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
+                    self.remove_order(sell_order['id'])
+                elif (result['price'] not in self.sellprice_spread):
+                    logging.info("cancel sellprice %s result['price'] = %s" % (self.sellprice_spread, result['price']))
+                    self.cancel_order(sell_order['market'], 'sell', sell_order['id'])
+            
+
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
                     weighted_buyprice, weighted_sellprice):
         if kask not in self.clients:
@@ -64,6 +109,14 @@ class TraderBot(Observer):
             return
         if kbid not in self.clients:
             logging.warn("Can't automate this trade, client not available: %s" % kbid)
+            return
+
+        if self.buying_len() > config.ARBITRAGER_BUY_QUEUE:
+            logging.warn("Can't automate this trade, BUY queue is full: %s" % self.buying_len())
+            return
+
+        if self.selling_len() > config.ARBITRAGER_SELL_QUEUE:
+            logging.warn("Can't automate this trade, SELL queue is full: %s" % self.selling_len())
             return
 
         arbitrage_max_volume = config.max_tx_volume
@@ -93,7 +146,7 @@ class TraderBot(Observer):
         else:
             logging.debug("Profit or profit percentage(%0.4f/%0.4f) out of scope thresholds(%s~%s/%s~%s)" 
                             % (profit, perc, self.reverse_profit_thresh, self.profit_thresh, self.perc_thresh, self.reverse_perc_thresh))
-            return
+            # return
 
         if perc > 20:  # suspicous profit, added after discovering btc-central may send corrupted order book
             logging.warn("Profit=%f seems malformed" % (perc, ))
@@ -123,11 +176,11 @@ class TraderBot(Observer):
                       weighted_sellprice, buyprice, sellprice):
         volume = float('%0.2f' % volume)
 
-        if self.clients[kask].cny_balance < volume*buyprice*10:
+        if self.clients[kask].cny_balance < max(volume*buyprice*10, 31*buyprice):
             logging.warn("%s cny is insufficent" % kask)
             return
  
-        if self.clients[kbid].btc_balance < volume*10:
+        if self.clients[kbid].btc_balance < max(volume*10, 31):
             logging.warn("%s btc is insufficent" % kbid)
             return
 
@@ -142,37 +195,46 @@ class TraderBot(Observer):
         logging.info("trend is %s[%s->%s]", "up, buy then sell" if self.trend_up else "down, sell then buy", self.last_bid_price, buyprice)
         self.last_bid_price = buyprice
 
+        if self.trend_up:
+            self.clients[self.hedger].buy(volume, buyprice)
+            self.clients[self.hedger].sell(volume, sellprice)
+        else:
+            self.clients[self.hedger].sell(volume, sellprice)
+            self.clients[self.hedger].buy(volume, buyprice)
+
+        return
+
         # trade
         if self.trend_up:
-            result = self.clients[kask].buy(volume, buyprice)
-            if result == False:
+            result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
+            if not result:
                 logging.warn("Buy @%s %f BTC failed" % (kask, volume))
                 return
 
             self.last_trade = time.time()
 
-            result = self.clients[kbid].sell(volume, sellprice)
-            if result == False:
+            result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
+            if not result:
                 logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
-                result = self.clients[kask].sell(volume, buyprice)
-                if result == False:
+                result = self.new_order(kask, 'sell', maker_only=False, amount=volume, price=buyprice)
+                if not result:
                     logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
                     return
                 return
         else:
 
-            result = self.clients[kbid].sell(volume, sellprice)
-            if result == False:
+            result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
+            if not result:
                 logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
                 return
                 
             self.last_trade = time.time()
 
-            result = self.clients[kask].buy(volume, buyprice)
-            if result == False:
+            result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
+            if not result:
                 logging.warn("Buy @%s %f BTC failed" % (kask, volume))
-                result = self.clients[kbid].buy(volume, sellprice)
-                if result == False:
+                result = self.new_order(kbid, 'buy', maker_only=False, amount= volume,  price=sellprice)
+                if not result:
                     logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
                     return
                 return

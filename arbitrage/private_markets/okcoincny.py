@@ -16,39 +16,49 @@ from lib.settings import OKCOIN_API_URL
 import logging
 
 class PrivateOkCoinCNY(Market):
-    okcoin = None
-
     def __init__(self,OKCOIN_API_KEY = None, OKCOIN_SECRET_TOKEN = None):
         super().__init__()
         if OKCOIN_API_KEY == None:
             OKCOIN_API_KEY = config.OKCOIN_API_KEY
             OKCOIN_SECRET_TOKEN = config.OKCOIN_SECRET_TOKEN
-        self.okcoin = exchange(OKCOIN_API_URL, OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN, 'okcoin')
+        self.market = exchange(OKCOIN_API_URL, OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN, 'okcoin')
 
         self.currency = "CNY"
         self.get_info()
 
     def _buy(self, amount, price):
         """Create a buy limit order"""
-        response = self.okcoin.buy(amount, price)
+        response = self.market.buy(amount, price)
         if response and "error_code" in response:
             logging.warn(response)
             return False
-            raise TradeException(response["error"])
-        return response
+        return response['order_id']
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
-        response = self.okcoin.sell(amount, price)
+        response = self.market.sell(amount, price)
         if response and "error_code" in response:
             logging.warn(response)
             return False
-            raise TradeException(response["error"])
+        return response['order_id']
+
+    def _get_order(self, order_id):
+        response = self.market.orderInfo(order_id)
+        if response and "error_code" in response:
+            logging.warn (response)
+            return False
+        return response
+
+    def _cancel_order(self, order_id):
+        response = self.market.cancel(order_id)
+        if response and "error_code" in response:
+            logging.warn (response)
+            return False
         return response
 
     def get_info(self):
         """Get balance"""
-        response = self.okcoin.accountInfo()
+        response = self.market.accountInfo()
         if response:
             if "error_code" in response:
                 logging.warn(response)

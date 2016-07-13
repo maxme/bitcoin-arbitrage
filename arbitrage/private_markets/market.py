@@ -16,6 +16,7 @@ class Market:
         self.btc_frozen = 0.
         self.cny_frozen = 0.
         self.fc = FiatConverter()
+        self.market = None
 
     def __str__(self):
         return "%s: %s" % (self.name, str({"cny_balance": self.cny_balance,

@@ -19,37 +19,50 @@ import config
 import logging
 
 class PrivateHuobiCNY(Market):
-    huobi = None
-
     def __init__(self,HUOBI_API_KEY=None, HUOBI_SECRET_TOKEN=None):
         super().__init__()
         if HUOBI_API_KEY == None:
             HUOBI_API_KEY = config.HUOBI_API_KEY
             HUOBI_SECRET_TOKEN = config.HUOBI_SECRET_TOKEN
-        self.huobi = exchange(HUOBI_API_URL, HUOBI_API_KEY, HUOBI_SECRET_TOKEN, 'huobi')
+        self.market = exchange(HUOBI_API_URL, HUOBI_API_KEY, HUOBI_SECRET_TOKEN, 'huobi')
         self.currency = "CNY"
         self.get_info()
 
     def _buy(self, amount, price):
         """Create a buy limit order"""
-        response = self.huobi.buy(amount, price)
+        response = self.market.buy(amount, price)
         if response and "code" in response:
             logging.warn("buy ex:%s", response)
             return False
-        return response
+        return response['id']
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
-        response = self.huobi.sell(amount, price)
+        response = self.market.sell(amount, price)
         if response and "code" in response:
             logging.warn("sell ex:%s", response)
+            return False
+        return response['id']
+
+
+    def _get_order(self, order_id):
+        response = self.market.orderInfo(order_id)
+        if response and "code" in response:
+            logging.warn (response)
+            return False
+        return response
+
+    def _cancel_order(self, order_id):
+        response = self.market.cancel(order_id)
+        if response and "code" in response:
+            logging.warn (response)
             return False
         return response
 
     def get_info(self):
         """Get balance"""
         try:
-            response = self.huobi.accountInfo()
+            response = self.market.accountInfo()
             if response and "code" in response:
                 logging.warn(response)
                 return False
