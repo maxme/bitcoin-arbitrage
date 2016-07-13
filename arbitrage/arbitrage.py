@@ -74,6 +74,7 @@ class ArbitrerCLI:
         btc_init = config.btc_init
         price_init = config.price_init
 
+        exchange_api.init_broker()
         while True:
             try:
                 accounts = exchange_api.exchange_get_account()
