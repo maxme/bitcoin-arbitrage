@@ -111,13 +111,13 @@ class TraderBot(BasicBot):
             logging.warn("Can't automate this trade, client not available: %s" % kbid)
             return
 
-        if self.buying_len() > config.ARBITRAGER_BUY_QUEUE:
-            logging.warn("Can't automate this trade, BUY queue is full: %s" % self.buying_len())
-            return
+        # if self.buying_len() > config.ARBITRAGER_BUY_QUEUE:
+        #     logging.warn("Can't automate this trade, BUY queue is full: %s" % self.buying_len())
+        #     return
 
-        if self.selling_len() > config.ARBITRAGER_SELL_QUEUE:
-            logging.warn("Can't automate this trade, SELL queue is full: %s" % self.selling_len())
-            return
+        # if self.selling_len() > config.ARBITRAGER_SELL_QUEUE:
+        #     logging.warn("Can't automate this trade, SELL queue is full: %s" % self.selling_len())
+        #     return
 
         arbitrage_max_volume = config.max_tx_volume
         if profit < self.reverse_profit_thresh and perc < self.reverse_perc_thresh:
@@ -210,7 +210,9 @@ class TraderBot(BasicBot):
                 if not result:
                     logging.warn("Buy @%s %f BTC failed" % (kask, volume))
                     return
-
+                else:
+                    self.remove_order(result［'order_id'])
+                    
                 self.last_trade = time.time()
 
                 result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
@@ -220,6 +222,11 @@ class TraderBot(BasicBot):
                     if not result:
                         logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
                         return
+                    else:
+                        self.remove_order(result［'order_id'])
+                        return
+                else:
+                    self.remove_order(result［'order_id'])
                     return
             else:
 
@@ -227,7 +234,9 @@ class TraderBot(BasicBot):
                 if not result:
                     logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
                     return
-                    
+                else:
+                    self.remove_order(result［'order_id'])
+
                 self.last_trade = time.time()
 
                 result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
@@ -237,5 +246,9 @@ class TraderBot(BasicBot):
                     if not result:
                         logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
                         return
+                    else:
+                        self.remove_order(result［'order_id'])
+                        return
+                else:
+                    self.remove_order(result［'order_id'])
                     return
-
