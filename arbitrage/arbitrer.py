@@ -21,13 +21,6 @@ def sigint_handler(signum, frame):
     is_sigint_up = True
     print ('catched interrupt signal!')
  
-#
-signal.signal(signal.SIGINT, sigint_handler)
- 
-#以下那句在windows python2.4不通过,但在freebsd下通过
-signal.signal(signal.SIGHUP, sigint_handler)
- 
-signal.signal(signal.SIGTERM, sigint_handler)
 is_sigint_up = False
 
 class Arbitrer(object):
@@ -38,6 +31,7 @@ class Arbitrer(object):
         self.init_markets(config.markets)
         self.init_observers(config.observers)
         self.threadpool = ThreadPoolExecutor(max_workers=10)
+
 
     def init_markets(self, _markets):
         logging.debug("_markets:%s" % _markets)
@@ -231,6 +225,14 @@ class Arbitrer(object):
             return
 
     def loop(self):
+        #
+        signal.signal(signal.SIGINT, sigint_handler)
+         
+        #以下那句在windows python2.4不通过,但在freebsd下通过
+        signal.signal(signal.SIGHUP, sigint_handler)
+         
+        signal.signal(signal.SIGTERM, sigint_handler)
+
         while True:
             self.depths = self.update_depths()
             # print(self.depths)

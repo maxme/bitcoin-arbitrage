@@ -74,7 +74,7 @@ class ArbitrerCLI:
         btc_init = config.btc_init
         price_init = config.price_init
 
-        while not is_sigint_up:
+        while True:
             try:
                 accounts = exchange_api.exchange_get_account()
                 ticker = exchange_api.exchange_get_ticker()
