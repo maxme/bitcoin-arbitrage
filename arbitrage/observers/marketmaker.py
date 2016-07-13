@@ -171,16 +171,6 @@ class MarketMaker(Observer):
                         logging.info("sellprice %s result['price'] = %s [%s]" % (sellprice, result['price'], result['price'] != sellprice))
 
                         self.cancel_order(kexchange, 'sell', sell_order['id'])
-
-        # if ask_price*(1+2*self.bid_fee_rate) < peer_bid_price:
-        #     logging.warn("eat to buy %s/%s", peer_bid_price, ask_price*(1+self.bid_fee_rate))
-        #     self.new_order(kexchange, 'buy', maker_only=False, amount=ask_amount, price=ask_price)
-        #     return
-
-        # if bid_price*(1+2*self.ask_fee_rate) > peer_ask_price:
-        #     logging.warn("eat to sell %s/%s", peer_ask_price, bid_price*(1+self.ask_fee_rate))
-        #     self.new_order(kexchange, 'sell', maker_only=False, amount= bid_amount,  price=bid_price)
-        #     return
             
         # excute trade
         if self.buying_len() < config.MAKER_BUY_QUEUE:

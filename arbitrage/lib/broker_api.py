@@ -9,13 +9,9 @@ import config
 import logging
 import traceback
 
+client = None 
 
-client = make_client(broker_thrift.TradeService, config.BROKER_HOST, config.BROKER_PORT,
-                         proto_factory=TBinaryProtocolFactory(),
-                         trans_factory=TFramedTransportFactory(),
-                         timeout=60000)  
-
-def re_init():
+def init_broker():
   try:
     global client
     client = make_client(broker_thrift.TradeService, config.BROKER_HOST, config.BROKER_PORT,

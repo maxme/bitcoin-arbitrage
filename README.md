@@ -50,7 +50,11 @@ To use the observer XMPPMessager you will need to install sleekxmpp:
 
     $ pip3 install sleekxmpp
 
-To use the market broker you will need to install thriftpy:
+To use the market broker you will need to install broker service 
+  
+    https://github.com/philsong/bitcoin-broker 
+
+and thriftpy:
 
     $ pip3 install cython thriftpy
 

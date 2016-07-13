@@ -32,24 +32,26 @@ class PrivateOkCoinCNY(Market):
         """Create a buy limit order"""
         response = self.okcoin.buy(amount, price)
         if response and "error_code" in response:
-            print(response)
+            logging.warn(response)
             return False
             raise TradeException(response["error"])
+        return response
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
         response = self.okcoin.sell(amount, price)
         if response and "error_code" in response:
-            print(response)
+            logging.warn(response)
             return False
             raise TradeException(response["error"])
+        return response
 
     def get_info(self):
         """Get balance"""
         response = self.okcoin.accountInfo()
         if response:
             if "error_code" in response:
-                print(response)
+                logging.warn(response)
                 return False
             else:
                 self.btc_balance = float(response['info']['funds']['free']['btc'])

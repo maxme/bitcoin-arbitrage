@@ -36,6 +36,7 @@ class PrivateHuobiCNY(Market):
         if response and "code" in response:
             logging.warn("buy ex:%s", response)
             return False
+        return response
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
@@ -43,13 +44,14 @@ class PrivateHuobiCNY(Market):
         if response and "code" in response:
             logging.warn("sell ex:%s", response)
             return False
+        return response
 
     def get_info(self):
         """Get balance"""
         try:
             response = self.huobi.accountInfo()
             if response and "code" in response:
-                print(response)
+                logging.warn(response)
                 return False
                 raise TradeException(response["message"])
             if response:

@@ -74,13 +74,13 @@ class ArbitrerCLI:
         btc_init = config.btc_init
         price_init = config.price_init
 
-        while True:
+        while not is_sigint_up:
             try:
                 accounts = exchange_api.exchange_get_account()
                 ticker = exchange_api.exchange_get_ticker()
             except Exception as e:
                 traceback.print_exc()
-                exchange_api.re_init()
+                exchange_api.init_broker()
                 time.sleep(3)
                 continue
 

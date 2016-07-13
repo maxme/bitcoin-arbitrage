@@ -21,6 +21,7 @@ class PrivateBrokerCNY(Market):
         self.currency = "CNY"
         self.get_info()
         self.client_id = 0
+        exchange_api.init_broker()
 
         self.filename = "broker-clientid.json"
         try:

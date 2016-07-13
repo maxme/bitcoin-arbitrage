@@ -11,6 +11,7 @@ class BrokerCNY(Market):
     def __init__(self):
         super().__init__('CNY')
         self.update_rate = 1
+        exchange_api.init_broker()
 
     def update_depth(self):
         depth = {}
@@ -19,7 +20,7 @@ class BrokerCNY(Market):
             depth['asks'] = [[ticker.ask, 30]]
             depth['bids'] = [[ticker.bid, 30]]
         except Exception as e:
-            exchange_api.re_init()
+            exchange_api.init_broker()
             return
 
         self.depth = self.format_depth(depth)
