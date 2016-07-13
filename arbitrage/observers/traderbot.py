@@ -195,47 +195,47 @@ class TraderBot(BasicBot):
         logging.info("trend is %s[%s->%s]", "up, buy then sell" if self.trend_up else "down, sell then buy", self.last_bid_price, buyprice)
         self.last_bid_price = buyprice
 
-        if self.trend_up:
-            self.clients[self.hedger].buy(volume, buyprice)
-            self.clients[self.hedger].sell(volume, sellprice)
+        if config.arbitrage_via_broker:
+            if self.trend_up:
+                self.clients[self.hedger].buy(volume, buyprice)
+                self.clients[self.hedger].sell(volume, sellprice)
+            else:
+                self.clients[self.hedger].sell(volume, sellprice)
+                self.clients[self.hedger].buy(volume, buyprice)
+            return
         else:
-            self.clients[self.hedger].sell(volume, sellprice)
-            self.clients[self.hedger].buy(volume, buyprice)
-
-        return
-
-        # trade
-        if self.trend_up:
-            result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
-            if not result:
-                logging.warn("Buy @%s %f BTC failed" % (kask, volume))
-                return
-
-            self.last_trade = time.time()
-
-            result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
-            if not result:
-                logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
-                result = self.new_order(kask, 'sell', maker_only=False, amount=volume, price=buyprice)
+            # trade
+            if self.trend_up:
+                result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
                 if not result:
-                    logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
+                    logging.warn("Buy @%s %f BTC failed" % (kask, volume))
                     return
-                return
-        else:
 
-            result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
-            if not result:
-                logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
-                return
-                
-            self.last_trade = time.time()
+                self.last_trade = time.time()
 
-            result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
-            if not result:
-                logging.warn("Buy @%s %f BTC failed" % (kask, volume))
-                result = self.new_order(kbid, 'buy', maker_only=False, amount= volume,  price=sellprice)
+                result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
                 if not result:
-                    logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
+                    logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
+                    result = self.new_order(kask, 'sell', maker_only=False, amount=volume, price=buyprice)
+                    if not result:
+                        logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
+                        return
                     return
-                return
+            else:
+
+                result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
+                if not result:
+                    logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
+                    return
+                    
+                self.last_trade = time.time()
+
+                result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
+                if not result:
+                    logging.warn("Buy @%s %f BTC failed" % (kask, volume))
+                    result = self.new_order(kbid, 'buy', maker_only=False, amount= volume,  price=sellprice)
+                    if not result:
+                        logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
+                        return
+                    return
 
