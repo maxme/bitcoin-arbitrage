@@ -9,6 +9,8 @@ import os, time
 import sys
 import traceback
 import config
+from .basicbot import BasicBot
+
 
 class MarketMaker(BasicBot):
     exchange = 'HaobtcCNY'
