@@ -146,7 +146,7 @@ class TraderBot(BasicBot):
         else:
             logging.debug("Profit or profit percentage(%0.4f/%0.4f) out of scope thresholds(%s~%s/%s~%s)" 
                             % (profit, perc, self.reverse_profit_thresh, self.profit_thresh, self.perc_thresh, self.reverse_perc_thresh))
-            # return
+            return
 
         if perc > 20:  # suspicous profit, added after discovering btc-central may send corrupted order book
             logging.warn("Profit=%f seems malformed" % (perc, ))
