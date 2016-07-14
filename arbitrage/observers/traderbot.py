@@ -207,13 +207,13 @@ class TraderBot(BasicBot):
                       weighted_sellprice, buyprice, sellprice):
         volume = float('%0.2f' % volume)
 
-        # if self.clients[kask].cny_balance < max(volume*buyprice*10, 31*buyprice):
-        #     logging.warn("%s cny is insufficent" % kask)
-        #     return
+        if self.clients[kask].cny_balance < max(volume*buyprice*10, 31*buyprice):
+            logging.warn("%s cny is insufficent" % kask)
+            return
  
-        # if self.clients[kbid].btc_balance < max(volume*10, 31):
-        #     logging.warn("%s btc is insufficent" % kbid)
-        #     return
+        if self.clients[kbid].btc_balance < max(volume*10, 31):
+            logging.warn("%s btc is insufficent" % kbid)
+            return
 
         logging.info("Fire:Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
 
