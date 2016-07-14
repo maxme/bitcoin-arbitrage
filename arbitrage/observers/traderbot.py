@@ -157,13 +157,13 @@ class TraderBot(BasicBot):
             arbitrage_max_volume = config.reverse_max_tx_volume
 
             if self.clients[kbid].btc_balance < self.stage0_percent*self.init_btc[kbid]:
-                # return
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                 logging.info("%s fund:%s < %s * init:%s, reverse", kbid, self.clients[kbid].btc_balance, self.stage0_percent, self.init_btc[kbid])
                 ktemp = kbid
                 kbid = kask
                 kask = ktemp
             elif self.clients[kask].btc_balance < self.stage1_percent*self.init_btc[kask]:
+                arbitrage_max_volume = 0.5*(config.reverse_max_tx_volume+config.max_tx_volume)
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                 logging.info("%s fund:%s init:%s, go on", kask, self.clients[kask].btc_balance, self.init_btc[kask])
             else:
@@ -172,9 +172,6 @@ class TraderBot(BasicBot):
         elif profit > self.profit_thresh and perc > self.perc_thresh:
             logging.info("Profit or profit percentage(%0.4f/%0.4f) higher than thresholds(%s/%s)" 
                             % (profit, perc, self.profit_thresh, self.perc_thresh))    
-            ktemp = kbid
-            kbid = kask
-            kask = ktemp
             arbitrage_max_volume = config.max_tx_volume
         else:
             logging.debug("Profit or profit percentage(%0.4f/%0.4f) out of scope thresholds(%s~%s/%s~%s)" 
