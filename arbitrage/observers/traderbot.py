@@ -81,7 +81,7 @@ class TraderBot(BasicBot):
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
                     if result['status'] == 'CANCELED':
                         left_amount = result['amount']- result['deal_size']
-                        logging.info("cancel result['price'] = %s, left_amount=%s" % (result['price'], left_amount))
+                        logging.info("cancel ok %s result['price'] = %s, left_amount=%s" % (buy_order['market'], result['price'], left_amount))
 
                         self.clients[self.hedger].buy(left_amount, result['price'])
 
@@ -96,7 +96,7 @@ class TraderBot(BasicBot):
 
                     if abs(result['price']-ask_price) > config.arbitrage_cancel_price_diff:
                         left_amount = result['amount']- result['deal_size']
-                        logging.info("cancel ask_price %s result['price'] = %s, left_amount=%s" % (ask_price, result['price'], left_amount))
+                        logging.info("Fire:cancel %s ask_price %s result['price'] = %s, left_amount=%s" % (buy_order['market'], ask_price, result['price'], left_amount))
                         self.cancel_order(buy_order['market'], 'buy', buy_order['id'])
 
         if self.is_selling():
@@ -114,7 +114,7 @@ class TraderBot(BasicBot):
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
                     if result['status'] == 'CANCELED':
                         left_amount = result['amount']- result['deal_size']
-                        logging.info("cancel result['price'] = %s, left_amount=%s" % (result['price'], left_amount))
+                        logging.info("cancel ok %s result['price'] = %s, left_amount=%s" % (sell_order['market'], result['price'], left_amount))
 
                         self.clients[self.hedger].sell(left_amount, result['price'])
 
@@ -130,7 +130,7 @@ class TraderBot(BasicBot):
                     if abs(result['price']-bid_price) > config.arbitrage_cancel_price_diff:
                         left_amount = result['amount']- result['deal_size']
 
-                        logging.info("cancel bid_price %s result['price'] = %s,left_amount=%s" % (bid_price, result['price'], left_amount))
+                        logging.info("Fire:cancel %s bid_price %s result['price'] = %s,left_amount=%s" % (sell_order['market'], bid_price, result['price'], left_amount))
                         self.cancel_order(sell_order['market'], 'sell', sell_order['id'])
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
@@ -172,7 +172,9 @@ class TraderBot(BasicBot):
         elif profit > self.profit_thresh and perc > self.perc_thresh:
             logging.info("Profit or profit percentage(%0.4f/%0.4f) higher than thresholds(%s/%s)" 
                             % (profit, perc, self.profit_thresh, self.perc_thresh))    
-
+            ktemp = kbid
+            kbid = kask
+            kask = ktemp
             arbitrage_max_volume = config.max_tx_volume
         else:
             logging.debug("Profit or profit percentage(%0.4f/%0.4f) out of scope thresholds(%s~%s/%s~%s)" 

@@ -69,20 +69,33 @@ class PrivateHaobtcCNY(Market):
 
     def _get_order(self, order_id):
         response = self.market.orderInfo(order_id)
-        if response and "code" in response:
-            logging.warn (response)
-            return False
         if not response:
             return response
+            
+        if "code" in response:
+            logging.warn (response)
+            return False
             
         return response
 
     def _cancel_order(self, order_id):
         response = self.market.cancel(order_id)
+
+        if not response:
+            return response
+
         if response and "code" in response:
             logging.warn (response)
             return False
-        return response
+
+        resp_order_id = response['order_id']
+        if resp_order_id == -1:
+            logging.warn("cancel order #%s failed, %s" % (order_id, resp_order_id))
+            return False
+        else:
+            logging.debug("Canceled order #%s ok" % (order_id))
+            return True
+        return True
 
     def _cancel_all(self):
         response = self.market.cancelAll()

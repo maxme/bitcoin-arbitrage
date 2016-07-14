@@ -79,12 +79,15 @@ class PrivateHuobiCNY(Market):
 
     def _cancel_order(self, order_id):
         response = self.market.cancel(order_id)
-        if response and "code" in response:
-            logging.warn (response)
-            return False
+
         if not response:
             return response
-        return response
+        if "code" in response:
+            logging.warn (response)
+            return False
+        if response['result'] == 'success':
+            return True
+        return False
 
     def get_info(self):
         """Get balance"""

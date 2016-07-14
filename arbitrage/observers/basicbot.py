@@ -81,16 +81,9 @@ class BasicBot(Observer):
         result = self.clients[kexchange].cancel_order(order_id)
         if not result:
             logging.warn("cancel %s #%s failed" % (type, order_id))
-            return
-
-        resp_order_id = result['order_id']
-        if resp_order_id == -1:
-            logging.warn("cancel %s #%s failed, %s" % (type, order_id, resp_order_id))
+            return False
         else:
-            logging.info("Canceled order %s #%s ok" % (type, order_id))
             return True
-
-        return False
 
     def remove_order(self, order_id):
         self.orders = [x for x in self.orders if not x['id'] == order_id]
