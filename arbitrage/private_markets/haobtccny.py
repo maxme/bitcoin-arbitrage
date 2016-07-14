@@ -32,6 +32,9 @@ class PrivateHaobtcCNY(Market):
         if response and "code" in response:
             logging.warn (response)
             return False
+        if not response:
+            return response
+
         return response['order_id']
 
     def _sell(self, amount, price):
@@ -40,6 +43,8 @@ class PrivateHaobtcCNY(Market):
         if response and "code" in response:
             logging.warn (response)
             return False
+        if not response:
+            return response
         return response['order_id']
 
     def _buy_maker(self, amount, price):
@@ -47,6 +52,9 @@ class PrivateHaobtcCNY(Market):
         if response and "code" in response:
             logging.warn (response)
             return False
+        if not response:
+            return response
+
         return response['order_id']
 
     def _sell_maker(self, amount, price):
@@ -54,6 +62,9 @@ class PrivateHaobtcCNY(Market):
         if response and "code" in response:
             logging.warn (response)
             return False
+        if not response:
+            return response
+
         return response['order_id']
 
     def _get_order(self, order_id):
@@ -61,6 +72,9 @@ class PrivateHaobtcCNY(Market):
         if response and "code" in response:
             logging.warn (response)
             return False
+        if not response:
+            return response
+            
         return response
 
     def _cancel_order(self, order_id):

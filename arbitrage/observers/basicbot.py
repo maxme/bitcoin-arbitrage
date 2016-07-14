@@ -54,7 +54,6 @@ class BasicBot(Observer):
                 logging.warn("%s @%s %f/%f BTC failed" % (type, kexchange, amount, price))
                 return None
             
-            print(order_id)
             if order_id == -1:
                 logging.warn("%s @%s %f/%f BTC failed, %s" % (type, kexchange, amount, price, order_id))
                 return None

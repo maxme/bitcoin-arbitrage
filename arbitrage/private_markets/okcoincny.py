@@ -32,6 +32,9 @@ class PrivateOkCoinCNY(Market):
         if response and "error_code" in response:
             logging.warn(response)
             return False
+        if not response:
+            return response
+
         return response['order_id']
 
     def _sell(self, amount, price):
@@ -40,20 +43,46 @@ class PrivateOkCoinCNY(Market):
         if response and "error_code" in response:
             logging.warn(response)
             return False
+
+        if not response:
+            return response
+
         return response['order_id']
 
     def _get_order(self, order_id):
         response = self.market.orderInfo(order_id)
+
         if response and "error_code" in response:
             logging.warn (response)
             return False
-        return response
+        if not response:
+            return response
+
+        order = response['orders'][0]
+        resp = {}
+        resp['order_id'] = order['order_id']
+        resp['amount'] = order['amount']
+        resp['price'] = order['price']
+        resp['deal_size'] = order['deal_amount']
+        resp['avg_price'] = order['avg_price']
+
+        status = order['status']
+        if status == -1:
+            resp['status'] = 'CANCELED'
+        elif status == 2:
+            resp['status'] = 'CLOSE'
+        else:
+            resp['status'] = 'OPEN'
+        return resp
 
     def _cancel_order(self, order_id):
         response = self.market.cancel(order_id)
         if response and "error_code" in response:
             logging.warn (response)
             return False
+        if not response:
+            return response
+            
         return response
 
     def get_info(self):

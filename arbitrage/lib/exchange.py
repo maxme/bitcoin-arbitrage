@@ -178,8 +178,8 @@ class exchange:
             params['sign']=sign
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
-            r = requestPost(self.url['host'], params=payload)
-            if  r and r.status_code == 200:
+            r = requests.post("http://"+self.url['host'], params=payload)
+            if r.status_code == 200:
                 data = r.json()
                 return data
             else:
@@ -223,8 +223,8 @@ class exchange:
             params['sign']=sign
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
-            r = requestPost(self.url['host'], params=payload)
-            if r and r.status_code == 200:
+            r = requests.post("http://"+self.url['host'], params=payload)
+            if r.status_code == 200:
                 data = r.json()
                 return data
             else:
@@ -264,37 +264,12 @@ class exchange:
             params['sign']=sign
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
-            r = requestPost(self.url['host'], params=payload)
-            if  r and r.status_code == 200:
+            r = requests.post("http://"+self.url['host'], params=payload)
+            if r.status_code == 200:
                 data = r.json()
                 return data
             else:
                 return None
-
-    def cancelQueue(self , arr):
-        if self.role == 'haobtc' or self.role == 'default':
-            for c in arr:
-                self.cancel(c)
-
-        if self.role == 'okcoin':
-            return
-
-        if self.role == '':
-            return
-
-
-    def cancelList(self, arr):
-        if self.role == 'haobtc' or self.role == 'default':
-            payload = {'api_key':self.apikey,'secret_key':self.secretToken,'cancel_list':batchTradeFormat(arr)}
-            payload = tradeLoad(payload, self.secretToken, self.role)
-            return requestPost(self.url['cancel_list'], payload)
-
-        if self.role == 'okcoin':
-            return
-
-        if self.role == '':
-            return
-
 
     def cancelAll(self):
         if self.role == 'haobtc' or self.role == 'default':
@@ -342,8 +317,8 @@ class exchange:
             params['sign']=sign
             del params['secret_key']
             payload = urllib.parse.urlencode(params)
-            r = requestPost(self.url['host'], params=payload)
-            if  r and r.status_code == 200:
+            r = requests.post("http://"+self.url['host'], params=payload)
+            if r.status_code == 200:
                 data = r.json()
                 return data
             else:

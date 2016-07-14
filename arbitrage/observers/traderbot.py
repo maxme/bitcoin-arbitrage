@@ -43,7 +43,7 @@ class TraderBot(BasicBot):
         # Update client balance
         self.update_balance()
 
-        # self.check_order()
+        self.check_order(depths)
 
     def update_balance(self):
         for kclient in self.clients:
@@ -62,7 +62,9 @@ class TraderBot(BasicBot):
 
         return min(min1, min2)
 
-    def check_order(self):
+    def check_order(self, depths):
+        # update price
+
         # query orders
         if self.is_buying():
             buy_orders = self.get_orders('buy')
@@ -71,17 +73,31 @@ class TraderBot(BasicBot):
             for buy_order in buy_orders:
                 logging.debug(buy_order)
                 result = self.clients[buy_order['market']].get_order(buy_order['id'])
-                logging.info (result)
+                logging.debug (result)
                 if not result:
                     logging.warn("get_order buy #%s failed" % (buy_order['id']))
-                    return
+                    continue
 
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
-                    self.remove_order(buy_order['id'])
-                elif (result['price'] not in self.buyprice_spread):
-                    logging.info("cancel buyprice %s result['price'] = %s" % (self.buyprice_spread, result['price']))
-                    self.cancel_order(buy_order['market'], 'buy', buy_order['id'])
+                    if result['status'] == 'CANCELED':
+                        left_amount = result['amount']- result['deal_size']
+                        logging.info("cancel result['price'] = %s, left_amount=%s" % (result['price'], left_amount))
 
+                        self.clients[self.hedger].buy(left_amount, result['price'])
+
+                    self.remove_order(buy_order['id'])
+                else:
+                    try:
+                        ask_price =  int(depths[buy_order['market']]["asks"][0]['price'])
+                    except  Exception as ex:
+                        logging.warn("exception depths:%s" % ex)
+                        traceback.print_exc()
+                        continue
+
+                    if abs(result['price']-ask_price) > config.arbitrage_cancel_price_diff:
+                        left_amount = result['amount']- result['deal_size']
+                        logging.info("cancel ask_price %s result['price'] = %s, left_amount=%s" % (ask_price, result['price'], left_amount))
+                        self.cancel_order(buy_order['market'], 'buy', buy_order['id'])
 
         if self.is_selling():
             sell_orders = self.get_orders('sell')
@@ -90,17 +106,32 @@ class TraderBot(BasicBot):
             for sell_order in self.get_orders('sell'):
                 logging.debug(sell_order)
                 result = self.clients[sell_order['market']].get_order(sell_order['id'])
-                logging.info (result)
+                logging.debug (result)
                 if not result:
                     logging.warn("get_order sell #%s failed" % (sell_order['id']))
-                    return
+                    continue
 
                 if result['status'] == 'CLOSE' or result['status'] == 'CANCELED':
+                    if result['status'] == 'CANCELED':
+                        left_amount = result['amount']- result['deal_size']
+                        logging.info("cancel result['price'] = %s, left_amount=%s" % (result['price'], left_amount))
+
+                        self.clients[self.hedger].sell(left_amount, result['price'])
+
                     self.remove_order(sell_order['id'])
-                elif (result['price'] not in self.sellprice_spread):
-                    logging.info("cancel sellprice %s result['price'] = %s" % (self.sellprice_spread, result['price']))
-                    self.cancel_order(sell_order['market'], 'sell', sell_order['id'])
-            
+                else:
+                    try:
+                        bid_price = int(depths[sell_order['market']]["bids"][0]['price'])
+                    except  Exception as ex:
+                        logging.warn("exception depths:%s" % ex)
+                        traceback.print_exc()
+                        continue
+
+                    if abs(result['price']-bid_price) > config.arbitrage_cancel_price_diff:
+                        left_amount = result['amount']- result['deal_size']
+
+                        logging.info("cancel bid_price %s result['price'] = %s,left_amount=%s" % (bid_price, result['price'], left_amount))
+                        self.cancel_order(sell_order['market'], 'sell', sell_order['id'])
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
                     weighted_buyprice, weighted_sellprice):
@@ -111,13 +142,13 @@ class TraderBot(BasicBot):
             logging.warn("Can't automate this trade, client not available: %s" % kbid)
             return
 
-        # if self.buying_len() > config.ARBITRAGER_BUY_QUEUE:
-        #     logging.warn("Can't automate this trade, BUY queue is full: %s" % self.buying_len())
-        #     return
+        if self.buying_len() >= config.ARBITRAGER_BUY_QUEUE:
+            logging.warn("Can't automate this trade, BUY queue is full: %s" % self.buying_len())
+            return
 
-        # if self.selling_len() > config.ARBITRAGER_SELL_QUEUE:
-        #     logging.warn("Can't automate this trade, SELL queue is full: %s" % self.selling_len())
-        #     return
+        if self.selling_len() >= config.ARBITRAGER_SELL_QUEUE:
+            logging.warn("Can't automate this trade, SELL queue is full: %s" % self.selling_len())
+            return
 
         arbitrage_max_volume = config.max_tx_volume
         if profit < self.reverse_profit_thresh and perc < self.reverse_perc_thresh:
@@ -126,7 +157,7 @@ class TraderBot(BasicBot):
             arbitrage_max_volume = config.reverse_max_tx_volume
 
             if self.clients[kbid].btc_balance < self.stage0_percent*self.init_btc[kbid]:
-                return
+                # return
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
                 logging.info("%s fund:%s < %s * init:%s, reverse", kbid, self.clients[kbid].btc_balance, self.stage0_percent, self.init_btc[kbid])
                 ktemp = kbid
@@ -176,13 +207,13 @@ class TraderBot(BasicBot):
                       weighted_sellprice, buyprice, sellprice):
         volume = float('%0.2f' % volume)
 
-        if self.clients[kask].cny_balance < max(volume*buyprice*10, 31*buyprice):
-            logging.warn("%s cny is insufficent" % kask)
-            return
+        # if self.clients[kask].cny_balance < max(volume*buyprice*10, 31*buyprice):
+        #     logging.warn("%s cny is insufficent" % kask)
+        #     return
  
-        if self.clients[kbid].btc_balance < max(volume*10, 31):
-            logging.warn("%s btc is insufficent" % kbid)
-            return
+        # if self.clients[kbid].btc_balance < max(volume*10, 31):
+        #     logging.warn("%s btc is insufficent" % kbid)
+        #     return
 
         logging.info("Fire:Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
 
@@ -195,60 +226,37 @@ class TraderBot(BasicBot):
         logging.info("trend is %s[%s->%s]", "up, buy then sell" if self.trend_up else "down, sell then buy", self.last_bid_price, buyprice)
         self.last_bid_price = buyprice
 
-        if config.arbitrage_via_broker:
-            if self.trend_up:
-                self.clients[self.hedger].buy(volume, buyprice)
-                self.clients[self.hedger].sell(volume, sellprice)
-            else:
-                self.clients[self.hedger].sell(volume, sellprice)
-                self.clients[self.hedger].buy(volume, buyprice)
-            return
+        # trade
+        if self.trend_up:
+            result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
+            if not result:
+                logging.warn("Buy @%s %f BTC failed" % (kask, volume))
+                return
+
+            self.last_trade = time.time()
+
+            result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
+            if not result:
+                logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
+                result = self.new_order(kask, 'sell', maker_only=False, amount=volume, price=buyprice)
+                if not result:
+                    logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
+                    return
         else:
-            # trade
-            if self.trend_up:
-                result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
+
+            result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
+            if not result:
+                logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
+                return
+
+            self.last_trade = time.time()
+
+            result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
+            if not result:
+                logging.warn("Buy @%s %f BTC failed" % (kask, volume))
+                result = self.new_order(kbid, 'buy', maker_only=False, amount= volume,  price=sellprice)
                 if not result:
-                    logging.warn("Buy @%s %f BTC failed" % (kask, volume))
+                    logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
                     return
-                else:
-                    self.remove_order(result['id'])
+        return
 
-                self.last_trade = time.time()
-
-                result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
-                if not result:
-                    logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
-                    result = self.new_order(kask, 'sell', maker_only=False, amount=volume, price=buyprice)
-                    if not result:
-                        logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
-                        return
-                    else:
-                        self.remove_order(result['id'])
-                        return
-                else:
-                    self.remove_order(result['id'])
-                    return
-            else:
-
-                result = self.new_order(kbid, 'sell', maker_only=False, amount= volume,  price=sellprice)
-                if not result:
-                    logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
-                    return
-                else:
-                    self.remove_order(result['id'])
-
-                self.last_trade = time.time()
-
-                result = self.new_order(kask, 'buy', maker_only=False, amount=volume, price=buyprice)
-                if not result:
-                    logging.warn("Buy @%s %f BTC failed" % (kask, volume))
-                    result = self.new_order(kbid, 'buy', maker_only=False, amount= volume,  price=sellprice)
-                    if not result:
-                        logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
-                        return
-                    else:
-                        self.remove_order(result['id'])
-                        return
-                else:
-                    self.remove_order(result['id'])
-                    return

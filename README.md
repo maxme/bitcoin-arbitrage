@@ -46,17 +46,17 @@ variants of them, use:
     $ sudo apt-get install python3 python3-pip python-nose
     $ pip3 install requests
 
-To use the observer XMPPMessager you will need to install sleekxmpp:
-
-    $ pip3 install sleekxmpp
-
-To use the market broker you will need to install broker service 
+You need market broker service, please read its README to install then run it. 
   
     https://github.com/philsong/bitcoin-broker 
 
-and thriftpy:
+To connect the broker server you will need to install thriftpy:
 
     $ pip3 install cython thriftpy
+
+To use the observer XMPPMessager you will need to install sleekxmpp:
+
+    $ pip3 install sleekxmpp
 
 # Run
 
