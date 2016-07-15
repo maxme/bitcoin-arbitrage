@@ -179,6 +179,10 @@ class HedgerBot(MarketMaker):
         for x in price_candidate_list:
             return x
 
+        logging.error (sell_orders)
+        logging.error (sell_prices)
+        logging.error (price_candidate_set)
+
     def get_buy_price(self):
         buy_orders = self.get_orders('buy')
         buy_prices = [x['price'] for x in buy_orders]
@@ -189,6 +193,10 @@ class HedgerBot(MarketMaker):
 
         for x in price_candidate_list:
             return x
+
+        logging.error (buy_orders)
+        logging.error (buy_prices)
+        logging.error (price_candidate_set)
 
     def hedge_order(self, order, result):
         if result['deal_size'] <= 0:
