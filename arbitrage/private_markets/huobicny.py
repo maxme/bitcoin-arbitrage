@@ -83,7 +83,7 @@ class PrivateHuobiCNY(Market):
         if not response:
             return response
         if "code" in response:
-            logging.warn ('%s', response)
+            logging.warn ('%s', str(response))
             return False
         if response['result'] == 'success':
             return True
