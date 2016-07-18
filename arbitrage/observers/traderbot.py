@@ -29,6 +29,7 @@ class TraderBot(BasicBot):
         self.last_trade = 0
 
         self.init_btc = {'OKCoinCNY':500, 'HuobiCNY':500}
+        self.init_cny = {'OKCoinCNY':100, 'HuobiCNY':100}
 
         self.stage0_percent = config.stage0_percent
         self.stage1_percent = config.stage1_percent
@@ -156,16 +157,18 @@ class TraderBot(BasicBot):
                             % (profit, perc, self.reverse_profit_thresh, self.reverse_perc_thresh))
             arbitrage_max_volume = config.reverse_max_tx_volume
 
-            if self.clients[kbid].btc_balance < self.stage0_percent*self.init_btc[kbid]:
+            if self.clients[kbid].btc_balance < self.stage0_percent*self.init_btc[kbid] 
+                or self.clients[kbid].cny_balance < self.stage0_percent*self.init_cny[kbid]:
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
-                logging.info("%s fund:%s < %s * init:%s, reverse", kbid, self.clients[kbid].btc_balance, self.stage0_percent, self.init_btc[kbid])
+                logging.info("%s btc:%s < %s * init:%s,cny:%s < %s * init:%s,  reverse", kbid, self.clients[kbid].btc_balance, self.stage0_percent, self.init_btc[kbid], self.clients[kbid].cny_balance, self.stage0_percent*self.init_cny[kbid])
                 ktemp = kbid
                 kbid = kask
                 kask = ktemp
-            elif self.clients[kask].btc_balance < self.stage1_percent*self.init_btc[kask]:
+            elif self.clients[kask].btc_balance < self.stage1_percent*self.init_btc[kask]
+                or self.clients[kask].cny_balance < self.stage1_percent*self.init_cny[kask]:
                 arbitrage_max_volume = 0.5*(config.reverse_max_tx_volume+config.max_tx_volume)
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
-                logging.info("%s fund:%s init:%s, go on", kask, self.clients[kask].btc_balance, self.init_btc[kask])
+                logging.info("%s btc:%s init:%s, cny:%s init:%s, go on", kask, self.clients[kask].btc_balance, self.init_btc[kask],self.clients[kask].cny_balance, self.stage1_percent*self.init_cny[kask])
             else:
                 logging.debug("wait for higher")
                 return
