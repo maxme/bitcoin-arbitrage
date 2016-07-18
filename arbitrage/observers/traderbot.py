@@ -159,14 +159,14 @@ class TraderBot(BasicBot):
 
             if self.clients[kbid].btc_balance < self.stage0_percent*self.init_btc[kbid] or self.clients[kbid].cny_balance < self.stage0_percent*self.init_cny[kbid]:
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
-                logging.info("%s btc:%s < %s * init:%s,cny:%s < %s * init:%s,  reverse", kbid, self.clients[kbid].btc_balance, self.stage0_percent, self.init_btc[kbid], self.clients[kbid].cny_balance, self.stage0_percent*self.init_cny[kbid])
+                logging.info("%s %s btc:%s < %s,cny:%s < %s,  reverse", self.stage0_percent, kbid, self.clients[kbid].btc_balance,  self.stage0_percent*self.init_btc[kbid], self.clients[kbid].cny_balance, self.stage0_percent*self.init_cny[kbid])
                 ktemp = kbid
                 kbid = kask
                 kask = ktemp
             elif self.clients[kask].btc_balance < self.stage1_percent*self.init_btc[kask] or self.clients[kask].cny_balance < self.stage1_percent*self.init_cny[kask]:
                 arbitrage_max_volume = 0.5*(config.reverse_max_tx_volume+config.max_tx_volume)
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" % (kask, buyprice, kbid, sellprice, volume))
-                logging.info("%s btc:%s init:%s, cny:%s init:%s, go on", kask, self.clients[kask].btc_balance, self.init_btc[kask],self.clients[kask].cny_balance, self.stage1_percent*self.init_cny[kask])
+                logging.info("%s %s btc:%s < %s, cny:%s <%s, go on", self.stage1_percent, kask, self.clients[kask].btc_balance, self.stage1_percent*self.init_btc[kask],self.clients[kask].cny_balance, self.stage1_percent*self.init_cny[kask])
             else:
                 logging.debug("wait for higher")
                 return
