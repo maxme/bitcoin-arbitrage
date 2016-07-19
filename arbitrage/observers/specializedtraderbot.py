@@ -2,22 +2,24 @@ import logging
 import config
 import time
 from .observer import Observer
-from private_markets import mtgox
-from private_markets import paymium
+from private_markets import haobtccny,huobicny,okcoincny
+
 from .emailer import send_email
 
 
 class SpecializedTraderBot(Observer):
     def __init__(self):
-        self.mtgox = mtgox.PrivateMtGox()
-        self.btcentral = paymium.PrivatePaymium()
+        self.haobtc = haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN)
+
+        self.okcoin = okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN)
+
         self.clients = {
-            "MtGoxEUR": self.mtgox,
-            "PaymiumEUR": self.btcentral,
+            "HaobtcCNY": self.haobtc,
+            "OkCoinCNY": self.okcoin,
         }
         self.profit_percentage_thresholds = {  # Graph
-            "MtGoxEUR": {"PaymiumEUR": 3.5},
-            "PaymiumEUR": {"MtGoxEUR": 1},
+            "HaobtcCNY": {"OkCoinCNY": 3.5},
+            "OkCoinCNY": {"HaobtcCNY": 1},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0
@@ -33,8 +35,8 @@ class SpecializedTraderBot(Observer):
         # Execute only the best (more profitable)
         self.execute_trade(*self.potential_trades[0][1:])
 
-    def get_min_tradeable_volume(self, buyprice, eur_bal, btc_bal):
-        min1 = float(eur_bal) / ((1. + config.balance_margin) * buyprice)
+    def get_min_tradeable_volume(self, buyprice, cny_bal, btc_bal):
+        min1 = float(cny_bal) / ((1. + config.balance_margin) * buyprice)
         min2 = float(btc_bal) / (1. + config.balance_margin)
         return min(min1, min2) * 0.95
 
@@ -66,12 +68,12 @@ class SpecializedTraderBot(Observer):
 
         # maximum volume transaction with current balances
         max_volume = self.get_min_tradeable_volume(
-            buyprice, self.clients[kask].eur_balance,
+            buyprice, self.clients[kask].cny_balance,
             self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
             logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f" % (volume, config.min_tx_volume))
-            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask, self.clients[kask].eur_balance, kbid, self.clients[kbid].btc_balance))
+            logging.info("Balance on %s: %f CNY - Balance on %s: %f BTC" % (kask, self.clients[kask].cny_balance, kbid, self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()

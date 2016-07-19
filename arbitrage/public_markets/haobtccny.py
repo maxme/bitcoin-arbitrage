@@ -1,17 +1,18 @@
+# Copyright (C) 2016, Philsong <songbohr@gmail.com>
+
 import urllib.request
 import urllib.error
 import urllib.parse
 import json
 from .market import Market
 
-class OKCoin(Market):
-    def __init__(self, currency, code):
-        super().__init__(currency)
-        self.code = code
+class HaobtcCNY(Market):
+    def __init__(self):
+        super().__init__('CNY')
         self.update_rate = 1
 
     def update_depth(self):
-        url = 'https://www.okcoin.cn/api/depth.do?size=10&symbol=' + self.code
+        url = 'https://haobtc.com/exchange/api/v1/depth/?size=50'
         req = urllib.request.Request(url, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",

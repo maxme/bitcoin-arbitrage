@@ -15,7 +15,6 @@ var
 sdist
 develop-eggs
 .installed.cfg
-lib
 lib64
 
 # Installer logs
@@ -39,5 +38,22 @@ nosetests.xml
 
 # Project
 config.py
+config_local.py
+config_*.py
 old/
 tmp/
+local_settings.py
+__pycache__
+.DS_Store
+arbitragerbot.py
+*.csv
+*.dta
+trade_history
+balance_history
+download.sh
+*.log
+*.do
+stata/
+# marketmaker.py
+
+

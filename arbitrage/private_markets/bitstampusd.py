@@ -7,9 +7,6 @@ import hmac
 import urllib.request
 import urllib.parse
 import urllib.error
-import urllib.request
-import urllib.error
-import urllib.parse
 import hashlib
 import sys
 import json
@@ -69,3 +66,8 @@ class PrivateBitstampUSD(Market):
         if response:
             self.btc_balance = float(response["btc_available"])
             self.usd_balance = float(response["usd_available"])
+            self.cny_balance = self.fc.convert(self.usd_balance, "USD", "CNY")
+            # todo:
+            self.btc_frozen = 0.
+            self.cny_frozen = 0.
+            
