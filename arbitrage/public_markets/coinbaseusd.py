@@ -1,4 +1,4 @@
-from ._coinbase import Coinbase
+from arbitrage.public_markets._coinbase import Coinbase
 
 class CoinbaseUSD(Coinbase):
     def __init__(self):

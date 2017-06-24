@@ -1,7 +1,6 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
 import urllib.request
-import sys
 import json
 import logging
 import time
@@ -9,8 +8,10 @@ import time
 
 class FiatConverter:
     __shared_state = {}
-    rate_exchange_url = "http://rate-exchange.appspot.com/currency?from=%s&to=%s"
-    rate_exchange_url_yahoo = "http://download.finance.yahoo.com/d/quotes.csv?s=%s%s=X&f=sl1d1&e=.csv"
+    rate_exchange_url = "http://rate-exchange.appspot.com/" \
+                        "currency?from=%s&to=%s"
+    rate_exchange_url_yahoo = "http://download.finance.yahoo.com/" \
+                              "d/quotes.csv?s=%s%s=X&f=sl1d1&e=.csv"
 
     def __init__(self):
         """USD is used as pivot"""

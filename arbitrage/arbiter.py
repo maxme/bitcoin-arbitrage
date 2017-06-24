@@ -1,48 +1,63 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
-
-import public_markets
-import observers
-import config
+import importlib
 import time
 import logging
-import json
+
 from concurrent.futures import ThreadPoolExecutor, wait
+from arbitrage import config
 
 
-class Arbitrer(object):
+class Arbiter(object):
     def __init__(self):
         self.markets = []
         self.observers = []
         self.depths = {}
         self.init_markets(config.markets)
         self.init_observers(config.observers)
-        self.threadpool = ThreadPoolExecutor(max_workers=10)
+        self.thread_pool = ThreadPoolExecutor(max_workers=10)
+        self.market_names = []
+        self.observer_names = []
 
     def init_markets(self, markets):
+        """Load python modules from arbitrage.public_markets package"""
+
+        if self.markets:
+            return
+
         self.market_names = markets
         for market_name in markets:
-            try:
-                exec('import public_markets.' + market_name.lower())
-                market = eval('public_markets.' + market_name.lower() + '.' +
-                              market_name + '()')
-                self.markets.append(market)
-            except (ImportError, AttributeError) as e:
-                print("%s market name is invalid: Ignored (you should check your config file)" % (market_name))
+            module_name = 'arbitrage.public_markets.%s' % market_name.lower()
+            module = importlib.import_module(module_name)
+            market = getattr(module, market_name, None)
+            if not market:
+                logging.error('Failed to import %s market. Please check your '
+                              'config file', market_name)
+            else:
+                self.markets.append(market())
+
+        logging.info('All markets modules was successfully loaded')
 
     def init_observers(self, _observers):
+        """Load python modules from arbitrage.observers package"""
+
+        if self.observers:
+            return
+
         self.observer_names = _observers
-        for observer_name in _observers:
-            try:
-                exec('import observers.' + observer_name.lower())
-                observer = eval('observers.' + observer_name.lower() + '.' +
-                                observer_name + '()')
-                self.observers.append(observer)
-            except (ImportError, AttributeError) as e:
-                print("%s observer name is invalid: Ignored (you should check your config file)" % (observer_name))
+        for observer_name in self.observer_names:
+            module_name = 'arbitrage.observers.%s' % observer_name.lower()
+            module = importlib.import_module(module_name)
+            observer = getattr(module, observer_name, None)
+            if not observer:
+                logging.error('Failed to import %s market. Please check your '
+                              'config file', observer_name)
+            else:
+                self.observers.append(observer())
+        logging.info('All observers modules was successfully loaded')
 
     def get_profit_for(self, mi, mj, kask, kbid):
         if self.depths[kask]["asks"][mi]["price"] \
-           >= self.depths[kbid]["bids"][mj]["price"]:
+                >= self.depths[kbid]["bids"][mj]["price"]:
             return 0, 0, 0, 0
 
         max_amount_buy = 0
@@ -58,7 +73,7 @@ class Arbitrer(object):
         for i in range(mi + 1):
             price = self.depths[kask]["asks"][i]["price"]
             amount = min(max_amount, buy_total + self.depths[
-                         kask]["asks"][i]["amount"]) - buy_total
+                kask]["asks"][i]["amount"]) - buy_total
             if amount <= 0:
                 break
             buy_total += amount
@@ -73,7 +88,7 @@ class Arbitrer(object):
         for j in range(mj + 1):
             price = self.depths[kbid]["bids"][j]["price"]
             amount = min(max_amount, sell_total + self.depths[
-                         kbid]["bids"][j]["amount"]) - sell_total
+                kbid]["bids"][j]["amount"]) - sell_total
             if amount < 0:
                 break
             sell_total += amount
@@ -89,17 +104,17 @@ class Arbitrer(object):
     def get_max_depth(self, kask, kbid):
         i = 0
         if len(self.depths[kbid]["bids"]) != 0 and \
-           len(self.depths[kask]["asks"]) != 0:
+                        len(self.depths[kask]["asks"]) != 0:
             while self.depths[kask]["asks"][i]["price"] \
-                  < self.depths[kbid]["bids"][0]["price"]:
+                    < self.depths[kbid]["bids"][0]["price"]:
                 if i >= len(self.depths[kask]["asks"]) - 1:
                     break
                 i += 1
         j = 0
         if len(self.depths[kask]["asks"]) != 0 and \
-           len(self.depths[kbid]["bids"]) != 0:
+                        len(self.depths[kbid]["bids"]) != 0:
             while self.depths[kask]["asks"][0]["price"] \
-                  < self.depths[kbid]["bids"][j]["price"]:
+                    < self.depths[kbid]["bids"][j]["price"]:
                 if j >= len(self.depths[kbid]["bids"]) - 1:
                     break
                 j += 1
@@ -128,8 +143,8 @@ class Arbitrer(object):
 
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
         perc = (bid["price"] - ask["price"]) / bid["price"] * 100
-        profit, volume, buyprice, sellprice, weighted_buyprice,\
-            weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
+        profit, volume, buyprice, sellprice, weighted_buyprice, \
+        weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
         if volume == 0 or buyprice == 0:
             return
         perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
@@ -145,20 +160,20 @@ class Arbitrer(object):
         depths = {}
         futures = []
         for market in self.markets:
-            futures.append(self.threadpool.submit(self.__get_market_depth,
-                                                  market, depths))
+            futures.append(self.thread_pool.submit(self.__get_market_depth,
+                                                   market, depths))
         wait(futures, timeout=20)
         return depths
 
     def tickers(self):
         for market in self.markets:
-            logging.verbose("ticker: " + market.name + " - " + str(
-                market.get_ticker()))
+            ticker = market.get_ticker()
+            msg = "ticker: %s - %s " % (market.name, str(ticker))
+            logging.debug(msg)
 
     def replay_history(self, directory):
         import os
         import json
-        import pprint
         files = os.listdir(directory)
         files.sort()
         for f in files:
@@ -180,11 +195,14 @@ class Arbitrer(object):
                 market1 = self.depths[kmarket1]
                 market2 = self.depths[kmarket2]
                 if market1["asks"] and market2["bids"] \
-                   and len(market1["asks"]) > 0 and len(market2["bids"]) > 0:
+                        and len(market1["asks"]) > 0 and len(
+                    market2["bids"]) > 0:
                     if float(market1["asks"][0]['price']) \
-                       < float(market2["bids"][0]['price']):
-                        self.arbitrage_opportunity(kmarket1, market1["asks"][0],
-                                                   kmarket2, market2["bids"][0])
+                            < float(market2["bids"][0]['price']):
+                        self.arbitrage_opportunity(kmarket1,
+                                                   market1["asks"][0],
+                                                   kmarket2,
+                                                   market2["bids"][0])
 
         for observer in self.observers:
             observer.end_opportunity_finder()

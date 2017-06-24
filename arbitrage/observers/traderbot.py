@@ -1,9 +1,10 @@
 import logging
-import config
 import time
-from .observer import Observer
-from .emailer import send_email
-from fiatconverter import FiatConverter
+
+from arbitrage.fiatconverter import FiatConverter
+from arbitrage.observers.observer import Observer
+from arbitrage.observers.emailer import send_email
+from arbitrage import config
 
 
 class TraderBot(Observer):
@@ -36,14 +37,16 @@ class TraderBot(Observer):
         for kclient in self.clients:
             self.clients[kclient].get_info()
 
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
+    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid,
+                    perc,
                     weighted_buyprice, weighted_sellprice):
         if profit < config.profit_thresh or perc < config.perc_thresh:
-            logging.verbose("[TraderBot] Profit or profit percentage lower than"+
-                            " thresholds")
+            logging.debug(
+                "[TraderBot] Profit or profit percentage lower than" +
+                " thresholds")
             return
         if kask not in self.clients:
-            logging.warn("[TraderBot] Can't automate this trade, client not "+
+            logging.warn("[TraderBot] Can't automate this trade, client not " +
                          "available: %s" % kask)
             return
         if kbid not in self.clients:
@@ -55,12 +58,15 @@ class TraderBot(Observer):
         # Update client balance
         self.update_balance()
         max_volume = self.get_min_tradeable_volume(buyprice,
-                                                   self.clients[kask].usd_balance,
-                                                   self.clients[kbid].btc_balance)
+                                                   self.clients[
+                                                       kask].usd_balance,
+                                                   self.clients[
+                                                       kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction"+
-                         " not reached %f/%f" % (volume, config.min_tx_volume))
+            logging.warn(
+                "Can't automate this trade, minimum volume transaction" +
+                " not reached %f/%f" % (volume, config.min_tx_volume))
             logging.warn("Balance on %s: %f USD - Balance on %s: %f BTC"
                          % (kask, self.clients[kask].usd_balance, kbid,
                             self.clients[kbid].btc_balance))

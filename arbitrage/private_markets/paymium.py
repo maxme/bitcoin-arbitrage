@@ -1,15 +1,12 @@
 from .market import Market
 import time
 import base64
-import hmac
 import urllib.request
 import urllib.parse
 import urllib.error
 import urllib.request
 import urllib.error
 import urllib.parse
-import hashlib
-import sys
 import json
 import config
 

@@ -49,3 +49,8 @@ smtp_to = 'FIXME'
 xmpp_jid = "FROM@jabber.org"
 xmpp_password = "FIXME"
 xmpp_to = "TO@jabber.org"
+
+
+### AMQP
+amqp_url = 'amqp://guest:guest@localhost:5672/'
+report_queue = 'arbitrage_watcher'

@@ -1,10 +1,12 @@
 import logging
-import config
 import time
-from .observer import Observer
-from private_markets import mtgox
-from private_markets import paymium
-from .emailer import send_email
+
+from arbitrage.observers.observer import Observer
+from arbitrage.observers.emailer import send_email
+from arbitrage import config
+
+from arbitrage.private_markets import mtgox
+from arbitrage.private_markets import paymium
 
 
 class SpecializedTraderBot(Observer):
@@ -42,7 +44,8 @@ class SpecializedTraderBot(Observer):
         for kclient in self.clients:
             self.clients[kclient].get_info()
 
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
+    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid,
+                    perc,
                     weighted_buyprice, weighted_sellprice):
         if kask not in self.clients:
             logging.warn(
@@ -53,12 +56,16 @@ class SpecializedTraderBot(Observer):
                 "Can't automate this trade, client not available: %s" % (kbid))
             return
         if perc < self.profit_percentage_thresholds[kask][kbid]:
-            logging.warn("Can't automate this trade, profit=%f is lower than defined threshold %f"
-                         % (perc, self.profit_percentage_thresholds[kask][kbid]))
+            logging.warn(
+                "Can't automate this trade, profit=%f is lower than defined"
+                " threshold %f"
+                % (perc, self.profit_percentage_thresholds[kask][kbid]))
             return
 
-        if perc > 20:  # suspicous profit, added after discovering btc-central may send corrupted order book
-            logging.warn("Profit=%f seems malformed" % (perc, ))
+        # suspicous profit, added after discovering btc-central may send
+        # corrupted order book
+        if perc > 20:
+            logging.warn("Profit=%f seems malformed" % (perc,))
             return
 
         # Update client balance
@@ -70,23 +77,31 @@ class SpecializedTraderBot(Observer):
             self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f" % (volume, config.min_tx_volume))
-            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask, self.clients[kask].eur_balance, kbid, self.clients[kbid].btc_balance))
+            logging.warn(
+                "Can't automate this trade, minimum volume transaction not"
+                " reached %f/%f" % (volume, config.min_tx_volume))
+            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (
+                kask, self.clients[kask].eur_balance, kbid,
+                self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
-            logging.warn("Can't automate this trade, last trade occured %s seconds ago"
-                         % (current_time - self.last_trade))
+            logging.warn(
+                "Can't automate this trade, last trade occured %s seconds ago"
+                % (current_time - self.last_trade))
             return
 
-        self.potential_trades.append([profit, volume, kask, kbid, weighted_buyprice,
-                                      weighted_sellprice])
+        self.potential_trades.append(
+            [profit, volume, kask, kbid, weighted_buyprice,
+             weighted_sellprice])
 
-    def execute_trade(self, volume, kask, kbid, weighted_buyprice, weighted_sellprice):
+    def execute_trade(self, volume, kask, kbid, weighted_buyprice,
+                      weighted_sellprice):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
         send_email("Bought @%s %f BTC and sold @%s" % (kask, volume, kbid),
-                   "weighted_buyprice=%f weighted_sellprice=%f" % (weighted_buyprice, weighted_sellprice))
+                   "weighted_buyprice=%f weighted_sellprice=%f" % (
+                       weighted_buyprice, weighted_sellprice))
         self.clients[kask].buy(volume)
         self.clients[kbid].sell(volume)

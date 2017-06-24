@@ -13,9 +13,17 @@ setup(name='bitcoin-arbitrage',
       version='0.1',
       description='Bitcoin arbitrage opportunity watcher',
       author='Maxime Biais',
+      install_requires=[
+          "sleekxmpp", 'tenacity', 'pika'
+      ],
+      entry_points={
+          'console_scripts': [
+              'arbitrage = arbitrage.cli:main'
+          ]
+      },
       author_email='maxime.biais@gmail.com',
       url='https://github.com/maxme/bitcoin-arbitrage',
       arbitrage=['bin/bitcoin-arbitrage'],
       test_suite='nose.collector',
       tests_require=['nose'],
-  )
+      )

@@ -1,7 +1,8 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
 import logging
-from fiatconverter import FiatConverter
+
+from arbitrage.fiatconverter import FiatConverter
 
 class TradeException(Exception):
     pass
