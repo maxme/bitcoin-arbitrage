@@ -11,7 +11,7 @@ class Coinbase(Market):
         self.update_rate = 30
 
     def update_depth(self):
-        url = 'https://api.exchange.coinbase.com/products/%s/book?level=2' % self.code
+        url = 'https://api.gdax.com/products/%s/book?level=2' % self.code
         req = urllib.request.Request(url, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",
