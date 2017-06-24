@@ -3,7 +3,7 @@
 import json
 import logging
 import importlib
-
+import time
 import tenacity
 import pika
 from pika.exceptions import AMQPError
@@ -88,7 +88,7 @@ class Rabbitmq(Observer):
             'kbid': kbid,
             'perc': perc,
             'weighted_buy_price': weighted_buyprice,
-            'weighted_sell_price': weighted_sellprice
+            'weighted_sell_price': weighted_sellprice,
+            'timestamp': time.time()
         }
-
         self.client.push(message)
