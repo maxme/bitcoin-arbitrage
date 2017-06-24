@@ -1,16 +1,6 @@
 markets = [
-"BitfinexUSD",
-"BitstampUSD",
-"BTCCCNY",
-"BtceEUR",
-"BtceUSD",
-"CampBXUSD",
-"CoinbaseUSD",
-"GeminiUSD",
-"KrakenEUR",
-"KrakenUSD",
-"OKCoinCNY",
-"PaymiumEUR",
+  "BTCC",
+  "HUOBI"
 ]
 
 # observers if any
@@ -24,12 +14,13 @@ refresh_rate = 20
 #### Trader Bot Config
 # Access to Private APIs
 
-paymium_username = "FIXME"
-paymium_password = "FIXME"
-paymium_address = "FIXME"  # to deposit btc from markets / wallets
+btcc_username = "FIXME"
+btcc_password = "FIXME"
+btcc_address = "FIXME"  # to deposit btc from markets / wallets
 
-bitstamp_username = "FIXME"
-bitstamp_password = "FIXME"
+huobi_username = "FIXME"
+huobi_password = "FIXME"
+huobi_address = "FIXME"  # to deposit btc from markets / wallets
 
 # SafeGuards
 max_tx_volume = 10  # in BTC
