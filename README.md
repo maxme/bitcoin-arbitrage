@@ -33,20 +33,17 @@ Donation are always welcome: **1MaximevzHUTMykWG3RK88BzevbtYCJoqq**
 Then edit config.py file to setup your preferences: watched markets
 and observers
 
-You need Python3 to run this program. To install on Debian, Ubuntu, or
-variants of them, use:
+You need Python 3+ to run this program. To install on Debian, Ubuntu, or
+variants of them, use the following commands:
 
-    $ sudo apt-get install python3 python3-pip python-nose
-
-To use the observer XMPPMessager you will need to install sleekxmpp:
-
-    $ pip3 install sleekxmpp
+    $ cd ./bitcoin-arbitrage
+    $ pip install .
 
 # Run
 
 To run the opportunity watcher:
 
-    $ python3 arbitrage/arbitrage.py
+    $ arbitrage
     2013-03-12 03:52:14,341 [INFO] profit: 30.539722 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 29.4670 (Bitcoin24EUR) ~10.41%
     2013-03-12 03:52:14,356 [INFO] profit: 66.283642 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (PaymiumEUR) ~22.59%
     2013-03-12 03:52:14,357 [INFO] profit: 31.811390 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (IntersangoEUR) ~10.84%
@@ -54,8 +51,8 @@ To run the opportunity watcher:
 
 To check your balance on an exchange (also a good way to check your accounts configuration):
 
-    $ python3 arbitrage.py -m MtGoxEUR get-balance
-    $ python3 arbitrage.py -m MtGoxEUR,MtGoxUSD,BitstampUSD get-balance
+    $ arbitrage -m MtGoxEUR get-balance
+    $ arbitrage -m MtGoxEUR,MtGoxUSD,BitstampUSD get-balance
 
 Run tests
 
@@ -64,9 +61,9 @@ Run tests
 ## Alternative usage
 
 * List supported public markets:
-      $ python3 arbitrage.py list-public-markets
+      $ arbitrage list-public-markets
 * Help
-      $ python3 arbitrage.py -h
+      $ arbitrage -h
 
 # TODO
 

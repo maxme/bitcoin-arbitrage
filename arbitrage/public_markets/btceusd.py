@@ -2,7 +2,8 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import json
-from .market import Market
+
+from arbitrage.public_markets.market import Market
 
 
 class BtceUSD(Market):
@@ -11,7 +12,7 @@ class BtceUSD(Market):
         self.update_rate = 60
 
     def update_depth(self):
-        url = 'https://btc-e.com/api/2/btc_usd/depth'
+        url = 'https://btc-e.nz/api/2/btc_usd/depth'
         req = urllib.request.Request(url, None, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",

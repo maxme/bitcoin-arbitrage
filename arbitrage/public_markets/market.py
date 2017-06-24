@@ -2,11 +2,11 @@ import time
 import urllib.request
 import urllib.error
 import urllib.parse
-import config
 import logging
-import sys
-from fiatconverter import FiatConverter
-from utils import log_exception
+
+from arbitrage.fiatconverter import FiatConverter
+from arbitrage.utils import log_exception
+from arbitrage import config
 
 class Market(object):
     def __init__(self, currency):
@@ -33,7 +33,8 @@ class Market(object):
             return
         for direction in ("asks", "bids"):
             for order in self.depth[direction]:
-                order["price"] = self.fc.convert(order["price"], self.currency, "USD")
+                order["price"] = self.fc.convert(order["price"], self.currency,
+                                                 "USD")
 
     def ask_update_depth(self):
         try:

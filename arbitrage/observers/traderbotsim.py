@@ -1,5 +1,5 @@
 import logging
-from .traderbot import TraderBot
+from arbitrage.observers.traderbot import TraderBot
 import json
 
 

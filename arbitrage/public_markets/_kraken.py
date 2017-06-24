@@ -2,7 +2,8 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import json
-from .market import Market
+from arbitrage.public_markets.market import Market
+
 
 class Kraken(Market):
     def __init__(self, currency, code):

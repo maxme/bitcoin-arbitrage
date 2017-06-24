@@ -1,8 +1,6 @@
-import sys
-sys.path.append('../')
 import unittest
 
-import arbitrage
+from arbitrage import arbiter
 
 depths1 = {
     'PaymiumEUR':
@@ -51,7 +49,7 @@ depths3 = {
 
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
-        self.arbitrer = arbitrage.Arbitrer()
+        self.arbitrer = arbiter.Arbiter()
 
     def test_getprofit1(self):
         self.arbitrer.depths = depths2
