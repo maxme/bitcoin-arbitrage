@@ -9,23 +9,17 @@ import inspect
 
 from arbitrage import public_markets
 from arbitrage.arbiter import Arbiter
+from arbitrage import config
 
 
 class ArbiterCLI:
-    def __init__(self):
-        self.inject_verbose_info()
-
-    def inject_verbose_info(self):
-        logging.VERBOSE = 15
-        logging.verbose = lambda x: logging.log(logging.VERBOSE, x)
-        logging.addLevelName(logging.VERBOSE, "VERBOSE")
 
     def exec_command(self, args):
         if "watch" in args.command:
-            self.create_arbitrer(args)
+            self.create_arbiter(args)
             self.arbiter.loop()
         if "replay-history" in args.command:
-            self.create_arbitrer(args)
+            self.create_arbiter(args)
             self.arbiter.replay_history(args.replay_history)
         if "get-balance" in args.command:
             self.get_balance(args)
@@ -60,17 +54,17 @@ class ArbiterCLI:
         for market in pmarketsi:
             print(market)
 
-    def create_arbitrer(self, args):
-        self.arbiter = Arbiter()
+    def create_arbiter(self, args):
         if args.observers:
-            self.arbiter.init_observers(args.observers.split(","))
+            given = args.observers.split(",")
+            config.observers = list(set(config.observers) | set(given))
         if args.markets:
-            self.arbiter.init_markets(args.markets.split(","))
+            given = args.markets.split(",")
+            config.markets = list(set(config.markets) | set(given))
+        self.arbiter = Arbiter()
 
     def init_logger(self, args):
         level = logging.INFO
-        if args.verbose:
-            level = logging.VERBOSE
         if args.debug:
             level = logging.DEBUG
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
@@ -79,8 +73,6 @@ class ArbiterCLI:
     def main(self):
         parser = argparse.ArgumentParser()
         parser.add_argument("-d", "--debug", help="debug verbose mode",
-                            action="store_true")
-        parser.add_argument("-v", "--verbose", help="info verbose mode",
                             action="store_true")
         parser.add_argument("-o", "--observers", type=str,
                             help="observers, example: -oLogger,Emailer")

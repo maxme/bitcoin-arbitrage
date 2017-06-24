@@ -21,6 +21,9 @@ class Arbiter(object):
     def init_markets(self, markets):
         """Load python modules from arbitrage.public_markets package"""
 
+        if self.markets:
+            return
+
         self.market_names = markets
         for market_name in markets:
             module_name = 'arbitrage.public_markets.%s' % market_name.lower()
@@ -36,6 +39,9 @@ class Arbiter(object):
 
     def init_observers(self, _observers):
         """Load python modules from arbitrage.observers package"""
+
+        if self.observers:
+            return
 
         self.observer_names = _observers
         for observer_name in self.observer_names:
@@ -161,8 +167,9 @@ class Arbiter(object):
 
     def tickers(self):
         for market in self.markets:
-            logging.verbose("ticker: " + market.name + " - " + str(
-                market.get_ticker()))
+            ticker = market.get_ticker()
+            msg = "ticker: %s - %s " % (market.name, str(ticker))
+            logging.debug(msg)
 
     def replay_history(self, directory):
         import os

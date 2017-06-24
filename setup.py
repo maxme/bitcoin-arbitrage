@@ -14,7 +14,7 @@ setup(name='bitcoin-arbitrage',
       description='Bitcoin arbitrage opportunity watcher',
       author='Maxime Biais',
       install_requires=[
-          "sleekxmpp"
+          "sleekxmpp", 'tenacity', 'pika'
       ],
       entry_points={
           'console_scripts': [

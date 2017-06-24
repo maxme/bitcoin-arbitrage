@@ -41,7 +41,7 @@ class TraderBot(Observer):
                     perc,
                     weighted_buyprice, weighted_sellprice):
         if profit < config.profit_thresh or perc < config.perc_thresh:
-            logging.verbose(
+            logging.debug(
                 "[TraderBot] Profit or profit percentage lower than" +
                 " thresholds")
             return
