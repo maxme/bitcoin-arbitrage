@@ -2,28 +2,23 @@
 
 import json
 import logging
-import importlib
 import time
+
 import tenacity
 import pika
+
 from pika.exceptions import AMQPError
 from tenacity import stop_after_delay, wait_exponential
-from arbitrage.observers.observer import Observer
+from arbitrage.observers.observer import ObserverBase
 
 LOG = logging.getLogger(__name__)
-
-config = None
-try:
-    config = importlib.import_module('arbitrage.config')
-except ImportError:
-    LOG.warn('Failed to import config.py')
 
 
 class AMQPClient(object):
     """Represents the AMQP client to send an opportunity given by watcher"""
 
-    def __init__(self, configuration=None):
-        self.config = configuration or config
+    def __init__(self, config):
+        self.config = config
         self.message_ttl = str(self.config.market_expiration_time * 1000)
         self.report_queue = self.config.report_queue
         self.params = pika.URLParameters(self.config.amqp_url)
@@ -60,35 +55,40 @@ class AMQPClient(object):
         try:
             properties = pika.BasicProperties(
                 content_type='application/json',
-                expiration=self.message_ttl
+                expiration=self.message_ttl,
+                timestamp=int(time.time())
             )
             self.channel.basic_publish(exchange='',
                                        routing_key=self.report_queue,
                                        body=json.dumps(data),
                                        properties=properties)
         except Exception:
-            LOG.exception('Failed to push a message')
+            LOG.error('Failed to push a message')
 
 
-class Rabbitmq(Observer):
-    """Represent the observer based on message queue"""
+class Rabbitmq(ObserverBase):
+    """Represent AMQP based arbitrage opportunity observer"""
 
-    def __init__(self, configuration=None):
-        self.config = configuration or config
-        self.client = AMQPClient(self.config)
+    def __init__(self, config):
+        super().__init__(config)
+        self.client = AMQPClient(config)
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid,
                     perc, weighted_buyprice, weighted_sellprice):
-        message = {
-            'profit': profit,
-            'volume': volume,
-            'buy_price': buyprice,
-            'kask': kask,
-            'sell_price': sellprice,
-            'kbid': kbid,
-            'perc': perc,
-            'weighted_buy_price': weighted_buyprice,
-            'weighted_sell_price': weighted_sellprice,
-            'timestamp': time.time()
-        }
+        """Sends opportunity to a message queue"""
+
+        # split market name and currency:  KrakenUSD -> (Kraken, USD)
+        buy_exchange, buy_currency = kask[:-3], kask[-3:]
+        sell_exchange, sell_currency = kbid[:-3], kbid[-3:]
+
+        message = {"order_type": "inter_exchange_arb",
+                   "order_specs": {
+                       "arb_volume": volume,
+                       "arb_currency": "BTC",
+                       "buy_currency": buy_currency,
+                       "sell_currency": sell_currency,
+                       "buy_exchange": buy_exchange,
+                       "sell_exchange": sell_exchange
+                   }}
+
         self.client.push(message)

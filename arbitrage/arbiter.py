@@ -1,59 +1,28 @@
-# Copyright (C) 2013, Maxime Biais <maxime@biais.org>
-import importlib
-import time
 import logging
 
+from arbitrage import registry
 from concurrent.futures import ThreadPoolExecutor, wait
-from arbitrage import config
+
+from arbitrage.config import Configuration
+
+LOG = logging.getLogger(__name__)
 
 
 class Arbiter(object):
-    def __init__(self):
-        self.markets = []
-        self.observers = []
+    """Fetching depths from markets and calculate arbitrage opportunity"""
+
+    def __init__(self, config: Configuration,
+                 markets=None,
+                 observers=None,
+                 workers=10):
+
+        self.config = config
+        self.markets = markets or self.init_markets()
+        self.observers = observers or self.init_observers()
         self.depths = {}
-        self.init_markets(config.markets)
-        self.init_observers(config.observers)
-        self.thread_pool = ThreadPoolExecutor(max_workers=10)
+        self.thread_pool = ThreadPoolExecutor(max_workers=workers)
         self.market_names = []
         self.observer_names = []
-
-    def init_markets(self, markets):
-        """Load python modules from arbitrage.public_markets package"""
-
-        if self.markets:
-            return
-
-        self.market_names = markets
-        for market_name in markets:
-            module_name = 'arbitrage.public_markets.%s' % market_name.lower()
-            module = importlib.import_module(module_name)
-            market = getattr(module, market_name, None)
-            if not market:
-                logging.error('Failed to import %s market. Please check your '
-                              'config file', market_name)
-            else:
-                self.markets.append(market())
-
-        logging.info('All markets modules was successfully loaded')
-
-    def init_observers(self, _observers):
-        """Load python modules from arbitrage.observers package"""
-
-        if self.observers:
-            return
-
-        self.observer_names = _observers
-        for observer_name in self.observer_names:
-            module_name = 'arbitrage.observers.%s' % observer_name.lower()
-            module = importlib.import_module(module_name)
-            observer = getattr(module, observer_name, None)
-            if not observer:
-                logging.error('Failed to import %s market. Please check your '
-                              'config file', observer_name)
-            else:
-                self.observers.append(observer())
-        logging.info('All observers modules was successfully loaded')
 
     def get_profit_for(self, mi, mj, kask, kbid):
         if self.depths[kask]["asks"][mi]["price"] \
@@ -66,7 +35,9 @@ class Arbiter(object):
         max_amount_sell = 0
         for j in range(mj + 1):
             max_amount_sell += self.depths[kbid]["bids"][j]["amount"]
-        max_amount = min(max_amount_buy, max_amount_sell, config.max_tx_volume)
+        max_amount = min(max_amount_buy,
+                         max_amount_sell,
+                         self.config.max_tx_volume)
 
         buy_total = 0
         w_buyprice = 0
@@ -102,22 +73,25 @@ class Arbiter(object):
         return profit, sell_total, w_buyprice, w_sellprice
 
     def get_max_depth(self, kask, kbid):
-        i = 0
-        if len(self.depths[kbid]["bids"]) != 0 and \
-                        len(self.depths[kask]["asks"]) != 0:
-            while self.depths[kask]["asks"][i]["price"] \
-                    < self.depths[kbid]["bids"][0]["price"]:
-                if i >= len(self.depths[kask]["asks"]) - 1:
-                    break
-                i += 1
-        j = 0
-        if len(self.depths[kask]["asks"]) != 0 and \
-                        len(self.depths[kbid]["bids"]) != 0:
-            while self.depths[kask]["asks"][0]["price"] \
-                    < self.depths[kbid]["bids"][j]["price"]:
-                if j >= len(self.depths[kbid]["bids"]) - 1:
-                    break
-                j += 1
+
+        i, j = 0, 0
+
+        bids = self.depths[kbid]["bids"]
+        asks = self.depths[kask]["asks"]
+
+        if not bids or not asks:
+            return i, j
+
+        while asks[i]["price"] < bids[0]["price"]:
+            if i >= len(asks) - 1:
+                break
+            i += 1
+
+        while asks[0]["price"] < bids[j]["price"]:
+            if j >= len(bids) - 1:
+                break
+            j += 1
+
         return i, j
 
     def arbitrage_depth_opportunity(self, kask, kbid):
@@ -162,27 +136,14 @@ class Arbiter(object):
         for market in self.markets:
             futures.append(self.thread_pool.submit(self.__get_market_depth,
                                                    market, depths))
-        wait(futures, timeout=20)
+        wait(futures, timeout=self.config.refresh_rate)
         return depths
 
     def tickers(self):
         for market in self.markets:
             ticker = market.get_ticker()
             msg = "ticker: %s - %s " % (market.name, str(ticker))
-            logging.debug(msg)
-
-    def replay_history(self, directory):
-        import os
-        import json
-        files = os.listdir(directory)
-        files.sort()
-        for f in files:
-            depths = json.load(open(directory + '/' + f, 'r'))
-            self.depths = {}
-            for market in self.market_names:
-                if market in depths:
-                    self.depths[market] = depths[market]
-            self.tick()
+            LOG.debug(msg)
 
     def tick(self):
         for observer in self.observers:
@@ -207,9 +168,24 @@ class Arbiter(object):
         for observer in self.observers:
             observer.end_opportunity_finder()
 
-    def loop(self):
-        while True:
-            self.depths = self.update_depths()
-            self.tickers()
-            self.tick()
-            time.sleep(config.refresh_rate)
+    def init_observers(self):
+        result = []
+        for name in self.config.observers:
+            klass = registry.observers_registry.get(name, None)
+            if not klass:
+                LOG.error('The %s observer class does not exist', name)
+            else:
+                LOG.debug('The %s observer was initialized', name)
+                result.append(klass(self.config))
+        return result
+
+    def init_markets(self):
+        result = []
+        for name in self.config.markets:
+            klass = registry.markets_registry.get(name, None)
+            if not klass:
+                LOG.error('The %s market class does not exist', name)
+            else:
+                LOG.debug('The %s market was initialized', name)
+                result.append(klass(self.config))
+        return result
