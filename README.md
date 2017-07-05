@@ -1,7 +1,7 @@
 ## How to install
 
 ```
-cd ./bitcoin-arbutrage/
+cd ./bitcoin-arbitrage/
 pip install .
 ```
 
