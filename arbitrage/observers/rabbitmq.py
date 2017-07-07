@@ -7,7 +7,7 @@ import time
 import tenacity
 import pika
 
-from pika.exceptions import AMQPError
+from pika.exceptions import AMQPError, AMQPChannelError
 from tenacity import stop_after_delay, wait_exponential
 from arbitrage.observers.observer import ObserverBase
 
@@ -22,19 +22,37 @@ class AMQPClient(object):
         self.message_ttl = str(self.config.market_expiration_time * 1000)
         self.report_queue = self.config.report_queue
         self.params = pika.URLParameters(self.config.amqp_url)
+        self.queue_args = self.config.queue_args
         self._connection = None
         self._channel = None
 
+    def _queue_exists(self):
+        """Check if the queue exists"""
+        try:
+            self._channel.queue_declare(self.config.report_queue, passive=True)
+        except AMQPChannelError as e:
+            # restore a channel
+            self._channel = self._connection.channel()
+            code = e.args[0]
+            if code == 404:
+                return False
+            else:
+                raise
+        return True
+
     def ensure_connected(self):
-        """Ensure that connection is established"""
+        """Ensure that connection is established and the queue is declared"""
         try:
             if not self._connection or not self._connection.is_open:
                 self._connection = pika.BlockingConnection(self.params)
             if not self._channel or not self._connection.is_open:
                 self._channel = self._connection.channel()
-                self._channel.queue_declare(self.config.report_queue)
-        except AMQPError:
-            LOG.error('Failed to establish connection. Retrying')
+                if not self._queue_exists():
+                    self._channel.queue_declare(self.config.report_queue,
+                                                arguments=self.queue_args)
+
+        except AMQPError as e:
+            LOG.error('Failed to establish connection. Retrying %s' % e)
             raise
         LOG.debug('AMQP connection to %s was successfully established' %
                   self.config.amqp_url)
@@ -62,8 +80,8 @@ class AMQPClient(object):
                                        routing_key=self.report_queue,
                                        body=json.dumps(data),
                                        properties=properties)
-        except Exception:
-            LOG.error('Failed to push a message')
+        except Exception as e:
+            LOG.error('Failed to push a message %s. Skipped.' % data)
 
 
 class Rabbitmq(ObserverBase):
