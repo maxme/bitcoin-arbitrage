@@ -17,7 +17,8 @@ class RabbitmqCfgMixin(ConfigBase):
         default = 'amqp://guest:guest@localhost:5672/'
         self.amqp_url = os.getenv('CLOUDAMQP_URL', default)
         self.report_queue = 'arbitrage_watcher'
-        self.opts.extend(['report_queue', 'amqp_url'])
+        self.queue_args = None
+        self.opts.extend(['report_queue', 'amqp_url', 'queue_args'])
 
 
 class Configuration(RabbitmqCfgMixin):
