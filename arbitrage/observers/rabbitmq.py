@@ -105,8 +105,8 @@ class Rabbitmq(ObserverBase):
                        "arb_currency": "BTC",
                        "buy_currency": buy_currency,
                        "sell_currency": sell_currency,
-                       "buy_exchange": buy_exchange,
-                       "sell_exchange": sell_exchange
+                       "buy_exchange": buy_exchange.upper(),
+                       "sell_exchange": sell_exchange.upper()
                    }}
 
         self.client.push(message)
