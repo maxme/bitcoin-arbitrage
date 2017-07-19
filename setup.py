@@ -9,7 +9,7 @@ if sys.version_info < (3,):
 
 setup(name='bitcoin-arbitrage',
       packages=find_packages(),
-      version='0.1',
+      version='0.2',
       description='Bitcoin arbitrage opportunity watcher',
       install_requires=[
           "sleekxmpp", 'tenacity', 'pika', 'PyYAML'
