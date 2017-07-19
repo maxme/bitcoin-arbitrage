@@ -101,7 +101,7 @@ class Rabbitmq(ObserverBase):
 
         message = {"order_type": "inter_exchange_arb",
                    "order_specs": {
-                       "arb_volume": volume,
+                       "arb_volume": 0,#volume,
                        "arb_currency": "BTC",
                        "buy_currency": buy_currency,
                        "sell_currency": sell_currency,
