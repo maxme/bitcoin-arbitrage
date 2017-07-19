@@ -15,8 +15,8 @@ class Logger(ObserverBase):
         sell_exchange, sell_currency = kbid[:-3], kbid[-3:]
         LOG.info(_format % (profit,
                             volume,
-                            buy_exchange,
+                            buy_exchange.upper(),
                             buy_currency,
-                            sell_exchange,
+                            sell_exchange.upper(),
                             sell_currency,
                             perc))
