@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 import sys
-
 
 if sys.version_info < (3,):
     print("bitcoin-arbitrage requires Python version >= 3.0")
     sys.exit(1)
 
 setup(name='bitcoin-arbitrage',
-      packages = ["arbitrage"],
-      version='0.1',
+      packages=find_packages(),
+      version='0.2',
       description='Bitcoin arbitrage opportunity watcher',
-      author='Maxime Biais',
-      author_email='maxime.biais@gmail.com',
-      url='https://github.com/maxme/bitcoin-arbitrage',
+      install_requires=[
+          "sleekxmpp", 'tenacity', 'pika', 'PyYAML'
+      ],
       arbitrage=['bin/bitcoin-arbitrage'],
       test_suite='nose.collector',
-      tests_require=['nose'],
-  )
+      tests_require=['nose']
+      )

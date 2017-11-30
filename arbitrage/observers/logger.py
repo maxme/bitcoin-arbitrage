@@ -1,9 +1,22 @@
 import logging
-from .observer import Observer
+from arbitrage.observers.observer import ObserverBase
+
+LOG = logging.getLogger(__name__)
+
+_format = "profit: %f USD, vol: %f BTC, %s [%s] -> %s [%s], ~%.2f%%"
 
 
-class Logger(Observer):
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
-                    weighted_buyprice, weighted_sellprice):
-        logging.info("profit: %f USD with volume: %f BTC - buy from %s sell to %s ~%.2f%%" \
-        	% (profit, volume, kask, kbid, perc))
+class Logger(ObserverBase):
+    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid,
+                    perc, weighted_buyprice, weighted_sellprice):
+        """Log opportunity"""
+
+        buy_exchange, buy_currency = kask[:-3], kask[-3:]
+        sell_exchange, sell_currency = kbid[:-3], kbid[-3:]
+        LOG.info(_format % (profit,
+                            volume,
+                            buy_exchange.upper(),
+                            buy_currency,
+                            sell_exchange.upper(),
+                            sell_currency,
+                            perc))

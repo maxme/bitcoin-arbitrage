@@ -1,18 +1,20 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
 import urllib.request
-import sys
-import json
-import logging
 import time
+import logging
+
+from arbitrage.config import Configuration
+
+LOG = logging.getLogger(__name__)
 
 
-class FiatConverter:
+class FiatConverter(object):
     __shared_state = {}
-    rate_exchange_url = "http://rate-exchange.appspot.com/currency?from=%s&to=%s"
-    rate_exchange_url_yahoo = "http://download.finance.yahoo.com/d/quotes.csv?s=%s%s=X&f=sl1d1&e=.csv"
+    rate_exchange_url = "http://download.finance.yahoo.com/" \
+                        "d/quotes.csv?s=%s%s=X&f=sl1d1&e=.csv"
 
-    def __init__(self):
+    def __init__(self, config=None):
         """USD is used as pivot"""
         self.__dict__ = self.__shared_state
         self.rates = {
@@ -21,23 +23,13 @@ class FiatConverter:
             "CNY": 6.15,
             "SEK": 6.6,
         }
-        self.update_delay = 60 * 60 # every hour
+        self.config = config or Configuration()
         self.last_update = 0
-        self.bank_fee = 0.007 # FIXME: bank fee
+        self.update_delay = self.config.fiat_update_delay
+        self.bank_fee = self.config.bank_fee
 
     def get_currency_pair(self, code_from, code_to):
         url = self.rate_exchange_url % (code_from, code_to)
-        res = urllib.request.urlopen(url)
-        data = json.loads(res.read().decode('utf8'))
-        rate = 0
-        if "rate" in data:
-            rate = float(data["rate"]) * (1.0 - self.bank_fee)
-        else:
-            logging.error("Can't update fiat conversion rate: %s", url)
-        return rate
-
-    def get_currency_pair_yahoo(self, code_from, code_to):
-        url = self.rate_exchange_url_yahoo % (code_from, code_to)
         res = urllib.request.urlopen(url)
         data = res.read().decode('utf8').split(",")[1]
         rate = float(data) * (1.0 - self.bank_fee)
@@ -47,10 +39,12 @@ class FiatConverter:
         if code_to == "USD":
             return
         code_from = "USD"
+        rate = None
         try:
             rate = self.get_currency_pair(code_from, code_to)
         except urllib.error.HTTPError:
-            rate = self.get_currency_pair_yahoo(code_from, code_to)
+            LOG.error('Failed to get currency pair %s:%s' % (code_from,
+                                                             code_to))
         if rate:
             self.rates[code_to] = rate
 
