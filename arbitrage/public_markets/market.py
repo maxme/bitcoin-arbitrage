@@ -2,11 +2,11 @@ import time
 import urllib.request
 import urllib.error
 import urllib.parse
-import config
 import logging
 import sys
-from fiatconverter import FiatConverter
-from utils import log_exception
+from arbitrage import config
+from arbitrage.fiatconverter import FiatConverter
+from arbitrage.utils import log_exception
 
 class Market(object):
     def __init__(self, currency):

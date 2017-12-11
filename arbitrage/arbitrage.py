@@ -3,11 +3,11 @@
 import logging
 import argparse
 import sys
-import public_markets
 import glob
 import os
 import inspect
-from arbitrer import Arbitrer
+from arbitrage.arbitrer import Arbitrer
+from arbitrage import public_markets
 
 
 class ArbitrerCLI:

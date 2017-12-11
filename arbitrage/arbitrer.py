@@ -1,12 +1,12 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
-import public_markets
-import observers
-import config
 import time
 import logging
 import json
 from concurrent.futures import ThreadPoolExecutor, wait
+from arbitrage import public_markets
+from arbitrage import observers
+from arbitrage import config
 
 
 class Arbitrer(object):
@@ -22,8 +22,8 @@ class Arbitrer(object):
         self.market_names = markets
         for market_name in markets:
             try:
-                exec('import public_markets.' + market_name.lower())
-                market = eval('public_markets.' + market_name.lower() + '.' +
+                exec('import arbitrage.public_markets.' + market_name.lower())
+                market = eval('arbitrage.public_markets.' + market_name.lower() + '.' +
                               market_name + '()')
                 self.markets.append(market)
             except (ImportError, AttributeError) as e:
@@ -33,8 +33,8 @@ class Arbitrer(object):
         self.observer_names = _observers
         for observer_name in _observers:
             try:
-                exec('import observers.' + observer_name.lower())
-                observer = eval('observers.' + observer_name.lower() + '.' +
+                exec('import arbitrage.observers.' + observer_name.lower())
+                observer = eval('arbitrage.observers.' + observer_name.lower() + '.' +
                                 observer_name + '()')
                 self.observers.append(observer)
             except (ImportError, AttributeError) as e:
