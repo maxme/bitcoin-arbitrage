@@ -13,7 +13,7 @@ Currently supported exchanges to get data:
  - CampBX (USD)
  - Gemini (USD)
  - BTCC (CNY)
- - Coinbase Exchange (USD)
+ - GDAX (USD, EUR)
 
 Currently supported exchanges to automate trade:
  - Bitstamp (USD)
