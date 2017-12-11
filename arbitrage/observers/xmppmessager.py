@@ -3,7 +3,7 @@ import config
 import time
 from sleekxmpp import ClientXMPP
 from sleekxmpp.exceptions import IqError, IqTimeout
-from .observer import Observer
+from arbitrage.observers.observer import Observer
 
 
 class MyXMPPClient(ClientXMPP):

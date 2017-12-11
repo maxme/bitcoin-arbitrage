@@ -35,8 +35,8 @@ class ArbitrerCLI:
         for filename in glob.glob(os.path.join(public_markets.__path__[0], "*.py")):
             module_name = os.path.basename(filename).replace('.py', '')
             if not module_name.startswith('_'):
-                module = __import__("public_markets." + module_name)
-                test = eval('module.' + module_name)
+                module = __import__("arbitrage.public_markets." + module_name)
+                test = eval('module.public_markets.' + module_name)
                 for name, obj in inspect.getmembers(test):
                     if inspect.isclass(obj) and 'Market' in (j.__name__ for j in obj.mro()[1:]):
                         if not obj.__module__.split('.')[-1].startswith('_'):
@@ -50,8 +50,8 @@ class ArbitrerCLI:
         pmarkets = args.markets.split(",")
         pmarketsi = []
         for pmarket in pmarkets:
-            exec('import private_markets.' + pmarket.lower())
-            market = eval('private_markets.' + pmarket.lower()
+            exec('import arbitrage.private_markets.' + pmarket.lower())
+            market = eval('arbitrage.private_markets.' + pmarket.lower()
                           + '.Private' + pmarket + '()')
             pmarketsi.append(market)
         for market in pmarketsi:

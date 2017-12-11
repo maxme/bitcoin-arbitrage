@@ -1,6 +1,5 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
-from .market import Market, TradeException
 import time
 import base64
 import hmac
@@ -13,7 +12,8 @@ import urllib.parse
 import hashlib
 import sys
 import json
-import config
+from arbitrage import config
+from arbitrage.private_markets.market import Market, TradeException
 
 
 class PrivateBitstampUSD(Market):

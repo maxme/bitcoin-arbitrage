@@ -1,10 +1,10 @@
 import logging
 import config
 import time
-from .observer import Observer
+from arbitrage.observers.observer import Observer
 from private_markets import mtgox
 from private_markets import paymium
-from .emailer import send_email
+from arbitrage.observers.emailer import send_email
 
 
 class SpecializedTraderBot(Observer):

@@ -4,7 +4,7 @@ It gets order books from supported exchanges and calculate arbitrage
 opportunities between each markets. It takes market depth into account.
 
 Currently supported exchanges to get data:
- - Bitstamp (USD)
+ - Bitstamp (USD, EUR)
  - Paymium (EUR)
  - BTC-e (USD, EUR)
  - Bitfinex (USD)
@@ -54,8 +54,8 @@ To run the opportunity watcher:
 
 To check your balance on an exchange (also a good way to check your accounts configuration):
 
-    $ python3 arbitrage.py -m MtGoxEUR get-balance
-    $ python3 arbitrage.py -m MtGoxEUR,MtGoxUSD,BitstampUSD get-balance
+    $ python3 -m arbitrage -m Paymium get-balance
+    $ python3 -m arbitrage -m Paymium,BitstampUSD get-balance
 
 Run tests
 
@@ -64,9 +64,9 @@ Run tests
 ## Alternative usage
 
 * List supported public markets:
-      $ python3 arbitrage.py list-public-markets
+      $ python3 -m arbitrage list-public-markets
 * Help
-      $ python3 arbitrage.py -h
+      $ python3 -m arbitrage -h
 
 # TODO
 

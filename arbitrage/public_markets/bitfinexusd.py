@@ -3,7 +3,7 @@ import urllib.error
 import urllib.parse
 import json
 import logging
-from .market import Market
+from arbitrage.public_markets.market import Market
 
 
 class BitfinexUSD(Market):

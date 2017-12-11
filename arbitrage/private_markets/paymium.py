@@ -1,4 +1,3 @@
-from .market import Market
 import time
 import base64
 import hmac
@@ -11,7 +10,8 @@ import urllib.parse
 import hashlib
 import sys
 import json
-import config
+from arbitrage import config
+from arbitrage.private_markets.market import Market
 
 
 class PrivatePaymium(Market):

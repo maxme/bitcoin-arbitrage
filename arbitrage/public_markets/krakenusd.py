@@ -1,4 +1,4 @@
-from ._kraken import Kraken
+from arbitrage.public_markets._kraken import Kraken
 
 class KrakenUSD(Kraken):
     def __init__(self):
