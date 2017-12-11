@@ -1,15 +1,11 @@
 markets = [
 "BitfinexUSD",
 "BitstampUSD",
-"BTCCCNY",
-"BtceEUR",
-"BtceUSD",
 "CampBXUSD",
 "GDAXUSD",
 "GeminiUSD",
 "KrakenEUR",
 "KrakenUSD",
-"OKCoinCNY",
 "PaymiumEUR",
 ]
 
