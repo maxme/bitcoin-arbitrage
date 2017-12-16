@@ -1,12 +1,13 @@
 markets = [
-"BitfinexUSD",
-"BitstampUSD",
-"CampBXUSD",
-"GDAXUSD",
-"GeminiUSD",
-"KrakenEUR",
-"KrakenUSD",
-"PaymiumEUR",
+    "BitfinexUSD",
+    "BitfinexEUR",
+    "BitstampUSD",
+    "CampBXUSD",
+    "GDAXUSD",
+    "GeminiUSD",
+    "KrakenEUR",
+    "KrakenUSD",
+    "PaymiumEUR",
 ]
 
 # observers if any
@@ -15,7 +16,7 @@ observers = ["Logger"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
-refresh_rate = 20
+refresh_rate = 60
 
 #### Trader Bot Config
 # Access to Private APIs
