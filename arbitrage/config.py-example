@@ -1,13 +1,16 @@
 markets = [
-    "BitfinexUSD",
     "BitfinexEUR",
+    "BitfinexUSD",
+    "BitstampEUR",
     "BitstampUSD",
     "CampBXUSD",
+    "GDAXEUR",
     "GDAXUSD",
     "GeminiUSD",
     "KrakenEUR",
     "KrakenUSD",
-    "PaymiumEUR",
+    "OKCoinCNY",
+    "PaymiumEUR"
 ]
 
 # observers if any

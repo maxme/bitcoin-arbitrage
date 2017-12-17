@@ -32,6 +32,7 @@ class ArbitrerCLI:
             self.list_markets()
 
     def list_markets(self):
+        markets = []
         for filename in glob.glob(os.path.join(public_markets.__path__[0], "*.py")):
             module_name = os.path.basename(filename).replace('.py', '')
             if not module_name.startswith('_'):
@@ -40,7 +41,9 @@ class ArbitrerCLI:
                 for name, obj in inspect.getmembers(test):
                     if inspect.isclass(obj) and 'Market' in (j.__name__ for j in obj.mro()[1:]):
                         if not obj.__module__.split('.')[-1].startswith('_'):
-                            print(obj.__name__)
+                            markets.append(obj.__name__)
+        markets.sort()
+        print("\n".join(markets))
         sys.exit(0)
 
     def get_balance(self, args):
