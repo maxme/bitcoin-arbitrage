@@ -14,6 +14,7 @@ Currently supported exchanges to get data:
  - Gemini (USD)
  - BTCC (CNY)
  - GDAX (USD, EUR)
+ - CEX.io (USD, EUR)
 
 Currently supported exchanges to automate trade:
  - Bitstamp (USD)
