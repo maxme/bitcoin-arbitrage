@@ -4,6 +4,8 @@ markets = [
     "BitstampEUR",
     "BitstampUSD",
     "CampBXUSD",
+    "CEXUSD",
+    "CEXEUR",
     "GDAXEUR",
     "GDAXUSD",
     "GeminiUSD",
