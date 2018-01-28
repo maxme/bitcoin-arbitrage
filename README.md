@@ -64,10 +64,13 @@ Run tests
 
 ## Alternative usage
 
-* List supported public markets:
-      $ python3 -m arbitrage list-public-markets
-* Help
-      $ python3 -m arbitrage -h
+List supported public markets:
+
+    $ python3 -m arbitrage list-public-markets
+
+Help:
+
+    $ python3 -m arbitrage -h
 
 # TODO
 
