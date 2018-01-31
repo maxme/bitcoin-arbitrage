@@ -2,10 +2,10 @@ import sys
 sys.path.append('../')
 import unittest
 
-import arbitrage
+from arbitrage import arbitrer
 
 depths1 = {
-    'PaymiumEUR':
+    'BitstampEUR':
     {'asks': [{'amount': 4, 'price': 32.8},
               {'amount': 8, 'price': 32.9},
               {'amount': 2, 'price': 33.0},
@@ -14,7 +14,7 @@ depths1 = {
               {'amount': 4, 'price': 31.6},
               {'amount': 6, 'price': 31.4},
               {'amount': 2, 'price': 30}]},
-    'MtGoxEUR':
+    'KrakenEUR':
     {'asks': [{'amount': 1, 'price': 34.2},
               {'amount': 2, 'price': 34.3},
               {'amount': 3, 'price': 34.5},
@@ -25,24 +25,24 @@ depths1 = {
               {'amount': 10, 'price': 32.3}]}}
 
 depths2 = {
-    'PaymiumEUR':
+    'BitstampEUR':
     {'asks': [{'amount': 4, 'price': 32.8},
               {'amount': 8, 'price': 32.9},
               {'amount': 2, 'price': 33.0},
               {'amount': 3, 'price': 33.6}]},
-    'MtGoxEUR':
+    'KrakenEUR':
     {'bids': [{'amount': 2, 'price': 33.2},
               {'amount': 3, 'price': 33.1},
               {'amount': 5, 'price': 32.6},
               {'amount': 10, 'price': 32.3}]}}
 
 depths3 = {
-    'PaymiumEUR':
+    'BitstampEUR':
     {'asks': [{'amount': 1, 'price': 34.2},
               {'amount': 2, 'price': 34.3},
               {'amount': 3, 'price': 34.5},
               {'amount': 3, 'price': 35.0}]},
-    'MtGoxEUR':
+    'KrakenEUR':
     {'bids': [{'amount': 2, 'price': 33.2},
               {'amount': 3, 'price': 33.1},
               {'amount': 5, 'price': 32.6},
@@ -51,26 +51,27 @@ depths3 = {
 
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
-        self.arbitrer = arbitrage.Arbitrer()
+        self.arbitrer = arbitrer.Arbitrer()
 
     def test_getprofit1(self):
         self.arbitrer.depths = depths2
         profit, vol, wb, ws = self.arbitrer.get_profit_for(
-            0, 0, 'PaymiumEUR', 'MtGoxEUR')
+            0, 0, 'BitstampEUR', 'KrakenEUR')
+        print(profit, vol, wb, ws)
         assert(80 == int(profit * 100))
         assert(vol == 2)
 
     def test_getprofit2(self):
         self.arbitrer.depths = depths2
         profit, vol, wb, ws = self.arbitrer.get_profit_for(
-            2, 1, 'PaymiumEUR', 'MtGoxEUR')
+            2, 1, 'BitstampEUR', 'KrakenEUR')
         assert(159 == int(profit * 100))
         assert(vol == 5)
 
     def test_getprofit3(self):
         self.arbitrer.depths = depths3
         profit, vol, wb, ws = self.arbitrer.get_profit_for(
-            2, 1, 'PaymiumEUR', 'MtGoxEUR')
+            2, 1, 'BitstampEUR', 'KrakenEUR')
         assert(profit == 0)
         assert(vol == 0)
 
