@@ -52,12 +52,12 @@ depths3 = {
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
         self.arbitrer = arbitrer.Arbitrer()
+        self.arbitrer.max_tx_volume = 10000
 
     def test_getprofit1(self):
         self.arbitrer.depths = depths2
         profit, vol, wb, ws = self.arbitrer.get_profit_for(
             0, 0, 'BitstampEUR', 'KrakenEUR')
-        print(profit, vol, wb, ws)
         assert(80 == int(profit * 100))
         assert(vol == 2)
 

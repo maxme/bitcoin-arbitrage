@@ -16,6 +16,7 @@ class Arbitrer(object):
         self.depths = {}
         self.init_markets(config.markets)
         self.init_observers(config.observers)
+        self.max_tx_volume = config.max_tx_volume
         self.threadpool = ThreadPoolExecutor(max_workers=10)
 
     def init_markets(self, markets):
@@ -51,7 +52,7 @@ class Arbitrer(object):
         max_amount_sell = 0
         for j in range(mj + 1):
             max_amount_sell += self.depths[kbid]["bids"][j]["amount"]
-        max_amount = min(max_amount_buy, max_amount_sell, config.max_tx_volume)
+        max_amount = min(max_amount_buy, max_amount_sell, self.max_tx_volume)
 
         buy_total = 0
         w_buyprice = 0
