@@ -1,9 +1,13 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
 import logging
+from arbitrage import config
 from arbitrage.fiatconverter import FiatConverter
 
 class TradeException(Exception):
+    pass
+
+class GetInfoException(Exception):
     pass
 
 class Market:
@@ -12,6 +16,10 @@ class Market:
         self.btc_balance = 0.
         self.eur_balance = 0.
         self.usd_balance = 0.
+        self.pair = config.pair
+        pair_names = str.split(self.pair, "_")
+        self.pair1_name = str.upper(pair_names[0])
+        self.pair2_name = str.upper(pair_names[1])
         self.fc = FiatConverter()
 
     def __str__(self):
