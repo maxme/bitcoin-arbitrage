@@ -14,6 +14,10 @@ class Market(object):
         self.currency = currency
         self.depth_updated = 0
         self.update_rate = 60
+        if currency == "BTC":
+            self.fiat = False
+        else:
+            self.fiat = True
         self.fc = FiatConverter()
         self.fc.update()
 
@@ -38,7 +42,8 @@ class Market(object):
     def ask_update_depth(self):
         try:
             self.update_depth()
-            self.convert_to_usd()
+            if self.fiat:
+                self.convert_to_usd()
             self.depth_updated = time.time()
         except (urllib.error.HTTPError, urllib.error.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)
