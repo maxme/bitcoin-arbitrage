@@ -14,7 +14,7 @@ import json
 import requests
 
 class PrivateBitstampUSD(Market):
-    balance_url = "https://www.bitstamp.net/api/balance/"
+    balance_url = "https://www.bitstamp.net/api/v2/balance/"
     buy_url = "https://www.bitstamp.net/api/buy/"
     sell_url = "https://www.bitstamp.net/api/sell/"
 
