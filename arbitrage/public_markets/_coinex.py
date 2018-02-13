@@ -45,8 +45,8 @@ class Coinex(Market):
 
     def format_depth(self, depth):
         if self.reverse_pair:
-            asks = self.sort_and_format(depth['bids'], True)
-            bids = self.sort_and_format(depth['asks'], False)
+            asks = self.sort_and_format(depth['bids'], False)
+            bids = self.sort_and_format(depth['asks'], True)
         else:
             bids = self.sort_and_format(depth['bids'], True)
             asks = self.sort_and_format(depth['asks'], False)  
