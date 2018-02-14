@@ -1,6 +1,7 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
 import logging
+import traceback
 import argparse
 import sys
 import glob
@@ -75,6 +76,14 @@ class ArbitrerCLI:
             level = logging.DEBUG
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
                             level=level)
+  
+        if not os.path.exists('tmp'):
+            os.makedirs('tmp')
+        fh = logging.FileHandler('./tmp/log.txt')
+        formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+        fh.setFormatter(formatter)
+        logging.getLogger('').addHandler(fh)
+
 
     def main(self):
         parser = argparse.ArgumentParser()
@@ -90,11 +99,19 @@ class ArbitrerCLI:
                             help='verb: "watch|replay-history|get-balance|list-public-markets"')
         args = parser.parse_args()
         self.init_logger(args)
-        self.exec_command(args)
+        try:
+            self.exec_command(args)
+        except Exception as e:
+            s=traceback.format_exc()
+            logging.info(e)
+            logging.error(s)
+        
 
 def main():
     cli = ArbitrerCLI()
     cli.main()
 
+
 if __name__ == "__main__":
     main()
+    
