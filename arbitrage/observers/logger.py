@@ -11,4 +11,4 @@ class Logger(Observer):
         pair1_name = str.upper(pair_names[0])
         pair2_name = str.upper(pair_names[1])
         logging.info("profit: %f %s with volume: %f %s - buy from %s sell to %s ~%.2f%%" \
-        	% (profit, pair1_name, volume, pair2_name, kask, kbid, perc))
+        	% (profit, pair2_name, volume, pair1_name, kask, kbid, perc))

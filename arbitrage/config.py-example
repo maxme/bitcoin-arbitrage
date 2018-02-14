@@ -1,46 +1,43 @@
 markets = [
-    "BitFlyerEUR",
-    "BitFlyerUSD",
-    "BitfinexEUR",
-    "BitfinexUSD",
-    "BitstampEUR",
-    "BitstampUSD",
-    "CampBXUSD",
-    "CEXEUR",
-    "CEXUSD",
-    "GDAXEUR",
-    "GDAXUSD",
-    "GeminiUSD",
-    "KrakenEUR",
-    "KrakenUSD",
-    "OKCoinCNY",
-    "PaymiumEUR"
+    "CoinexBCH",
+    "BitstampBCH"
 ]
 
 # observers if any
-# ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
+# ["Logger", "DetailedLogger", "TraderBot", "BCHTraderBot", TraderBotSim", "HistoryDumper", "Emailer"]
 observers = ["Logger"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
-refresh_rate = 60
+refresh_rate = 2
+
+
+# Arbitrage pair, parameter is to allow for more pairs to be traded than BTC_USD and BTC_EUR
+#pair = "BTC_USD"
+#pair = "DTC_BTC"
+#pair = "LTC_BTC"
+#pair = "QRK_BTC"
+pair = "BCH_BTC"
+
+
 
 #### Trader Bot Config
 # Access to Private APIs
 
-paymium_username = "FIXME"
-paymium_password = "FIXME"
-paymium_address = "FIXME"  # to deposit btc from markets / wallets
+# Fixed the bitstamp code to work properly, username and password no longer used
+bitstamp_client_id = "333333"
+bitstamp_api_key = "xxxx"
+bitstamp_api_secret = "xxxx"
 
-bitstamp_username = "FIXME"
-bitstamp_password = "FIXME"
+coinex_api_id="xxxx"
+coinex_api_key="xxxx"
 
 # SafeGuards
-max_tx_volume = 10  # in BTC
-min_tx_volume = 1  # in BTC
+max_tx_volume = 0.02  
+min_tx_volume = 0.001  
 balance_margin = 0.05  # 5%
-profit_thresh = 1  # in EUR
-perc_thresh = 2  # in %
+profit_thresh = 0.000001  
+perc_thresh = 0.15  # in %
 
 #### Emailer Observer Config
 smtp_host = 'FIXME'
@@ -50,6 +47,6 @@ smtp_from = 'FIXME'
 smtp_to = 'FIXME'
 
 #### XMPP Observer
-xmpp_jid = "FROM@jabber.org"
-xmpp_password = "FIXME"
-xmpp_to = "TO@jabber.org"
+xmpp_jid = "xx@blah.im"
+xmpp_password = "xxx"
+xmpp_to = "xx@blah.im"

@@ -18,8 +18,8 @@ class Market(object):
             self.fiat = False
         else:
             self.fiat = True
-        self.fc = FiatConverter()
-        self.fc.update()
+            self.fc = FiatConverter()
+            self.fc.update()
 
     def get_depth(self):
         timediff = time.time() - self.depth_updated

@@ -35,6 +35,7 @@ class Arbitrer(object):
         for observer_name in _observers:
             try:
                 exec('import arbitrage.observers.' + observer_name.lower())
+
                 observer = eval('arbitrage.observers.' + observer_name.lower() + '.' +
                                 observer_name + '()')
                 self.observers.append(observer)
