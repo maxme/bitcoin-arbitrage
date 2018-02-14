@@ -62,7 +62,7 @@ class BCHTraderBot(Observer):
                          " not reached %f/%f" % (volume, config.min_tx_volume))
             logging.warn("Balance on %s: %f %s - Balance on %s: %f %s"
                          % (kask, self.clients[kask].pair2_balance, self.clients[kask].pair2_name,kbid,
-                            self.clients[kbid].pair1_balance),self.clients[kbid].pair1_name)
+                            self.clients[kbid].pair1_balance,self.clients[kbid].pair1_name))
             return
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
