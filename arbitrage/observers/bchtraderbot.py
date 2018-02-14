@@ -62,6 +62,7 @@ class BCHTraderBot(Observer):
             logging.warn("Balance on %s: %f %s - Balance on %s: %f %s"
                          % (kask, self.clients[kask].pair2_balance, self.clients[kask].pair2_name,kbid,
                             self.clients[kbid].pair1_balance,self.clients[kbid].pair1_name))
+            self.update_balance()
             return
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
