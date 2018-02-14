@@ -9,8 +9,8 @@ from arbitrage.private_markets import coinexbch
 class BCHTraderBot(Observer):
     def __init__(self):
         self.clients = {
-            "CoinexBCH": bitstampbch.PrivateBitstampBCH(),
-            "BitstampBCH": coinexbch.PrivateCoinexBCH()
+            "CoinexBCH": coinexbch.PrivateCoinexBCH(),
+            "BitstampBCH": bitstampbch.PrivateBitstampBCH()
         }
         self.trade_wait = 30  # in seconds
         self.last_trade = 0
