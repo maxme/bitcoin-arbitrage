@@ -57,37 +57,34 @@ class PrivateBitstampBCH(MarketNoFiat):
         if code == 200:
             #jsonstr = response.read().decode('utf-8')
             #return json.loads(jsonstr)
-            if 'error' in response.json():
-                return False, response.json()['error']
-            else:
-                return response.json()
+            return response.json()
         return None
 
     def _buy(self, amount, price):
         """Create a buy limit order"""
         params = {"amount": amount, "price": price}
         response = self._send_request(self.buy_url, params)
-        if "error" in response:
-            raise TradeException(response["error"])
+        if "status" in response and "error" == response["status"]:
+            raise TradeException(response["reason"])
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
         params = {"amount": amount, "price": price}
         response = self._send_request(self.sell_url, params)
-        if "error" in response:
-            raise TradeException(response["error"])
+        if "status" in response and "error" == response["status"]:
+            raise TradeException(response["reason"])
 
     def get_info(self):
         """Get balance"""
         response = self._send_request(self.balance_url)
-        if False in response:
-            raise GetInfoException(response[1])
-        if response:
-            #print(json.dumps(response))            
-            self.pair1_balance = float(response[str.lower(self.pair1_name)+"_balance"])
-            self.pair2_balance = float(response[str.lower(self.pair2_name)+"_balance"])
-        else:
-            raise GetInfoException("Critical error no balances retrieved")
+        if "status" in response and "error" == response["status"]:
+            raise GetInfoException(response["reason"])
+            return
+
+        #print(json.dumps(response))            
+        self.pair1_balance = float(response[str.lower(self.pair1_name)+"_balance"])
+        self.pair2_balance = float(response[str.lower(self.pair2_name)+"_balance"])
+
 
 
 

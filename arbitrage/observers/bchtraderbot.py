@@ -12,7 +12,7 @@ class BCHTraderBot(Observer):
             "CoinexBCH": coinexbch.PrivateCoinexBCH(),
             "BitstampBCH": bitstampbch.PrivateBitstampBCH()
         }
-        self.trade_wait = 30  # in seconds
+        self.trade_wait = 10  # in seconds
         self.last_trade = 0
         self.potential_trades = []
 
