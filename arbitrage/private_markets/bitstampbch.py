@@ -62,14 +62,14 @@ class PrivateBitstampBCH(MarketNoFiat):
 
     def _buy(self, amount, price):
         """Create a buy limit order"""
-        params = {"amount": amount, "price": price}
+        params = {"amount": round(amount,8), "price": round(price,8)}
         response = self._send_request(self.buy_url, params)
         if "status" in response and "error" == response["status"]:
             raise TradeException(response["reason"])
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
-        params = {"amount": amount, "price": price}
+        params = {"amount": round(amount,8), "price": round(price,8)}
         response = self._send_request(self.sell_url, params)
         if "status" in response and "error" == response["status"]:
             raise TradeException(response["reason"])
