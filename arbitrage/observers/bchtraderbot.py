@@ -51,8 +51,7 @@ class BCHTraderBot(Observer):
             return
         volume = min(config.max_tx_volume, volume)
 
-        # Update client balance
-        self.update_balance()
+
         max_volume = self.get_min_tradeable_volume(buyprice,
                                                    self.clients[kask].pair2_balance,
                                                    self.clients[kbid].pair1_balance)
@@ -83,3 +82,5 @@ class BCHTraderBot(Observer):
         logging.info("Buy @%s %f BCH and sell @%s" % (kask, volume, kbid))
         self.clients[kask].buy(volume, buyprice)
         self.clients[kbid].sell(volume, sellprice)
+        # Update client balance
+        self.update_balance()
