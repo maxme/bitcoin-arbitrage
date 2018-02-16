@@ -15,9 +15,12 @@ class BCHTraderBot(Observer):
         self.trade_wait = 10  # in seconds
         self.last_trade = 0
         self.potential_trades = []
+        self.update_balance_failed = False
 
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
+        if self.update_balance_failed:
+            self.update_balance()
 
     def end_opportunity_finder(self):
         if not self.potential_trades:
@@ -32,8 +35,19 @@ class BCHTraderBot(Observer):
         return min(min1, min2)
 
     def update_balance(self):
-        for kclient in self.clients:
-            self.clients[kclient].get_info()
+        try:
+            for kclient in self.clients:
+                self.clients[kclient].get_info()
+            self.update_balance_failed = False
+        except Exception as e:
+            _message = 'update_balance failed!\n'
+            _message += str(e)
+            logging.warn(_message)
+            send_message(_message)
+            self.update_balance_failed = True         
+        finally:
+            pass
+
 
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
                     weighted_buyprice, weighted_sellprice):
