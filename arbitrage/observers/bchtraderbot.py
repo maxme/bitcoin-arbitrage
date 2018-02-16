@@ -4,7 +4,7 @@ import time
 from arbitrage.observers.observer import Observer
 from arbitrage.private_markets import bitstampbch
 from arbitrage.private_markets import coinexbch
-
+from arbitrage.observers.telegram import send_message
 
 class BCHTraderBot(Observer):
     def __init__(self):
@@ -49,21 +49,28 @@ class BCHTraderBot(Observer):
             logging.warn("[TraderBot] Can't automate this trade, " +
                          "client not available: %s" % kbid)
             return
-        volume = min(config.max_tx_volume, volume)
 
-
-        max_volume = self.get_min_tradeable_volume(buyprice,
-                                                   self.clients[kask].pair2_balance,
-                                                   self.clients[kbid].pair1_balance)
-        volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
             logging.warn("Can't automate this trade, minimum volume transaction"+
                          " not reached %f/%f" % (volume, config.min_tx_volume))
-            logging.warn("Balance on %s: %f %s - Balance on %s: %f %s"
+            return
+
+ 
+        max_volume = self.get_min_tradeable_volume(buyprice,
+                                                   self.clients[kask].pair2_balance,
+                                                   self.clients[kbid].pair1_balance)
+
+        if max_volume < config.min_tx_volume:
+            _message = ("Insufficient funds!\n%s: %.4f %s\n%s: %.4f %s"
                          % (kask, self.clients[kask].pair2_balance, self.clients[kask].pair2_name,kbid,
                             self.clients[kbid].pair1_balance,self.clients[kbid].pair1_name))
+            logging.warn(_message)
+            send_message(_message)
             self.update_balance()
             return
+
+        volume = min(volume, max_volume, config.max_tx_volume)
+
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
             logging.warn("[TraderBot] Can't automate this trade, last trade " +
@@ -80,8 +87,14 @@ class BCHTraderBot(Observer):
     def execute_trade(self, volume, kask, kbid, weighted_buyprice,
                       weighted_sellprice, buyprice, sellprice):
         self.last_trade = time.time()
-        logging.info("Buy @%s %f BCH and sell @%s" % (kask, volume, kbid))
+        logging.info("Buy @%s %f BCH and Sell @%s" % (kask, volume, kbid))
         self.clients[kask].buy(volume, buyprice)
         self.clients[kbid].sell(volume, sellprice)
         # Update client balance
         self.update_balance()
+        _perc = (weighted_sellprice/weighted_buyprice - 1.0)*100.0
+        _message1 = ("Buy @%s %f BCH and Sell @%s\n" % (kask, volume, kbid))
+        _message2 = ("buyprice: %.5f\nsellprice %.5f\nw_buyprice %.5f\nw_sellprice %.5f\nperc %.2f%%\n"
+                        %(buyprice,sellprice,weighted_buyprice,weighted_sellprice,_perc))
+        send_message(_message1+_message2)
+

@@ -4,7 +4,7 @@ markets = [
 ]
 
 # observers if any
-# ["Logger", "DetailedLogger", "TraderBot", "BCHTraderBot", TraderBotSim", "HistoryDumper", "Emailer"]
+# ["Logger", "DetailedLogger", "TraderBot", "BCHTraderBot", TraderBotSim", "HistoryDumper", "Emailer", "Telegram"]
 observers = ["Logger"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
@@ -45,6 +45,12 @@ smtp_login = 'FIXME'
 smtp_passwd = 'FIXME'
 smtp_from = 'FIXME'
 smtp_to = 'FIXME'
+
+#### Telegram Observer Config
+#Turtorial for how to get id and token(https://www.forsomedefinition.com/automation/creating-telegram-bot-notifications/)
+telegram_chatid = '12345'
+telegram_token = '12345:xxxxxx'
+telegram_rmsc = 3 #telegram_repeat_message_send_count
 
 #### XMPP Observer
 xmpp_jid = "xx@blah.im"

@@ -9,6 +9,7 @@ import os
 import inspect
 from arbitrage.arbitrer import Arbitrer
 from arbitrage import public_markets
+from arbitrage.observers.telegram import send_message
 
 
 class ArbitrerCLI:
@@ -105,6 +106,7 @@ class ArbitrerCLI:
             s=traceback.format_exc()
             logging.info(e)
             logging.error(s)
+            send_message("Exception: " + str(e))
         
 
 def main():
