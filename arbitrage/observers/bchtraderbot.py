@@ -74,7 +74,7 @@ class BCHTraderBot(Observer):
                                                    self.clients[kask].pair2_balance,
                                                    self.clients[kbid].pair1_balance)
 
-        if max_volume < config.min_tx_volume:
+        if max_volume < config.min_tx_volume or max_volume < volume:
             _message = ("Insufficient funds!\n%s: %.4f %s\n%s: %.4f %s"
                          % (kask, self.clients[kask].pair2_balance, self.clients[kask].pair2_name,kbid,
                             self.clients[kbid].pair1_balance,self.clients[kbid].pair1_name))
