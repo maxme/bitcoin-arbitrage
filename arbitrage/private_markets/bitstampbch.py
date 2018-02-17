@@ -82,8 +82,8 @@ class PrivateBitstampBCH(MarketNoFiat):
             return
 
         #print(json.dumps(response))            
-        self.pair1_balance = float(response[str.lower(self.pair1_name)+"_balance"])
-        self.pair2_balance = float(response[str.lower(self.pair2_name)+"_balance"])
+        self.pair1_balance = float(response[str.lower(self.pair1_name)+"_available"])
+        self.pair2_balance = float(response[str.lower(self.pair2_name)+"_available"])
 
 
 
