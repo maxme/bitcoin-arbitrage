@@ -3,22 +3,23 @@ import sys
 import pysher
 from arbitrage.public_markets.market import Market
 import logging
-
+import time
 
 class Bitstamp(Market):
     def __init__(self, currency, code):
         super().__init__(currency)
         self.code = code
-        self.update_rate = 0.5
+        self.update_rate = 0.01
         self.pusher = pysher.Pusher("de504dc5763aeef9ff52",log_level=logging.ERROR)
         self.pusher.connection.bind('pusher:connection_established', self.connect_handler)
         self.pusher.connect()
         self.depth_data = {'asks':[],'bids':[]}
+        self.depth_update_time = time.time()
 
 
     def channel_callback(self, data):
-
         self.depth_data = json.loads(data)
+        self.depth_update_time = time.time()
 
     def connect_handler(self, data):
         channel_name = "order_book_"+self.code
@@ -30,6 +31,9 @@ class Bitstamp(Market):
 
 
     def update_depth(self):
+        timediff = time.time() - self.depth_update_time
+        if timediff > 2:
+            raise Exception('get bitstampws data timeout.')
 
         self.depth = self.format_depth(self.depth_data)
         

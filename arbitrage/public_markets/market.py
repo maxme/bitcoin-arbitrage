@@ -7,6 +7,7 @@ import sys
 from arbitrage import config
 from arbitrage.fiatconverter import FiatConverter
 from arbitrage.utils import log_exception
+from arbitrage.observers.telegram import send_message
 
 class Market(object):
     def __init__(self, currency):
@@ -27,7 +28,9 @@ class Market(object):
             self.ask_update_depth()
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
-            logging.warn('Market: %s order book is expired' % self.name)
+            _str = 'Market: %s order book is expired' % self.name
+            logging.warn(_str)
+            send_message(_str)
             self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
                 {'price': 0, 'amount': 0}]}
         return self.depth
