@@ -155,11 +155,12 @@ class Arbitrer(object):
     def tickers(self):
         for market in self.markets:
             item = market.get_ticker()
-            #logging.verbose("ticker: " + market.name + " - " + str( market.get_ticker()))
-            logging.verbose("ask p:%.4f v:%.4f bid p:%.4f v:%.4f -%s" % ( 
-                item['ask']['price'],item['ask']['amount'],
-                item['bid']['price'],item['bid']['amount'],
-                market.name))
+            if item['ask'] != 0 and item['ask'] != 0:
+                #logging.verbose("ticker: " + market.name + " - " + str( market.get_ticker()))
+                logging.verbose("ask p:%.4f v:%.4f bid p:%.4f v:%.4f -%s" % ( 
+                    item['ask']['price'],item['ask']['amount'],
+                    item['bid']['price'],item['bid']['amount'],
+                    market.name))
 
 
 

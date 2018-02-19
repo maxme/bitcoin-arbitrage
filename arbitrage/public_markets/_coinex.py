@@ -10,10 +10,10 @@ class Coinex(Market):
     def __init__(self, currency, code,reverse_pair = False):
         super().__init__(currency)
         self.code = code
-        self.update_rate = 20
+        self.update_rate = 0.5
         self.reverse_pair = reverse_pair
     def update_depth(self):
-        url = 'https://api.coinex.com/v1/market/depth?market=' + self.code + '&limit=10&merge=0'
+        url = 'https://api.coinex.com/v1/market/depth?market=' + self.code + '&limit=20&merge=0'
         req = urllib.request.Request(url, None, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",

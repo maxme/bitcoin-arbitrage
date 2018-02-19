@@ -13,7 +13,7 @@ class Market(object):
         self.name = self.__class__.__name__
         self.currency = currency
         self.depth_updated = 0
-        self.update_rate = 60
+        self.update_rate = 0.5
         if currency == "BTC":
             self.fiat = False
         else:

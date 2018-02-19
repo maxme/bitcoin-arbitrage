@@ -1,4 +1,4 @@
-from arbitrage.public_markets._bitstamp import Bitstamp
+from arbitrage.public_markets._bitstampws import Bitstamp
 
 class BitstampBCH(Bitstamp):
     def __init__(self):

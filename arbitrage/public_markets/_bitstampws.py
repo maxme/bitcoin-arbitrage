@@ -1,9 +1,8 @@
-import urllib.request
-import urllib.error
-import urllib.parse
 import json
 import sys
+import pysher
 from arbitrage.public_markets.market import Market
+import logging
 
 
 class Bitstamp(Market):
@@ -11,17 +10,29 @@ class Bitstamp(Market):
         super().__init__(currency)
         self.code = code
         self.update_rate = 0.5
+        self.pusher = pysher.Pusher("de504dc5763aeef9ff52",log_level=logging.ERROR)
+        self.pusher.connection.bind('pusher:connection_established', self.connect_handler)
+        self.pusher.connect()
+        self.depth_data = {'asks':[],'bids':[]}
+
+
+    def channel_callback(self, data):
+
+        self.depth_data = json.loads(data)
+
+    def connect_handler(self, data):
+        channel_name = "order_book_"+self.code
+
+        self.channel = self.pusher.subscribe(channel_name)
+
+        self.channel.bind('data', self.channel_callback)
+
+
 
     def update_depth(self):
-        url = 'https://www.bitstamp.net/api/v2/order_book/' + self.code
-        req = urllib.request.Request(url, None, headers={
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "*/*",
-            "User-Agent": "curl/7.24.0 (x86_64-apple-darwin12.0)"})
-        res = urllib.request.urlopen(req)
-        depth = json.loads(res.read().decode('utf8'))
-        self.depth = self.format_depth(depth)
 
+        self.depth = self.format_depth(self.depth_data)
+        
 
     def sort_and_format(self, l, reverse):
         r = []
@@ -36,5 +47,10 @@ class Bitstamp(Market):
         return {'asks': asks, 'bids': bids}
 
 def test_update_depth():
+    import time
     b = Bitstamp("BTC", "bchbtc")
-    b.update_depth()
+
+
+    while True:
+        time.sleep(1)
+        b.update_depth()
