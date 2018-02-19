@@ -10,6 +10,7 @@ class Bitstamp(Market):
         super().__init__(currency)
         self.code = code
         self.update_rate = 0.01
+        self.isWebsocket = True
         self.pusher = pysher.Pusher("de504dc5763aeef9ff52",log_level=logging.ERROR)
         self.pusher.connection.bind('pusher:connection_established', self.connect_handler)
         self.pusher.connect()

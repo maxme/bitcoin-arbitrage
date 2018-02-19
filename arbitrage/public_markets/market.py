@@ -15,6 +15,7 @@ class Market(object):
         self.currency = currency
         self.depth_updated = 0
         self.update_rate = 0.5
+        self.isWebsocket = False
         if currency == "BTC":
             self.fiat = False
         else:

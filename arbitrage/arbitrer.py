@@ -146,10 +146,16 @@ class Arbitrer(object):
     def update_depths(self):
         depths = {}
         futures = []
+        _need_wait = False
         for market in self.markets:
-            futures.append(self.threadpool.submit(self.__get_market_depth,
+            if market.isWebsocket:
+                self.__get_market_depth(market,depths)
+            else:
+                _need_wait = True
+                futures.append(self.threadpool.submit(self.__get_market_depth,
                                                   market, depths))
-        wait(futures, timeout=20)
+        if _need_wait:
+            wait(futures, timeout=20)
         return depths
 
     def tickers(self):
