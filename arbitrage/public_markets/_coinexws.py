@@ -18,6 +18,7 @@ class Coinex(Market):
         self.isWebsocket = True
         self.depth_data = {'asks':[],'bids':[]}
         self.depth_update_time = time.time()
+        self.last_ping_time = time.time()
         self.host = "wss://socket.coinex.com/"
 
         self.ws = WebSocketApp(self.host,
@@ -100,6 +101,9 @@ class Coinex(Market):
                 self._update_orderbook(data[1])
 
             self.depth_update_time = time.time()
+        elif 'result' in data:
+            if data['result'] == 'pong':
+                logging.verbose('get coinex pong message')
  
 
 
@@ -124,12 +128,23 @@ class Coinex(Market):
               "id":0
             }
         ws.send(json.dumps(jdata))
-
+    def ping(self):
+        self.last_ping_time = time.time()
+        jdata = {
+              "method":"server.ping",
+              "params":[],
+              "id":11
+            }
+        self.ws.send(json.dumps(jdata))
 
     def update_depth(self):
-        timediff = time.time() - self.depth_update_time
+        _cur_time = time.time()
+        timediff = _cur_time - self.depth_update_time
         if timediff > config.websocket_expiration_time:
             raise Exception('get coinexws data timeout.')
+        timediff = _cur_time - self.last_ping_time
+        if timediff > 5:
+            self.ping()
 
         self.depth = self.format_depth(self.depth_data)
         
