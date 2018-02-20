@@ -24,6 +24,7 @@ class Bitstamp(Market):
         self.depth_update_time = time.time()
 
     def connect_handler(self, data):
+        logging.info("### bitstamp ws opened ###")
         channel_name = "order_book_"+self.code
 
         self.channel = self.pusher.subscribe(channel_name)
