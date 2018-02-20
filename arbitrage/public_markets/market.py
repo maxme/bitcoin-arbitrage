@@ -16,6 +16,7 @@ class Market(object):
         self.depth_updated = 0
         self.update_rate = 0.5
         self.isWebsocket = False
+        self.shouldReportWebsocketTimeout = False
         if currency == "BTC":
             self.fiat = False
         else:
@@ -49,12 +50,21 @@ class Market(object):
             if self.fiat:
                 self.convert_to_usd()
             self.depth_updated = time.time()
+            self.shouldReportWebsocketTimeout = True
         except (urllib.error.HTTPError, urllib.error.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)
             log_exception(logging.DEBUG)
         except Exception as e:
-            logging.error("Can't update market: %s - %s" % (self.name, str(e)))
-            log_exception(logging.DEBUG)
+            if not self.isWebsocket:   
+                logging.error("Can't update market: %s - %s" % (self.name, str(e)))
+                log_exception(logging.DEBUG)
+            else:
+                #don't repeat report
+                if self.shouldReportWebsocketTimeout:
+                    logging.error(str(e))
+                    self.shouldReportWebsocketTimeout = False
+                
+
 
     def get_ticker(self):
         depth = self.get_depth()
