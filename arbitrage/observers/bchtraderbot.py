@@ -82,6 +82,7 @@ class BCHTraderBot(Observer):
                             self.clients[kbid].pair1_balance,self.clients[kbid].pair1_name))
             logging.warn(_message)
             send_message(_message)
+            time.sleep(5)
             self.update_balance()
             return
 
