@@ -113,6 +113,7 @@ class Coinex(Market):
 
     def on_open(self, ws):
         logging.info("### coinex ws opened ###")
+        self.depth_update_time = time.time()
         jdata = {
               "method":"depth.subscribe",
               "params":[
