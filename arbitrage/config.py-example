@@ -9,8 +9,18 @@ observers = ["Logger"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
-refresh_rate = 2
+websocket_expiration_time = 20  # in seconds
 
+trade_wait_time = 10  # in seconds
+
+refresh_rate = 0.1
+
+# SafeGuards
+max_tx_volume = 0.1
+min_tx_volume = 0.01  
+balance_margin = 0.01  # 1%
+profit_thresh = 0.000001  
+perc_thresh = 0.2  # in %
 
 # Arbitrage pair, parameter is to allow for more pairs to be traded than BTC_USD and BTC_EUR
 #pair = "BTC_USD"
@@ -32,12 +42,6 @@ bitstamp_api_secret = "xxxx"
 coinex_api_id="xxxx"
 coinex_api_key="xxxx"
 
-# SafeGuards
-max_tx_volume = 0.02  
-min_tx_volume = 0.001  
-balance_margin = 0.05  # 5%
-profit_thresh = 0.000001  
-perc_thresh = 0.15  # in %
 
 #### Emailer Observer Config
 smtp_host = 'FIXME'
