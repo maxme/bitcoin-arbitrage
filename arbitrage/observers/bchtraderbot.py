@@ -1,6 +1,7 @@
 import logging
 from arbitrage import config
 import time
+from concurrent.futures import ThreadPoolExecutor, wait
 from arbitrage.observers.observer import Observer
 from arbitrage.private_markets import bitstampbch
 from arbitrage.private_markets import coinexbch
@@ -16,6 +17,7 @@ class BCHTraderBot(Observer):
         self.last_trade = 0
         self.potential_trades = []
         self.update_balance_failed = False
+        self.threadpool = ThreadPoolExecutor(max_workers=10)
 
     def begin_opportunity_finder(self, depths):
         self.potential_trades = []
@@ -102,8 +104,12 @@ class BCHTraderBot(Observer):
                       weighted_sellprice, buyprice, sellprice):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BCH and Sell @%s" % (kask, volume, kbid))
-        self.clients[kask].buy(volume, buyprice)
-        self.clients[kbid].sell(volume, sellprice)
+
+        futures = []
+        futures.append(self.threadpool.submit(self.clients[kask].buy, volume, buyprice))
+        futures.append(self.threadpool.submit(self.clients[kbid].sell, volume, sellprice))
+        wait(futures, timeout=20)
+
         # Update client balance
         self.update_balance()
         _perc = (weighted_sellprice/weighted_buyprice - 1.0)*100.0
