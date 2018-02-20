@@ -1,4 +1,4 @@
-from arbitrage.public_markets._coinex import Coinex
+from arbitrage.public_markets._coinexws import Coinex
 
 class CoinexBCH(Coinex):
     def __init__(self):

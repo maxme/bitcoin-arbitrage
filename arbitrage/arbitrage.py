@@ -101,6 +101,7 @@ class ArbitrerCLI:
         args = parser.parse_args()
         self.init_logger(args)
         try:
+            send_message("Arbitrage Started!")
             self.exec_command(args)
         except Exception as e:
             s=traceback.format_exc()

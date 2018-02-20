@@ -4,12 +4,13 @@ import pysher
 from arbitrage.public_markets.market import Market
 import logging
 import time
+from arbitrage import config
 
 class Bitstamp(Market):
     def __init__(self, currency, code):
         super().__init__(currency)
         self.code = code
-        self.update_rate = 0.01
+        self.update_rate = 0.0001
         self.isWebsocket = True
         self.pusher = pysher.Pusher("de504dc5763aeef9ff52",log_level=logging.ERROR)
         self.pusher.connection.bind('pusher:connection_established', self.connect_handler)
@@ -33,7 +34,7 @@ class Bitstamp(Market):
 
     def update_depth(self):
         timediff = time.time() - self.depth_update_time
-        if timediff > 2:
+        if timediff > config.websocket_expiration_time:
             raise Exception('get bitstampws data timeout.')
 
         self.depth = self.format_depth(self.depth_data)
