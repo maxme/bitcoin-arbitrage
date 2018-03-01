@@ -35,6 +35,7 @@ class Market(object):
             send_message(_str)
             self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
                 {'price': 0, 'amount': 0}]}
+            raise Exception('get depth timeout.')
         return self.depth
 
     def convert_to_usd(self):

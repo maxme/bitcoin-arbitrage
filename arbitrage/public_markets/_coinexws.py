@@ -141,6 +141,7 @@ class Coinex(Market):
         _cur_time = time.time()
         timediff = _cur_time - self.depth_update_time
         if timediff > config.websocket_expiration_time:
+            self.depth_data = {'asks':[],'bids':[]}
             raise Exception('get coinexws data timeout.')
         timediff = _cur_time - self.last_ping_time
         if timediff > 5:

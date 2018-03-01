@@ -18,7 +18,6 @@ class Bitstamp(Market):
         self.depth_data = {'asks':[],'bids':[]}
         self.depth_update_time = time.time()
 
-
     def channel_callback(self, data):
         self.depth_data = json.loads(data)
         self.depth_update_time = time.time()
@@ -36,6 +35,7 @@ class Bitstamp(Market):
     def update_depth(self):
         timediff = time.time() - self.depth_update_time
         if timediff > config.websocket_expiration_time:
+            self.depth_data = {'asks':[],'bids':[]}
             raise Exception('get bitstampws data timeout.')
 
         self.depth = self.format_depth(self.depth_data)

@@ -111,10 +111,8 @@ class ArbitrerCLI:
         
 
 def main():
-    cli = ArbitrerCLI()
-    cli.main()
+    while True:
+        cli = ArbitrerCLI()
+        cli.main()
 
 
-if __name__ == "__main__":
-    main()
-    
