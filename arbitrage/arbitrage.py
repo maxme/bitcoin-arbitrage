@@ -7,6 +7,7 @@ import sys
 import glob
 import os
 import inspect
+import time
 from arbitrage.arbitrer import Arbitrer
 from arbitrage import public_markets
 from arbitrage.observers.telegram import send_message
@@ -114,5 +115,6 @@ def main():
     while True:
         cli = ArbitrerCLI()
         cli.main()
+        time.sleep(60)
 
 
