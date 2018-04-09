@@ -12,14 +12,20 @@ repeat_count = 0
 prev_message = ''
 
 def send_message(message):
-    for i in range(0,100):
-        while True:
-            try:
-                _send_message(message)
-            except Exception as e:
-                time.sleep(20)
-                continue
-            break
+
+    max_retry = 10
+    retry = 0
+    while retry < max_retry:
+        try:
+            _send_message(message)
+            print('retry times',retry)
+        except Exception as e:
+            print('send_message occur exception!')
+            time.sleep(20)
+            retry = retry+1
+            continue
+        break
+
 
 def _send_message(message):
     global prev_message,repeat_count
