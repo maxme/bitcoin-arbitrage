@@ -5,12 +5,23 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import json
+import time
 
 
 repeat_count = 0
 prev_message = ''
 
 def send_message(message):
+    for i in range(0,100):
+        while True:
+            try:
+                _send_message(message)
+            except Exception as e:
+                time.sleep(20)
+                continue
+            break
+
+def _send_message(message):
     global prev_message,repeat_count
     if message == prev_message:
         repeat_count += 1
