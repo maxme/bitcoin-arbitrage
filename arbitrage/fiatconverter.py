@@ -9,7 +9,7 @@ import time
 
 class FiatConverter:
     __shared_state = {}
-    rate_exchange_url = "https://api.fixer.io/latest?base=%s&symbols=%s"
+    rate_exchange_url = "https://free.currencyconverterapi.com/api/v5/convert?q=%s_%s&compact=ultra"
 
     def __init__(self):
         """USD is used as pivot"""
@@ -29,9 +29,9 @@ class FiatConverter:
         res = urllib.request.urlopen(url)
         data = json.loads(res.read().decode('utf8'))
         rate = 0
-        if "rates" in data:
-            rate = float(data["rates"][code_to]) * (1.0 - self.bank_fee)
-        else:
+        try:
+            rate = float(data[str.format("{}_{}", code_from, code_to)] * (1.0 - self.bank_fee))
+        except:
             logging.error("Can't update fiat conversion rate: %s", url)
         return rate
 
