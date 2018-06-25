@@ -106,10 +106,13 @@ class BCHTraderBot(Observer):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BCH and Sell @%s" % (kask, volume, kbid))
 
-        futures = []
-        futures.append(self.threadpool.submit(self.clients[kask].buy, volume, buyprice))
-        futures.append(self.threadpool.submit(self.clients[kbid].sell, volume, sellprice))
-        wait(futures, timeout=20)
+        self.clients[kask].buy(volume, buyprice)
+        self.clients[kbid].sell(volume, sellprice)
+
+        #futures = []
+        #futures.append(self.threadpool.submit(self.clients[kask].buy, volume, buyprice))
+        #futures.append(self.threadpool.submit(self.clients[kbid].sell, volume, sellprice))
+        #wait(futures, timeout=20)
 
         # Update client balance
         self.update_balance()
