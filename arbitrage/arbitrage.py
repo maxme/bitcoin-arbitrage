@@ -112,9 +112,9 @@ class ArbitrerCLI:
         
 
 def main():
-    while True:
-        cli = ArbitrerCLI()
-        cli.main()
-        time.sleep(60)
+    #while True:
+    cli = ArbitrerCLI()
+    cli.main()
+    #time.sleep(60)
 
 
