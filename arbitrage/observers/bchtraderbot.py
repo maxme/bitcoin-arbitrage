@@ -106,8 +106,12 @@ class BCHTraderBot(Observer):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BCH and Sell @%s" % (kask, volume, kbid))
 
-        self.clients[kask].buy(volume, buyprice)
-        self.clients[kbid].sell(volume, sellprice)
+        if kask == 'CoinexBCH':
+            self.clients[kask].buy(volume, buyprice)
+            self.clients[kbid].sell(volume, sellprice)
+        else:
+            self.clients[kbid].sell(volume, sellprice)
+            self.clients[kask].buy(volume, buyprice)
 
         #futures = []
         #futures.append(self.threadpool.submit(self.clients[kask].buy, volume, buyprice))
