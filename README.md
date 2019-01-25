@@ -4,29 +4,29 @@ It gets order books from supported exchanges and calculate arbitrage
 opportunities between each markets. It takes market depth into account.
 
 Currently supported exchanges to get data:
- - Bitstamp (USD, EUR)
- - Paymium (EUR)
- - BTC-e (USD, EUR)
- - Bitfinex (USD, EUR)
- - bitFlyer (USD, EUR)
- - Kraken (USD, EUR)
- - OkCoin (CNY)
- - CampBX (USD)
- - Gemini (USD)
- - BTCC (CNY)
- - GDAX (USD, EUR)
- - CEX.io (USD, EUR)
+
+- Bitstamp (USD, EUR)
+- Paymium (EUR)
+- BTC-e (USD, EUR)
+- Bitfinex (USD, EUR)
+- bitFlyer (USD, EUR)
+- Kraken (USD, EUR)
+- OkCoin (CNY)
+- CampBX (USD)
+- Gemini (USD)
+- BTCC (CNY)
+- GDAX (USD, EUR)
+- CEX.io (USD, EUR)
 
 Currently supported exchanges to automate trade:
- - Bitstamp (USD)
- - Paymium (EUR) - (API changed)
 
-Donation are always welcome: **1MaximevzHUTMykWG3RK88BzevbtYCJoqq**
+- Bitstamp (USD)
+- Paymium (EUR) - (API changed)
 
 # WARNING
 
 **Real trading bots are included. Don't put your API keys in config.py
-  if you don't know what you are doing.**
+if you don't know what you are doing.**
 
 # Installation And Configuration
 
@@ -48,7 +48,7 @@ To use the observer XMPPMessager you will need to install sleekxmpp:
 
 To run the opportunity watcher:
 
-    $ python3 -m arbitrage
+    $ python3 -m arbitrage -v
     2013-03-12 03:52:14,341 [INFO] profit: 30.539722 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 29.4670 (Bitcoin24EUR) ~10.41%
     2013-03-12 03:52:14,356 [INFO] profit: 66.283642 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (PaymiumEUR) ~22.59%
     2013-03-12 03:52:14,357 [INFO] profit: 31.811390 EUR with volume: 10 BTC - buy at 29.3410 (MtGoxEUR) sell at 30.0000 (IntersangoEUR) ~10.84%
@@ -75,19 +75,18 @@ Help:
 
 # TODO
 
- * Tests
- * Write documentation
- * Add other exchanges:
-   * icbit
-   * BitFinex
- * Update order books with a WebSocket client for supported exchanges
-   (MtGox, Paymium)
- * Better history handling for observer "HistoryDumper" (Redis ?)
- * Move EUR / USD from a market to an other:
-   * Coupons
-   * Ripple ?
-   * Negative Operations
-   * use Litecoin or other cryptocurrencies trades
+- Tests
+- Write documentation
+- Add other exchanges:
+  - icbit
+- Update order books with a WebSocket client for supported exchanges
+  (Kraken, Bitfinex, Paymium)
+- Better history handling for observer "HistoryDumper" (Redis ?)
+- Move EUR / USD from a market to an other:
+  - Coupons
+  - Ripple ?
+  - Negative Operations
+  - use Litecoin or other cryptocurrencies trades
 
 # LICENSE
 
