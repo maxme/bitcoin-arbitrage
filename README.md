@@ -40,6 +40,10 @@ variants of them, use:
 
     $ sudo apt-get install python3 python3-pip python-nose
 
+To install on Windows, use:
+
+    py -m pip install -r .\requirements.txt
+
 To use the observer XMPPMessager you will need to install sleekxmpp:
 
     $ pip3 install sleekxmpp

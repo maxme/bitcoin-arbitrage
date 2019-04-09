@@ -1,6 +1,6 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
-from .market import Market, TradeException, GetInfoException
+from .marketnofiat import MarketNoFiat, TradeException, GetInfoException
 from arbitrage import config
 import time
 import base64
@@ -13,10 +13,10 @@ import sys
 import json
 import requests
 
-class PrivateBitstampUSD(Market):
+class PrivateBitstampBCH(MarketNoFiat):
     balance_url = "https://www.bitstamp.net/api/v2/balance/"
-    buy_url = "https://www.bitstamp.net/api/buy/"
-    sell_url = "https://www.bitstamp.net/api/sell/"
+    buy_url = "https://www.bitstamp.net/api/v2/buy/bchbtc/"
+    sell_url = "https://www.bitstamp.net/api/v2/sell/bchbtc/"
 
     def __init__(self):
         super().__init__()
@@ -24,7 +24,6 @@ class PrivateBitstampUSD(Market):
         self.client_id = config.bitstamp_client_id
         self.api_key = config.bitstamp_api_key
         self.api_secret = config.bitstamp_api_secret
-        self.currency = "USD"
         self.get_info()        
         
     def _create_nonce(self):
@@ -58,36 +57,38 @@ class PrivateBitstampUSD(Market):
         if code == 200:
             #jsonstr = response.read().decode('utf-8')
             #return json.loads(jsonstr)
-            if 'error' in response.json():
-                return False, response.json()['error']
-            else:
-                return response.json()
+            return response.json()
         return None
 
     def _buy(self, amount, price):
         """Create a buy limit order"""
-        params = {"amount": amount, "price": price}
+        params = {"amount": round(amount,8), "price": round(price,8)}
         response = self._send_request(self.buy_url, params)
-        if "error" in response:
-            raise TradeException(response["error"])
+        if "status" in response and "error" == response["status"]:
+            raise TradeException(response["reason"])
 
     def _sell(self, amount, price):
         """Create a sell limit order"""
-        params = {"amount": amount, "price": price}
+        params = {"amount": round(amount,8), "price": round(price,8)}
         response = self._send_request(self.sell_url, params)
-        if "error" in response:
-            raise TradeException(response["error"])
+        if "status" in response and "error" == response["status"]:
+            raise TradeException(response["reason"])
 
     def get_info(self):
         """Get balance"""
         response = self._send_request(self.balance_url)
-        if False in response:
-            raise GetInfoException(response[1])
-        if response:
-            #print(json.dumps(response))            
-            self.btc_balance = float(response["btc_available"])
-            self.usd_balance = float(response["usd_available"])
-            self.pair1_balance = float(response[str.lower(self.pair1_name)+"_balance"])
-            self.pair2_balance = float(response[str.lower(self.pair2_name)+"_balance"])
-        else:
-            raise GetInfoException("Critical error no balances retrieved")
+        if "status" in response and "error" == response["status"]:
+            raise GetInfoException(response["reason"])
+            return
+
+        #print(json.dumps(response))            
+        self.pair1_balance = float(response[str.lower(self.pair1_name)+"_available"])
+        self.pair2_balance = float(response[str.lower(self.pair2_name)+"_available"])
+
+
+
+
+if __name__ == "__main__":
+    market = PrivateBitstampBCH()
+    market.get_info()
+    print(market)

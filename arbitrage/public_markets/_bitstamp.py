@@ -10,7 +10,7 @@ class Bitstamp(Market):
     def __init__(self, currency, code):
         super().__init__(currency)
         self.code = code
-        self.update_rate = 20
+        self.update_rate = 0.5
 
     def update_depth(self):
         url = 'https://www.bitstamp.net/api/v2/order_book/' + self.code
@@ -21,6 +21,7 @@ class Bitstamp(Market):
         res = urllib.request.urlopen(req)
         depth = json.loads(res.read().decode('utf8'))
         self.depth = self.format_depth(depth)
+
 
     def sort_and_format(self, l, reverse):
         r = []
@@ -33,3 +34,7 @@ class Bitstamp(Market):
         bids = self.sort_and_format(depth['bids'], True)
         asks = self.sort_and_format(depth['asks'], False)
         return {'asks': asks, 'bids': bids}
+
+def test_update_depth():
+    b = Bitstamp("BTC", "bchbtc")
+    b.update_depth()

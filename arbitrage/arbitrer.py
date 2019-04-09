@@ -35,6 +35,7 @@ class Arbitrer(object):
         for observer_name in _observers:
             try:
                 exec('import arbitrage.observers.' + observer_name.lower())
+
                 observer = eval('arbitrage.observers.' + observer_name.lower() + '.' +
                                 observer_name + '()')
                 self.observers.append(observer)
@@ -145,16 +146,30 @@ class Arbitrer(object):
     def update_depths(self):
         depths = {}
         futures = []
+        _need_wait = False
         for market in self.markets:
-            futures.append(self.threadpool.submit(self.__get_market_depth,
+            if market.isWebsocket:
+                self.__get_market_depth(market,depths)
+            else:
+                _need_wait = True
+                futures.append(self.threadpool.submit(self.__get_market_depth,
                                                   market, depths))
-        wait(futures, timeout=20)
+        if _need_wait:
+            wait(futures, timeout=20)
         return depths
 
     def tickers(self):
         for market in self.markets:
-            logging.verbose("ticker: " + market.name + " - " + str(
-                market.get_ticker()))
+            item = market.get_ticker()
+            if item['ask'] != 0 and item['ask'] != 0:
+                #logging.verbose("ticker: " + market.name + " - " + str( market.get_ticker()))
+                logging.verbose("ask p:%.4f v:%.4f bid p:%.4f v:%.4f -%s" % ( 
+                    item['ask']['price'],item['ask']['amount'],
+                    item['bid']['price'],item['bid']['amount'],
+                    market.name))
+
+
+
 
     def replay_history(self, directory):
         import os

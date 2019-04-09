@@ -7,15 +7,22 @@ import sys
 from arbitrage import config
 from arbitrage.fiatconverter import FiatConverter
 from arbitrage.utils import log_exception
+from arbitrage.observers.telegram import send_message
 
 class Market(object):
     def __init__(self, currency):
         self.name = self.__class__.__name__
         self.currency = currency
         self.depth_updated = 0
-        self.update_rate = 60
-        self.fc = FiatConverter()
-        self.fc.update()
+        self.update_rate = 0.5
+        self.isWebsocket = False
+        self.shouldReportWebsocketTimeout = False
+        if currency == "BTC":
+            self.fiat = False
+        else:
+            self.fiat = True
+            self.fc = FiatConverter()
+            self.fc.update()
 
     def get_depth(self):
         timediff = time.time() - self.depth_updated
@@ -23,9 +30,12 @@ class Market(object):
             self.ask_update_depth()
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
-            logging.warn('Market: %s order book is expired' % self.name)
+            _str = 'Market: %s order book is expired' % self.name
+            logging.warn(_str)
+            send_message(_str)
             self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
                 {'price': 0, 'amount': 0}]}
+            raise Exception('get depth timeout.')
         return self.depth
 
     def convert_to_usd(self):
@@ -38,14 +48,24 @@ class Market(object):
     def ask_update_depth(self):
         try:
             self.update_depth()
-            self.convert_to_usd()
+            if self.fiat:
+                self.convert_to_usd()
             self.depth_updated = time.time()
+            self.shouldReportWebsocketTimeout = True
         except (urllib.error.HTTPError, urllib.error.URLError) as e:
             logging.error("HTTPError, can't update market: %s" % self.name)
             log_exception(logging.DEBUG)
         except Exception as e:
-            logging.error("Can't update market: %s - %s" % (self.name, str(e)))
-            log_exception(logging.DEBUG)
+            if not self.isWebsocket:   
+                logging.error("Can't update market: %s - %s" % (self.name, str(e)))
+                log_exception(logging.DEBUG)
+            else:
+                #don't repeat report
+                if self.shouldReportWebsocketTimeout:
+                    logging.error(str(e))
+                    self.shouldReportWebsocketTimeout = False
+                
+
 
     def get_ticker(self):
         depth = self.get_depth()

@@ -2,7 +2,6 @@
 
 import logging
 from arbitrage import config
-from arbitrage.fiatconverter import FiatConverter
 
 class TradeException(Exception):
     pass
@@ -10,37 +9,29 @@ class TradeException(Exception):
 class GetInfoException(Exception):
     pass
 
-class Market:
+class MarketNoFiat:
     def __init__(self):
         self.name = self.__class__.__name__
-        self.btc_balance = 0.
-        self.eur_balance = 0.
-        self.usd_balance = 0.
         self.pair = config.pair
         pair_names = str.split(self.pair, "_")
         self.pair1_name = str.upper(pair_names[0])
         self.pair2_name = str.upper(pair_names[1])
-        self.fc = FiatConverter()
 
     def __str__(self):
-        return "%s: %s" % (self.name, str({"btc_balance": self.btc_balance,
-                                           "eur_balance": self.eur_balance,
-                                           "usd_balance": self.usd_balance}))
+        return "%s: %s" % (self.name, str({self.pair1_name: self.pair1_balance,
+                                           self.pair2_name: self.pair2_balance
+                                           }))
 
     def buy(self, amount, price):
-        """Orders are always priced in USD"""
-        local_currency_price = self.fc.convert(price, "USD", self.currency)
-        logging.info("Buy %f BTC at %f %s (%f USD) @%s" % (amount,
-                     local_currency_price, self.currency, price, self.name))
-        self._buy(amount, local_currency_price)
+        logging.info("Buy %f %s at %f %s @%s" % (amount,self.pair1_name,
+                     price,self.pair2_name,self.name))
+        self._buy(amount, price)
 
 
     def sell(self, amount, price):
-        """Orders are always priced in USD"""
-        local_currency_price = self.fc.convert(price, "USD", self.currency)
-        logging.info("Sell %f BTC at %f %s (%f USD) @%s" % (amount,
-                     local_currency_price, self.currency, price, self.name))
-        self._sell(amount, local_currency_price)
+        logging.info("Sell %f %s at %f %s @%s" % (amount,self.pair1_name,
+                     price,self.pair2_name,self.name))
+        self._sell(amount, price)
 
     def _buy(self, amount, price):
         raise NotImplementedError("%s.sell(self, amount, price)" % self.name)

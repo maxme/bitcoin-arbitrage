@@ -41,3 +41,5 @@ nosetests.xml
 config.py
 old/
 tmp/
+project.sublime-project
+project.sublime-workspace

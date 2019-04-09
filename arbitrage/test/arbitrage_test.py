@@ -48,6 +48,17 @@ depths3 = {
               {'amount': 5, 'price': 32.6},
               {'amount': 10, 'price': 32.3}]}}
 
+depths4 = {
+    'BitstampEUR':
+    {'asks': [{'amount': 1, 'price': 34.2},
+              {'amount': 2, 'price': 34.3},
+              {'amount': 3, 'price': 34.5},
+              {'amount': 3, 'price': 38.0}]},
+    'KrakenEUR':
+    {'bids': [{'amount': 2, 'price': 33.2},
+              {'amount': 3, 'price': 33.1},
+              {'amount': 5, 'price': 32.6},
+              {'amount': 10, 'price': 32.3}]}}
 
 class TestArbitrage(unittest.TestCase):
     def setUp(self):
@@ -70,6 +81,13 @@ class TestArbitrage(unittest.TestCase):
 
     def test_getprofit3(self):
         self.arbitrer.depths = depths3
+        profit, vol, wb, ws = self.arbitrer.get_profit_for(
+            2, 1, 'BitstampEUR', 'KrakenEUR')
+        assert(profit == 0)
+        assert(vol == 0)
+
+    def test_getprofit4(self):
+        self.arbitrer.depths = depths4
         profit, vol, wb, ws = self.arbitrer.get_profit_for(
             2, 1, 'BitstampEUR', 'KrakenEUR')
         assert(profit == 0)
