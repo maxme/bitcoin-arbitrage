@@ -4,8 +4,19 @@ python:
   - "3.7"
 
 install:
+  # Install dependencies
   - pip install -r requirements.txt
+  # Run setup install
   - python setup.py -q install
+  # Instal dev dependencies
+  - pip install nose black flake8
 
 script:
+  # Run formatter
+  - ./tools/inplace-code-formatting.sh
+
+  # Run linter
+  - flake8 .
+
+  # Run tests
   - nosetests arbitrage/
