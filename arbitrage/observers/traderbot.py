@@ -36,50 +36,66 @@ class TraderBot(Observer):
         for kclient in self.clients:
             self.clients[kclient].get_info()
 
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
-                    weighted_buyprice, weighted_sellprice):
+    def opportunity(
+        self,
+        profit,
+        volume,
+        buyprice,
+        kask,
+        sellprice,
+        kbid,
+        perc,
+        weighted_buyprice,
+        weighted_sellprice,
+    ):
         if profit < config.profit_thresh or perc < config.perc_thresh:
-            logging.verbose("[TraderBot] Profit or profit percentage lower than"+
-                            " thresholds")
+            logging.verbose("[TraderBot] Profit or profit percentage lower than" + " thresholds")
             return
         if kask not in self.clients:
-            logging.warn("[TraderBot] Can't automate this trade, client not "+
-                         "available: %s" % kask)
+            logging.warn(
+                "[TraderBot] Can't automate this trade, client not " + "available: %s" % kask
+            )
             return
         if kbid not in self.clients:
-            logging.warn("[TraderBot] Can't automate this trade, " +
-                         "client not available: %s" % kbid)
+            logging.warn(
+                "[TraderBot] Can't automate this trade, " + "client not available: %s" % kbid
+            )
             return
         volume = min(config.max_tx_volume, volume)
 
         # Update client balance
         self.update_balance()
-        max_volume = self.get_min_tradeable_volume(buyprice,
-                                                   self.clients[kask].usd_balance,
-                                                   self.clients[kbid].btc_balance)
+        max_volume = self.get_min_tradeable_volume(
+            buyprice, self.clients[kask].usd_balance, self.clients[kbid].btc_balance
+        )
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction"+
-                         " not reached %f/%f" % (volume, config.min_tx_volume))
-            logging.warn("Balance on %s: %f USD - Balance on %s: %f BTC"
-                         % (kask, self.clients[kask].usd_balance, kbid,
-                            self.clients[kbid].btc_balance))
+            logging.warn(
+                "Can't automate this trade, minimum volume transaction"
+                + " not reached %f/%f" % (volume, config.min_tx_volume)
+            )
+            logging.warn(
+                "Balance on %s: %f USD - Balance on %s: %f BTC"
+                % (kask, self.clients[kask].usd_balance, kbid, self.clients[kbid].btc_balance)
+            )
             return
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
-            logging.warn("[TraderBot] Can't automate this trade, last trade " +
-                         "occured %.2f seconds ago" %
-                         (current_time - self.last_trade))
+            logging.warn(
+                "[TraderBot] Can't automate this trade, last trade "
+                + "occured %.2f seconds ago" % (current_time - self.last_trade)
+            )
             return
-        self.potential_trades.append([profit, volume, kask, kbid,
-                                      weighted_buyprice, weighted_sellprice,
-                                      buyprice, sellprice])
+        self.potential_trades.append(
+            [profit, volume, kask, kbid, weighted_buyprice, weighted_sellprice, buyprice, sellprice]
+        )
 
     def watch_balances(self):
         pass
 
-    def execute_trade(self, volume, kask, kbid, weighted_buyprice,
-                      weighted_sellprice, buyprice, sellprice):
+    def execute_trade(
+        self, volume, kask, kbid, weighted_buyprice, weighted_sellprice, buyprice, sellprice
+    ):
         self.last_trade = time.time()
         logging.info("Buy @%s %f BTC and sell @%s" % (kask, volume, kbid))
         self.clients[kask].buy(volume, buyprice)

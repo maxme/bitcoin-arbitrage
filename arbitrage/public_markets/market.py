@@ -8,6 +8,7 @@ from arbitrage import config
 from arbitrage.fiatconverter import FiatConverter
 from arbitrage.utils import log_exception
 
+
 class Market(object):
     def __init__(self, currency):
         self.name = self.__class__.__name__
@@ -23,9 +24,8 @@ class Market(object):
             self.ask_update_depth()
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
-            logging.warn('Market: %s order book is expired' % self.name)
-            self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
-                {'price': 0, 'amount': 0}]}
+            logging.warn("Market: %s order book is expired" % self.name)
+            self.depth = {"asks": [{"price": 0, "amount": 0}], "bids": [{"price": 0, "amount": 0}]}
         return self.depth
 
     def convert_to_usd(self):
@@ -49,10 +49,9 @@ class Market(object):
 
     def get_ticker(self):
         depth = self.get_depth()
-        res = {'ask': 0, 'bid': 0}
-        if len(depth['asks']) > 0 and len(depth["bids"]) > 0:
-            res = {'ask': depth['asks'][0],
-                   'bid': depth['bids'][0]}
+        res = {"ask": 0, "bid": 0}
+        if len(depth["asks"]) > 0 and len(depth["bids"]) > 0:
+            res = {"ask": depth["asks"][0], "bid": depth["bids"][0]}
         return res
 
     ## Abstract methods

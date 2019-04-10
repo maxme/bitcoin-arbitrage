@@ -36,9 +36,8 @@ class BitFlyer(Market):
         self.update_rate = 20
 
     def update_depth(self):
-        res = urllib.request.urlopen(
-            'https://api.bitflyer.com/v1/board?product_code=' + self.code)
-        jsonstr = res.read().decode('utf8')
+        res = urllib.request.urlopen("https://api.bitflyer.com/v1/board?product_code=" + self.code)
+        jsonstr = res.read().decode("utf8")
         try:
             depth = json.loads(jsonstr)
         except Exception:
@@ -49,11 +48,10 @@ class BitFlyer(Market):
         l.sort(key=lambda x: float(x["price"]), reverse=reverse)
         r = []
         for i in l:
-            r.append({'price': float(i['price']),
-                      'amount': float(i['size'])})
+            r.append({"price": float(i["price"]), "amount": float(i["size"])})
         return r
 
     def format_depth(self, depth):
-        bids = self.sort_and_format(depth['bids'], True)
-        asks = self.sort_and_format(depth['asks'], False)
-        return {'asks': asks, 'bids': bids}
+        bids = self.sort_and_format(depth["bids"], True)
+        asks = self.sort_and_format(depth["asks"], False)
+        return {"asks": asks, "bids": bids}

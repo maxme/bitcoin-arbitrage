@@ -30,22 +30,22 @@ class PrivateBitstampUSD(Market):
 
     def _send_request(self, url, params={}, extra_headers=None):
         headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+            "Content-type": "application/json",
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "User-Agent": "Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)",
         }
         if extra_headers is not None:
             for k, v in extra_headers.items():
                 headers[k] = v
 
-        params['user'] = self.username
-        params['password'] = self.password
+        params["user"] = self.username
+        params["password"] = self.password
         postdata = urllib.parse.urlencode(params).encode("utf-8")
         req = urllib.request.Request(url, postdata, headers=headers)
         response = urllib.request.urlopen(req)
         code = response.getcode()
         if code == 200:
-            jsonstr = response.read().decode('utf-8')
+            jsonstr = response.read().decode("utf-8")
             return json.loads(jsonstr)
         return None
 

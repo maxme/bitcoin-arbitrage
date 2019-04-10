@@ -33,9 +33,9 @@ class PrivatePaymium(Market):
 
     def _send_request(self, url, params=[], extra_headers=None):
         headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+            "Content-type": "application/json",
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "User-Agent": "Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)",
         }
         if extra_headers is not None:
             for k, v in extra_headers.items():
@@ -43,18 +43,16 @@ class PrivatePaymium(Market):
 
         req = None
         if params:
-            req = urllib.request.Request(
-                url, json.dumps(params), headers=headers)
+            req = urllib.request.Request(url, json.dumps(params), headers=headers)
         else:
             req = urllib.request.Request(url, headers=headers)
-        userpass = '%s:%s' % (self.username, self.password)
-        base64string = base64.b64encode(bytes(
-            userpass, 'utf-8')).decode('ascii')
+        userpass = "%s:%s" % (self.username, self.password)
+        base64string = base64.b64encode(bytes(userpass, "utf-8")).decode("ascii")
         req.add_header("Authorization", "Basic %s" % base64string)
         response = urllib.request.urlopen(req)
         code = response.getcode()
         if code == 200:
-            jsonstr = response.read().decode('utf-8')
+            jsonstr = response.read().decode("utf-8")
             return json.loads(jsonstr)
         return None
 
@@ -88,6 +86,7 @@ class PrivatePaymium(Market):
             self.btc_balance = response["BTC"]
             self.eur_balance = response["EUR"]
             self.usd_balance = self.fc.convert(self.eur_balance, "EUR", "USD")
+
 
 if __name__ == "__main__":
     market = PrivatePaymium()

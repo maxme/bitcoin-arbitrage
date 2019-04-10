@@ -34,13 +34,13 @@ class ArbitrerCLI:
     def list_markets(self):
         markets = []
         for filename in glob.glob(os.path.join(public_markets.__path__[0], "*.py")):
-            module_name = os.path.basename(filename).replace('.py', '')
-            if not module_name.startswith('_'):
+            module_name = os.path.basename(filename).replace(".py", "")
+            if not module_name.startswith("_"):
                 module = __import__("arbitrage.public_markets." + module_name)
-                test = eval('module.public_markets.' + module_name)
+                test = eval("module.public_markets." + module_name)
                 for name, obj in inspect.getmembers(test):
-                    if inspect.isclass(obj) and 'Market' in (j.__name__ for j in obj.mro()[1:]):
-                        if not obj.__module__.split('.')[-1].startswith('_'):
+                    if inspect.isclass(obj) and "Market" in (j.__name__ for j in obj.mro()[1:]):
+                        if not obj.__module__.split(".")[-1].startswith("_"):
                             markets.append(obj.__name__)
         markets.sort()
         print("\n".join(markets))
@@ -53,9 +53,10 @@ class ArbitrerCLI:
         pmarkets = args.markets.split(",")
         pmarketsi = []
         for pmarket in pmarkets:
-            exec('import arbitrage.private_markets.' + pmarket.lower())
-            market = eval('arbitrage.private_markets.' + pmarket.lower()
-                          + '.Private' + pmarket + '()')
+            exec("import arbitrage.private_markets." + pmarket.lower())
+            market = eval(
+                "arbitrage.private_markets." + pmarket.lower() + ".Private" + pmarket + "()"
+            )
             pmarketsi.append(market)
         for market in pmarketsi:
             print(market)
@@ -73,28 +74,33 @@ class ArbitrerCLI:
             level = logging.VERBOSE
         if args.debug:
             level = logging.DEBUG
-        logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
-                            level=level)
+        logging.basicConfig(format="%(asctime)s [%(levelname)s] %(message)s", level=level)
 
     def main(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument("-d", "--debug", help="debug verbose mode",
-                            action="store_true")
-        parser.add_argument("-v", "--verbose", help="info verbose mode",
-                            action="store_true")
-        parser.add_argument("-o", "--observers", type=str,
-                            help="observers, example: -oLogger,Emailer")
-        parser.add_argument("-m", "--markets", type=str,
-                            help="markets, example: -m BitstampEUR,KrakenEUR")
-        parser.add_argument("command", nargs='*', default="watch",
-                            help='verb: "watch|replay-history|get-balance|list-public-markets"')
+        parser.add_argument("-d", "--debug", help="debug verbose mode", action="store_true")
+        parser.add_argument("-v", "--verbose", help="info verbose mode", action="store_true")
+        parser.add_argument(
+            "-o", "--observers", type=str, help="observers, example: -oLogger,Emailer"
+        )
+        parser.add_argument(
+            "-m", "--markets", type=str, help="markets, example: -m BitstampEUR,KrakenEUR"
+        )
+        parser.add_argument(
+            "command",
+            nargs="*",
+            default="watch",
+            help='verb: "watch|replay-history|get-balance|list-public-markets"',
+        )
         args = parser.parse_args()
         self.init_logger(args)
         self.exec_command(args)
 
+
 def main():
     cli = ArbitrerCLI()
     cli.main()
+
 
 if __name__ == "__main__":
     main()

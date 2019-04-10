@@ -5,8 +5,7 @@ from arbitrage import config
 
 
 class MockMarket(object):
-    def __init__(self, name, fee=0, usd_balance=500., btc_balance=15.,
-                 persistent=True):
+    def __init__(self, name, fee=0, usd_balance=500.0, btc_balance=15.0, persistent=True):
         self.name = name
         self.filename = "traderbot-sim-" + name + ".json"
         self.usd_balance = usd_balance
@@ -20,16 +19,14 @@ class MockMarket(object):
                 pass
 
     def buy(self, volume, price):
-        logging.info("[TraderBotSim] execute buy %f BTC @ %f on %s" %
-                     (volume, price, self.name))
+        logging.info("[TraderBotSim] execute buy %f BTC @ %f on %s" % (volume, price, self.name))
         self.usd_balance -= price * volume
         self.btc_balance += volume - volume * self.fee
         if self.persistent:
             self.save()
 
     def sell(self, volume, price):
-        logging.info("[TraderBotSim] execute sell %f BTC @ %f on %s" %
-                     (volume, price, self.name))
+        logging.info("[TraderBotSim] execute sell %f BTC @ %f on %s" % (volume, price, self.name))
         self.btc_balance -= volume
         self.usd_balance += price * volume - price * volume * self.fee
         if self.persistent:
@@ -41,7 +38,7 @@ class MockMarket(object):
         self.btc_balance = data["btc"]
 
     def save(self):
-        data = {'usd': self.usd_balance, 'btc': self.btc_balance}
+        data = {"usd": self.usd_balance, "btc": self.btc_balance}
         json.dump(data, open(self.filename, "w"))
 
     def balance_total(self, price):
@@ -62,8 +59,7 @@ class TraderBotSim(TraderBot):
         self.last_trade = 0
 
     def total_balance(self, price):
-        market_balances = [i.balance_total(
-            price) for i in set(self.clients.values())]
+        market_balances = [i.balance_total(price) for i in set(self.clients.values())]
         return sum(market_balances)
 
     def total_usd_balance(self):
@@ -72,11 +68,12 @@ class TraderBotSim(TraderBot):
     def total_btc_balance(self):
         return sum([i.btc_balance for i in set(self.clients.values())])
 
-    def execute_trade(self, volume, kask, kbid,
-                      weighted_buyprice, weighted_sellprice,
-                      buyprice, sellprice):
+    def execute_trade(
+        self, volume, kask, kbid, weighted_buyprice, weighted_sellprice, buyprice, sellprice
+    ):
         self.clients[kask].buy(volume, buyprice)
         self.clients[kbid].sell(volume, sellprice)
+
 
 if __name__ == "__main__":
     t = TraderBotSim()

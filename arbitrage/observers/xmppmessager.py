@@ -21,20 +21,33 @@ class MyXMPPClient(ClientXMPP):
         self.get_roster()
 
     def msend_message(self, message):
-        logging.debug('Sending XMPP message: "%s" to %s' % (message,
-                                                            config.xmpp_to))
-        self.send_message(mto=config.xmpp_to, mbody=message, mtype='chat')
+        logging.debug('Sending XMPP message: "%s" to %s' % (message, config.xmpp_to))
+        self.send_message(mto=config.xmpp_to, mbody=message, mtype="chat")
 
     def message(self, msg):
         # TODO: Use this to control / re-config
         pass  # msg.reply("%(body)s" % msg).send()
 
+
 class XmppMessager(Observer):
     def __init__(self):
         self.xmppclient = MyXMPPClient()
 
-    def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
-                    weighted_buyprice, weighted_sellprice):
+    def opportunity(
+        self,
+        profit,
+        volume,
+        buyprice,
+        kask,
+        sellprice,
+        kbid,
+        perc,
+        weighted_buyprice,
+        weighted_sellprice,
+    ):
         if profit > config.profit_thresh and perc > config.perc_thresh:
-            message = "profit: %f USD with volume: %f BTC - buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%" % (profit, volume, buyprice, kask, sellprice, kbid, perc)
+            message = (
+                "profit: %f USD with volume: %f BTC - buy at %.4f (%s) sell at %.4f (%s) ~%.2f%%"
+                % (profit, volume, buyprice, kask, sellprice, kbid, perc)
+            )
             self.xmppclient.msend_message(message)
