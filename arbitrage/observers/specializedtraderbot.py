@@ -1,23 +1,23 @@
 import logging
-import config
 import time
 from arbitrage.observers.observer import Observer
-from private_markets import mtgox
-from private_markets import paymium
+from arbitrage.private_markets import bitstampusd
+from arbitrage.private_markets import paymium
 from arbitrage.observers.emailer import send_email
+from arbitrage import config
 
 
 class SpecializedTraderBot(Observer):
     def __init__(self):
-        self.mtgox = mtgox.PrivateMtGox()
+        self.bitstamp = bitstampusd.PrivateBitstampUSD()
         self.btcentral = paymium.PrivatePaymium()
         self.clients = {
-            "MtGoxEUR": self.mtgox,
+            "BitStampUSD": self.bitstamp,
             "PaymiumEUR": self.btcentral,
         }
         self.profit_percentage_thresholds = {  # Graph
-            "MtGoxEUR": {"PaymiumEUR": 3.5},
-            "PaymiumEUR": {"MtGoxEUR": 1},
+            "BitStampUSD": {"PaymiumEUR": 3.5},
+            "PaymiumEUR": {"BitStampUSD": 1},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0

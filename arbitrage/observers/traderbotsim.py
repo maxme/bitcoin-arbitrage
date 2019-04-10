@@ -2,7 +2,6 @@ import logging
 import json
 from arbitrage.observers.traderbot import TraderBot
 
-
 class MockMarket(object):
     def __init__(self, name, fee=0, usd_balance=500., btc_balance=15.,
                  persistent=True):
