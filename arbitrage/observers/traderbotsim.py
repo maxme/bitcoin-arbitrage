@@ -1,6 +1,8 @@
 import logging
 import json
 from arbitrage.observers.traderbot import TraderBot
+from arbitrage import config
+
 
 class MockMarket(object):
     def __init__(self, name, fee=0, usd_balance=500., btc_balance=15.,
@@ -18,7 +20,7 @@ class MockMarket(object):
                 pass
 
     def buy(self, volume, price):
-        logging.info("execute buy %f BTC @ %f on %s" %
+        logging.info("[TraderBotSim] execute buy %f BTC @ %f on %s" %
                      (volume, price, self.name))
         self.usd_balance -= price * volume
         self.btc_balance += volume - volume * self.fee
@@ -26,7 +28,7 @@ class MockMarket(object):
             self.save()
 
     def sell(self, volume, price):
-        logging.info("execute sell %f BTC @ %f on %s" %
+        logging.info("[TraderBotSim] execute sell %f BTC @ %f on %s" %
                      (volume, price, self.name))
         self.btc_balance -= volume
         self.usd_balance += price * volume - price * volume * self.fee
@@ -51,20 +53,11 @@ class MockMarket(object):
 
 class TraderBotSim(TraderBot):
     def __init__(self):
-        self.kraken = MockMarket("kraken", 0.005, 5000) # 0.5% fee
-        self.paymium = MockMarket("paymium", 0.005, 5000) # 0.5% fee
-        self.bitstamp = MockMarket("bitstamp", 0.005, 5000) # 0.5% fee
-        self.btcc = MockMarket("btcc", 0.005, 5000) # 0.5% fee
-        self.okcoin = MockMarket("okcoin", 0.005, 5000) # 0.5% fee
-        self.clients = {
-            "KrakenEUR": self.kraken,
-            "PaymiumEUR": self.paymium,
-            "BitstampUSD": self.bitstamp,
-            "BTCCCNY": self.btcc,
-            "OKCoinCNY": self.okcoin,
-        }
+        self.clients = {}
+        for configured_market in config.markets:
+            self.clients[configured_market] = MockMarket(configured_market, 0.005, 10000)
         self.profit_thresh = 10  # in EUR
-        self.perc_thresh = 0.02  # in %
+        self.perc_thresh = 0.01  # in %
         self.trade_wait = 120
         self.last_trade = 0
 
