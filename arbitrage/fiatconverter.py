@@ -1,9 +1,7 @@
 # Copyright (C) 2013-2019, Maxime Biais <maxime@bia.is>
 
 import urllib.request
-import sys
 import xml.sax
-import logging
 import time
 
 

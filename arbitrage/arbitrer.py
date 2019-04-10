@@ -2,10 +2,9 @@
 
 import time
 import logging
+import os
 import json
 from concurrent.futures import ThreadPoolExecutor, wait
-from arbitrage import public_markets
-from arbitrage import observers
 from arbitrage import config
 
 
@@ -28,7 +27,7 @@ class Arbitrer(object):
                     "arbitrage.public_markets." + market_name.lower() + "." + market_name + "()"
                 )
                 self.markets.append(market)
-            except (ImportError, AttributeError) as e:
+            except (ImportError, AttributeError):
                 print(
                     "%s market name is invalid: Ignored (you should check your config file)"
                     % (market_name)
@@ -43,7 +42,7 @@ class Arbitrer(object):
                     "arbitrage.observers." + observer_name.lower() + "." + observer_name + "()"
                 )
                 self.observers.append(observer)
-            except (ImportError, AttributeError) as e:
+            except (ImportError, AttributeError):
                 print(
                     "%s observer name is invalid: Ignored (you should check your config file)"
                     % (observer_name)
@@ -167,10 +166,6 @@ class Arbitrer(object):
             logging.verbose("ticker: " + market.name + " - " + str(market.get_ticker()))
 
     def replay_history(self, directory):
-        import os
-        import json
-        import pprint
-
         files = os.listdir(directory)
         files.sort()
         for f in files:
