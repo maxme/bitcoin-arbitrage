@@ -7,12 +7,10 @@ Currently supported exchanges to get data:
 
 - Bitstamp (USD, EUR)
 - Paymium (EUR)
-- BTC-e (USD, EUR)
 - Bitfinex (USD, EUR)
 - bitFlyer (USD, EUR)
 - Kraken (USD, EUR)
 - OkCoin (CNY)
-- CampBX (USD)
 - Gemini (USD)
 - BTCC (CNY)
 - GDAX (USD, EUR)
