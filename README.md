@@ -22,7 +22,7 @@ Currently supported exchanges to get data:
 Currently supported exchanges to automate trade:
 
 - Bitstamp (USD)
-- Paymium (EUR) - (API changed)
+- Paymium (EUR)
 
 ## WARNING
 

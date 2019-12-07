@@ -13,12 +13,7 @@ class Binance(Market):
 
     def update_depth(self):
         url = "https://api.binance.com/api/v1/depth?symbol=%s" % self.code
-        req = urllib.request.Request(
-            url,
-            headers={
-                "Accept": "*/*",
-            },
-        )
+        req = urllib.request.Request(url, headers={"Accept": "*/*"})
         res = urllib.request.urlopen(req)
         depth = json.loads(res.read().decode("utf8"))
         self.depth = self.format_depth(depth)
