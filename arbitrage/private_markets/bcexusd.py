@@ -14,9 +14,9 @@ import sys
 import json
 from arbitrage import config
 from arbitrage.private_markets.market import Market, TradeException
-from core.exchange_interface import ExchangeInterface
-from core.websocket_client import Environment, Channel
-from core.orders import OrderSide
+from bcex.core.bcex_interface import BcexInterface
+from bcex.core.websocket_client import Environment, Channel
+from bcex.core.orders import OrderSide
 
 
 class PrivateBcexUSD(Market):
@@ -28,7 +28,7 @@ class PrivateBcexUSD(Market):
         super().__init__()
         self.api_secret = config.bcex_api_secret
         self.get_info()
-        self._client = ExchangeInterface(symbols=["BTC-USD"],env=Environment.PROD)
+        self._client = BcexInterface(symbols=["BTC-USD"],env=Environment.PROD)
         self._client.connect()
 
 
