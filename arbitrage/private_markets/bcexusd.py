@@ -1,21 +1,9 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 
-import time
-import base64
-import hmac
-import urllib.request
-import urllib.parse
-import urllib.error
-import urllib.request
-import urllib.error
-import urllib.parse
-import hashlib
-import sys
-import json
 from arbitrage import config
-from arbitrage.private_markets.market import Market, TradeException
+from arbitrage.private_markets.market import Market
 from bcex.core.bcex_interface import BcexInterface
-from bcex.core.websocket_client import Environment, Channel
+from bcex.core.websocket_client import Environment
 from bcex.core.orders import OrderSide
 
 
