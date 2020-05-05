@@ -3,6 +3,7 @@ import time
 from arbitrage.observers.observer import Observer
 from arbitrage.private_markets import bitstampusd
 from arbitrage.private_markets import paymium
+from arbitrage.private_markets import bcexusd
 from arbitrage.observers.emailer import send_email
 from arbitrage import config
 
@@ -11,10 +12,12 @@ class SpecializedTraderBot(Observer):
     def __init__(self):
         self.bitstamp = bitstampusd.PrivateBitstampUSD()
         self.btcentral = paymium.PrivatePaymium()
-        self.clients = {"BitStampUSD": self.bitstamp, "PaymiumEUR": self.btcentral}
+        self.bcex = bcexusd.PrivateBcexUSD()
+        self.clients = {"BitStampUSD": self.bitstamp, "PaymiumEUR": self.btcentral, "BcexUSD": self.bcex}
         self.profit_percentage_thresholds = {  # Graph
-            "BitStampUSD": {"PaymiumEUR": 3.5},
-            "PaymiumEUR": {"BitStampUSD": 1},
+            "BitStampUSD": {"PaymiumEUR": 3.5, "BcexUSD": 3},
+            "PaymiumEUR": {"BitStampUSD": 1, "BcexUSD": 3},
+            "BcexUSD": {"BitStampUSD": 3, "PaymiumEUR": 3},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0
