@@ -8,9 +8,6 @@ from bcex.core.orders import OrderSide
 
 
 class PrivateBcexUSD(Market):
-    balance_url = "https://www.bitstamp.net/api/balance/"
-    buy_url = "https://www.bitstamp.net/api/buy/"
-    sell_url = "https://www.bitstamp.net/api/sell/"
 
     def __init__(self):
         super().__init__()
