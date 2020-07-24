@@ -63,3 +63,34 @@ class Market(object):
 
     def sell(self, price, amount):
         pass
+
+    def _depth_pct(self,pct):
+        bid1 = float(self.depth['bids'][0]['price'])
+        ask1 = float(self.depth['asks'][0]['price'])
+        fair = bid1*0.5 + ask1*0.5
+        ceiling,floor = fair*(1+pct/100), fair*(1-pct/100)
+
+        bid_sum = 0
+        for bid in self.depth['bids']:
+            if float(bid['price'])>floor:
+                bid_sum += float(bid['amount'])
+            else:
+                break
+
+        ask_sum = 0
+        for ask in self.depth['asks']:
+            if float(ask['price'])<ceiling:
+                ask_sum += float(ask['amount'])
+            else:
+                break
+
+        def _f(v):
+            return int(v*100)/100
+
+        return 'pct depth [bid, ask]: [ %s, %s ]'%( _f(bid_sum), _f(ask_sum) )
+
+    def depth_1pct(self):
+        return self._depth_pct(1)
+    def depth_01pct(self):
+        return self._depth_pct(0.1)
+

@@ -21,8 +21,7 @@ class ArbitrerCLI:
 
     def exec_command(self, args):
         if "watch" in args.command:
-            self.create_arbitrer(args)
-            self.arbitrer.loop()
+            self.create_arbitrer(args).loop()
         if "replay-history" in args.command:
             self.create_arbitrer(args)
             self.arbitrer.replay_history(args.replay_history)
@@ -30,6 +29,32 @@ class ArbitrerCLI:
             self.get_balance(args)
         if "list-public-markets" in args.command:
             self.list_markets()
+        if "compare-depths" in args.command:
+            self.compare_depths(args)
+
+    def compare_depths(self, args):
+        if not args.exchanges:
+            logging.error("You must use --exchanges argument to specify exchanges")
+            sys.exit(2)
+        pexchanges = args.exchanges.split(",")
+        pexchangei = []
+        for pexchange in pexchanges:
+            exec("import arbitrage.public_markets._" + pexchange.lower())
+
+            # FIXME: Fix the following hard-coded USDT and btc_usdt
+            market = eval( 
+                "arbitrage.public_markets._" + pexchange.lower() + "." + pexchange + "('USDT','btc_usdt').update_depth().depth_1pct()"
+            )
+            pexchangei.append( ('1%', pexchange,market) )
+            market = eval(
+                "arbitrage.public_markets._" + pexchange.lower() + "." + pexchange + "('USDT','btc_usdt').update_depth().depth_01pct()"
+            )
+            pexchangei.append( ('0.1%', pexchange,market) )
+
+        for market in pexchangei:
+            print(market)
+        
+        sys.exit(0)
 
     def list_markets(self):
         markets = []
@@ -67,6 +92,7 @@ class ArbitrerCLI:
             self.arbitrer.init_observers(args.observers.split(","))
         if args.markets:
             self.arbitrer.init_markets(args.markets.split(","))
+        return self.arbitrer
 
     def init_logger(self, args):
         level = logging.INFO
@@ -87,10 +113,13 @@ class ArbitrerCLI:
             "-m", "--markets", type=str, help="markets, example: -m BitstampEUR,KrakenEUR"
         )
         parser.add_argument(
+            "-e", "--exchanges", type=str, help="exchanges, example: -e OKCoin"
+        )
+        parser.add_argument(
             "command",
             nargs="*",
             default="watch",
-            help='verb: "watch|replay-history|get-balance|list-public-markets"',
+            help='verb: "watch|replay-history|get-balance|list-public-markets|compare-depths"',
         )
         args = parser.parse_args()
         self.init_logger(args)

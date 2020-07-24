@@ -12,7 +12,7 @@ class Binance(Market):
         self.update_rate = 30
 
     def update_depth(self):
-        url = "https://api.binance.com/api/v1/depth?symbol=%s" % self.code
+        url = "https://api.binance.com/api/v1/depth?symbol=%s" % self.code.replace('_','').upper()
         req = urllib.request.Request(
             url,
             headers={
@@ -22,6 +22,7 @@ class Binance(Market):
         res = urllib.request.urlopen(req)
         depth = json.loads(res.read().decode("utf8"))
         self.depth = self.format_depth(depth)
+        return self
 
     def sort_and_format(self, l, reverse=False):
         l.sort(key=lambda x: float(x[0]), reverse=reverse)

@@ -75,6 +75,10 @@ Run tests
 ```sh
 nosetests arbitrage/
 ```
+or
+```sh
+python3 -m nose arbitrage/
+```
 
 ### Alternative usage
 
@@ -88,6 +92,12 @@ Help:
 
 ```sh
 python3 -m arbitrage -h
+```
+
+Compare depth difference among exchanges:
+
+```sh
+python3 -m arbitrage compare-depths --exchanges=OKCoin,Huobipro,Binance,WBFEx
 ```
 
 ## TODO
