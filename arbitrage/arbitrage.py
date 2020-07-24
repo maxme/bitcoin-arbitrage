@@ -31,6 +31,10 @@ class ArbitrerCLI:
             self.list_markets()
         if "compare-depths" in args.command:
             self.compare_depths(args)
+      
+        if "generate-config" in args.command:
+            self.generate_sample_config()
+
 
     def compare_depths(self, args):
         if not args.exchanges:
@@ -56,7 +60,7 @@ class ArbitrerCLI:
         
         sys.exit(0)
 
-    def list_markets(self):
+    def get_market_list(self):
         markets = []
         for filename in glob.glob(os.path.join(public_markets.__path__[0], "*.py")):
             module_name = os.path.basename(filename).replace(".py", "")
@@ -67,8 +71,31 @@ class ArbitrerCLI:
                     if inspect.isclass(obj) and "Market" in (j.__name__ for j in obj.mro()[1:]):
                         if not obj.__module__.split(".")[-1].startswith("_"):
                             markets.append(obj.__name__)
+        return markets
+
+    def list_markets(self):
+        markets = self.get_market_list()
         markets.sort()
         print("\n".join(markets))
+        sys.exit(0)
+
+    def generate_sample_config(self):
+        markets = self.get_market_list()
+        markets.sort()
+        print("markets = [")
+        print('",\n'.join(['  "' + i for i in markets]) + '"')
+        print("]")
+        print('observers = ["Logger"]')
+        print("""
+refresh_rate = 60
+market_expiration_time = 120  # in seconds: 2 minutes
+
+# SafeGuards
+max_tx_volume = 1  # in BTC
+min_tx_volume = 0.01  # in BTC
+balance_margin = 0.05  # 5%
+profit_thresh = 0  # in USD
+perc_thresh = 0  # in %""")
         sys.exit(0)
 
     def get_balance(self, args):

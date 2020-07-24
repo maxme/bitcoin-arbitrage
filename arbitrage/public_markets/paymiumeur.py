@@ -13,7 +13,16 @@ class PaymiumEUR(Market):
         self.update_rate = 24 * 60 * 60 / 2500
 
     def update_depth(self):
-        res = urllib.request.urlopen("https://paymium.com/api/data/eur/depth")
+        url = "https://paymium.com/api/data/eur/depth"
+        req = urllib.request.Request(
+            url,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "*/*",
+                "User-Agent": "curl/7.24.0 (x86_64-apple-darwin12.0)",
+            },
+        )
+        res = urllib.request.urlopen(req)
         depth = json.loads(res.read().decode("utf8"))
         self.depth = self.format_depth(depth)
 
