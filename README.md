@@ -24,8 +24,12 @@ Currently supported exchanges to automate trade:
 
 ## WARNING
 
-**Real trading bots are included. Don't put your API keys in config.py
-if you don't know what you are doing.**
+ - Real trading bots are included. Don't put your API keys in config.py
+if you don't know what you are doing.
+
+ - Note that all prices are converted to USD immediately after retrieving
+information from the exchanges you have configured. Rates come from official
+[European Central Bank, Euro foreign exchange reference rates](https://www.ecb.europa.eu/stats/eurofxref/).
 
 ## Installation And Configuration
 
